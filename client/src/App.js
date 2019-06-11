@@ -5,7 +5,7 @@ import './App.scss';
 import 'semantic-ui-css/semantic.min.css';
 import Main from './components/Main';
 import TopBar from './components/TopBar';
-import Things from './components/Things'
+import Things from './components/things/Things'
 import Channels from './components/Channels'
 import Connections from './components/Connections'
 import Notfound from './components/NotFound'
