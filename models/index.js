@@ -1,14 +1,13 @@
 import mongoose from 'mongoose';
-
-import User from './User';
-import Thing from './Thing';
+require('dotenv').config();
 
 const connectDb = () => {
-  return mongoose.connect("mongodb://localhost:27017/mainflux_admin");
+  return mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true });
 };
 
-const models = { User, Thing };
+mongoose.Promise = global.Promise;
+var db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 export { connectDb };
-
-export default models;

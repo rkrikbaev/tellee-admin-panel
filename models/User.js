@@ -1,28 +1,32 @@
 import mongoose from 'mongoose';
-
+import timestamp from 'mongoose-timestamp';
 
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
     unique: true,
+    required: true,
+    trim: true,
   },
+  email: {
+    type: String,
+    unique: true,
+    required: true,
+    trim: true,
+  },
+  password: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  mainflux_pwd: {
+    type: Number,
+    required: true,
+    trim: true,
+  }
 });
 
-userSchema.statics.findByLogin = async function (login) {
-  let user = await this.findOne({
-    username: login,
-  });
-
-  if(!user) {
-    user = await this.findOne({ email: login });
-  }
-
-  return user;
-}
-
-userSchema.pre('remove', function(next) {
-  this.model('Thing').deleteMany({ user: this._id }, next);
-})
+userSchema.plugin(timestamp);
 
 const User = mongoose.model('User', userSchema);
 

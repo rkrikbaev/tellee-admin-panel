@@ -22,7 +22,7 @@ class TopBar extends Component {
     return (
       <Segment clearing id='top_menu' >
         <Header className='topbar_left' floated='left'>
-          <img className="top_logo" alt="Zeinetsse" src="ZeinetSSE.png" />
+          <img className="top_logo" alt="Zeinetsse" src="/ZeinetSSE.png" />
         </Header>
         <Header className='topbar_right' floated='right'>
         <Dropdown text='Choose action' className='top_dropdown__action'>

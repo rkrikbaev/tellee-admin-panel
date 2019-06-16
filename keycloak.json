@@ -1,0 +1,8 @@
+{
+  "realm": "zeinetsse",
+  "auth-server-url": "http://key.zeinetsse.com/auth",
+  "ssl-required": "none",
+  "resource": "mainflux_admin",
+  "public-client": true,
+  "confidential-port": 0
+}

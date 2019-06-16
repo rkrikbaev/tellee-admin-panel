@@ -6,20 +6,20 @@ import 'semantic-ui-css/semantic.min.css';
 import Main from './components/Main';
 import TopBar from './components/TopBar';
 import Things from './components/things/Things'
-import Channels from './components/Channels'
-import Connections from './components/Connections'
+import Channels from './components/channels/Channels'
+import Connections from './components/bootstrap/Bootstrap'
 import Notfound from './components/NotFound'
 
 class App extends Component {
 
   state = {
-    activeItem: 'main',
+    // activeItem: 'main',
   };
 
   handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
   render() {
-    const { activeItem } = this.state
+    // const { activeItem } = this.state
 
     return (
       <div className="App">
