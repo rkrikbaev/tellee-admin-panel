@@ -11,6 +11,7 @@ import UserRouter from './api/user/userRouter';
 import ThingRouter from './api/thing/thingRouter';
 import ChannelRouter from './api/channel/channelRouter';
 import BootstrapRouter from './api/bootstrap/bootstrapRouter';
+import FirmwareRouter from './api/firmwareRouter';
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use('/api/users', UserRouter);
 app.use('/api/things', ThingRouter);
 app.use('/api/channels', ChannelRouter);
 app.use('/api/bootstrap', BootstrapRouter);
+app.use('/api/firmwares', FirmwareRouter);
 
 // Logout
 app.use( keycloak.middleware( { logout: '/'} ));

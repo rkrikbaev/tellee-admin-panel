@@ -7,7 +7,7 @@ import Main from './components/Main';
 import TopBar from './components/TopBar';
 import Things from './components/things/Things'
 import Channels from './components/channels/Channels'
-import Connections from './components/bootstrap/Bootstrap'
+import Bootstrap from './components/bootstrap/Bootstrap'
 import Notfound from './components/NotFound'
 
 class App extends Component {
@@ -31,14 +31,14 @@ class App extends Component {
                 <li><Link to="/">Home</Link></li>
                 <li><Link to="/things">Things</Link></li>
                 <li><Link to="/channels">Channels</Link></li>
-                <li><Link to="/connections">Connections</Link></li>
+                <li><Link to="/bootstrap">Bootstrap</Link></li>
               </ul>
             </Menu>
             <Switch>
               <Route exact path="/" component={Main} />
               <Route path="/things" component={Things} />
               <Route path="/channels" component={Channels} />
-              <Route path="/connections" component={Connections} />
+              <Route path="/bootstrap" component={Bootstrap} />
               <Route component={Notfound} />
             </Switch>
           </div>

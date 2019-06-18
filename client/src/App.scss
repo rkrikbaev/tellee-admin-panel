@@ -2,6 +2,11 @@ html, body {
   margin: 0;
   padding: 0;
   border: 0;
+  background-color: #efefef !important;
+}
+
+.App {
+  background-color: #efefef;
 }
 
 #top_menu {
@@ -38,3 +43,23 @@ html, body {
     }
   }
 }
+
+// -- GLOBAL STYLES --
+.middle.aligned.content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.extra {
+  width: auto !important;
+}
+
+.ui.items>.item>.content:after {
+  display: none !important;
+}
+
+.description {
+  margin-top: 0 !important;
+}
+// -- GLOBAL STYLES END --

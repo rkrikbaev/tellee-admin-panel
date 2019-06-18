@@ -3,10 +3,9 @@ import './Things.scss';
 import {
   Button,
   Item,
-  Header,
-  Modal,
-  Icon
 } from 'semantic-ui-react';
+import ThingModalRemove from './ThingModalRemove';
+import ThingModalEdit from './ThingModalEdit';
 
 class Things extends Component {
 
@@ -15,7 +14,10 @@ class Things extends Component {
 
     this.state = {
       things: [],
-      open: false,
+      showModalEdit: false,
+      showModalRemove: false,
+      removingThing: {},
+      edittingThing: {}
     }
   }
 
@@ -41,19 +43,17 @@ class Things extends Component {
       });
   };
 
-  removeThing = async (id, event) => {
-    console.log(event)
-    fetch(`/api/things/remove/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-    this.close();
-  }
+  removeModalCallback = (showModalRemove, id) => {
+    this.setState({ showModalRemove });
+    if(id) {
+      this.setState({ things: this.state.things.filter( i => i.id !== id )
+      });
+    };
+  };
 
-  show = dimmer => () => this.setState({ dimmer, open: false })
-  close = () => this.setState({ open: false })
+  editModalCallback = (showModalEdit) => {
+    this.setState({ showModalEdit });
+  };
 
   componentDidMount() {
     this.getToken();
@@ -62,7 +62,7 @@ class Things extends Component {
 
   render() {
 
-    const { open, dimmer } = this.state
+    const { showModalEdit, showModalRemove, removingThing, edittingThing } = this.state
 
     return (
       <div id="things">
@@ -76,36 +76,21 @@ class Things extends Component {
                 <Item.Header>{thing.name}</Item.Header>
                 <Item.Description>{thing.id}</Item.Description>
                 <Item.Extra>
-                  <Modal trigger={
-                    <Button
-                      color="red"
-                      floated='right'
-                      icon='trash alternate outline'
-                      labelPosition='right'
-                      content="Remove"
-                      onClick={() => this.setState({ open: true })}
-                    />} basic size='small' open={open}>
-                    <Header icon='archive' content='REMOVE THING?' />
-                    <Modal.Content>
-                      <p>
-                        Do you want to remove thing: {thing.id}
-                      </p>
-                    </Modal.Content>
-                    <Modal.Actions>
-                      <Button basic color='green' inverted onClick={this.close}>
-                        <Icon name='remove' /> No
-                      </Button>
-                      <Button color='red' inverted onClick={(event) => {this.removeThing(thing.id, event)} }>
-                        <Icon name='checkmark' /> Yes
-                      </Button>
-                    </Modal.Actions>
-                  </Modal>
+                  <Button
+                    color="red"
+                    floated='right'
+                    icon='trash alternate outline'
+                    labelPosition='right'
+                    content="Remove"
+                    onClick={() => this.setState({ showModalRemove: true, removingThing: thing })}
+                  />
                   <Button
                     color="yellow"
                     floated='right'
                     icon='edit outline'
                     labelPosition='right'
                     content="Edit"
+                    onClick={() => this.setState({ showModalEdit: true, edittingThing: thing })}
                   />
                 </Item.Extra>
               </Item.Content>
@@ -113,27 +98,16 @@ class Things extends Component {
             </Item>
           )}
         </Item.Group>
-
-        {/* <Modal dimmer={dimmer} open={open} onClose={this.close}>
-          <Modal.Header>REMOVE THING</Modal.Header>
-          <Modal.Content>
-            <Modal.Description>
-              <Header>Default Profile Image</Header>
-            </Modal.Description>
-          </Modal.Content>
-          <Modal.Actions>
-            <Button color='black' onClick={this.close}>
-              No
-            </Button>
-            <Button
-              positive
-              icon='trash alternate outline'
-              labelPosition='right'
-              content="Yes"
-              onClick={this.close}
-            />
-          </Modal.Actions>
-        </Modal> */}
+        <ThingModalRemove
+          showModalRemove={showModalRemove}
+          thing={removingThing}
+          callbackFromParent={this.removeModalCallback}
+        />
+        <ThingModalEdit
+          showModalEdit={showModalEdit}
+          thing={edittingThing}
+          callbackFromParent={this.editModalCallback}
+        />
       </div>
     );
   }

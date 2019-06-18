@@ -20,6 +20,7 @@ BootstrapRouter.route('/create').post( async (req, res, next) => {
       rejectUnauthorized: false,
     }),
   };
+  console.log(req.body)
 
   const pref_name = `zsse/${name}`;
 
@@ -27,11 +28,11 @@ BootstrapRouter.route('/create').post( async (req, res, next) => {
     "external_id": `${mac}`,
     "external_key": `${md5(mac.toLowerCase())}`,
     "thing_id": `${id}`,
-    "name": `${name}`,
+    "name": `${pref_name}`,
     "channels": typeof channels === "string"
       ? [channels]
       : channels,
-    "content": `"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(pref_name)}, "cycle": ${JSON.stringify(cycle)}`,
+    "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(pref_name)}, "cycle": ${JSON.stringify(cycle)}}`,
     "state": state
   };
 
@@ -118,7 +119,7 @@ BootstrapRouter.route('/edit/channels/:id').put( async (req, res, next) => {
   }
 
   const token = req.cookies.auth;
-  const { mac, id, channels, name, firmware, cycle, state } = req.body;
+  const { mac, id, channels, name, firmware, cycle, state } = req.body.obj;
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -129,7 +130,7 @@ BootstrapRouter.route('/edit/channels/:id').put( async (req, res, next) => {
     })
   };
 
-  const pref_name = `zsse/${name}`;
+  // const pref_name = `zsse/${name}`;
 
   const editedConfig = {
     "external_id": `${mac}`,
@@ -139,7 +140,7 @@ BootstrapRouter.route('/edit/channels/:id').put( async (req, res, next) => {
     "channels": typeof channels === "string"
       ? [channels]
       : channels,
-    "content": `"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(pref_name)}, "cycle": ${JSON.stringify(cycle)}`,
+    "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(name)}, "cycle": ${JSON.stringify(cycle)}}`,
     "state": state
   };
 
@@ -169,7 +170,7 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
   }
 
   const token = req.cookies.auth;
-  const { mac, id, channels, name, firmware, cycle, state } = req.body;
+  const { mac, id, channels, name, firmware, cycle, state } = req.body.obj;
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -183,14 +184,14 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
   const pref_name = `zsse/${name}`;
 
   const editedConfig = {
-    "external_id": `${mac}`,
+    "mainflux_id": `${mac}`,
     "external_key": `${md5(mac.toLowerCase())}`,
     "thing_id": `${id}`,
     "name": `${name}`,
     "channels": typeof channels === "string"
       ? [channels]
       : channels,
-    "content": `"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(pref_name)}, "cycle": ${JSON.stringify(cycle)}`,
+    "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(name)}, "cycle": ${JSON.stringify(cycle)}}`,
     "state": state
   };
 
@@ -220,7 +221,7 @@ BootstrapRouter.route('/edit/state/:id').put( async (req, res, next) => {
   }
 
   const token = req.cookies.auth;
-  const { mac, id, channels, name, firmware, cycle, state } = req.body;
+  const { mac, id, channels, name, firmware, cycle, state } = req.body.obj;
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -241,7 +242,7 @@ BootstrapRouter.route('/edit/state/:id').put( async (req, res, next) => {
     "channels": typeof channels === "string"
       ? [channels]
       : channels,
-    "content": `"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(pref_name)}, "cycle": ${JSON.stringify(cycle)}`,
+    "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(name)}, "cycle": ${JSON.stringify(cycle)}}`,
     "state": state
   };
 
@@ -261,7 +262,7 @@ BootstrapRouter.route('/edit/state/:id').put( async (req, res, next) => {
 
 });
 
-// -- Edit config's state by it's mainflux_id in Bootstrap (name, content***) --
+// -- Delete config by it's mainflux_id in Bootstrap (name, content***) --
 BootstrapRouter.route('/remove/:id').delete( async (req, res, next) => {
 
   // Chech for JSON
