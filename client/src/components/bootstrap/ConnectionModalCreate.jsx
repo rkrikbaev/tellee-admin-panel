@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Bootstrap.scss';
+import './Connections.scss';
 import {
   Button,
   Form,
@@ -14,9 +14,12 @@ class ConnectionModalCreate extends Component {
 
     this.state = {
       showModalCreate: false,
+      showModalError: false,
+      errorText: '',
       things: [],
       channels: [],
       firmwares: [],
+      models: [],
       thingsDropdown: [],
       config: {
         mac: '',
@@ -24,35 +27,88 @@ class ConnectionModalCreate extends Component {
         channels: [],
         name: '',
         firmware: '',
-        cycle: ''
-      }
+        cycle: '',
+        model: '',
+      },
+      isEnabled: true
     }
   }
 
-  createConnection = async name => {
-    fetch('/api/bootstrap/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(this.state.config)
-    });
+  createConnection = async () => {
+    const { id, channels } = this.state.config;
+
+    try {
+      let response = await fetch('/api/bootstrap/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this.state.config)
+      });
+
+      // If config in Bootstrap doesn't created, below script show's error
+      if( response.status !== 201 ) {
+        const errorText = `Error occured when creating connection with thing: ${id} to channels`
+        this.setState({ showModalError: true, errorText});
+        this.close();
+      } else {
+        // If config in Bootstrap created, below script connect's thing and channel(s) in Mainflux
+        for( let i = 0; i < channels.length; i++ ) {
+
+          let response = await fetch(
+            `/api/connection/create/channels/${channels[i]}/things/${id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+
+          // If connection between thing and channel(s) in Mainflux doesn't created, below script show's error
+          if( response.status !== 200 ) {
+            const errorText = `Error occured when connecting thing: ${id} to channel: ${channels[i]}`
+            this.setState({ showModalError: true, errorText});
+            this.close();
+            break;
+          }
+
+        };
+      };
+    } catch(err) {
+      return err;
+    }
     this.close();
   };
 
   close = () => {
+    const { showModalCreate, showModalError, errorText } = this.state;
     this.setState({ showModalCreate: false });
-    this.props.callbackFromParent(this.state.showModalCreate);
+    this.props.callbackFromParent(showModalCreate, showModalError, errorText);
   };
 
+  closeError = () => {
+    this.setState({ showModalError: false, errorText: '' });
+  }
+
   getFirmwares = async () => {
-    fetch('/api/firmwares')
+    fetch('/api/other/firmwares')
       .then( res => res.json())
       .then( firmwares => {
         const firm = firmwares.map( item => {
           return { text: item, value: item}
         });
         this.setState({ firmwares: firm });
+      })
+      .catch( err => console.log(err) );
+  };
+
+  getModels = async () => {
+    fetch('/api/other/models')
+      .then( res => res.json())
+      .then( models => {
+        const mod = models.map( item => {
+          return { text: item, value: item}
+        });
+        this.setState({ models: mod });
       })
       .catch( err => console.log(err) );
   };
@@ -84,6 +140,7 @@ class ConnectionModalCreate extends Component {
   componentDidMount() {
     this.getFirmwares();
     this.getChannels();
+    this.getModels();
     this.getThings();
   }
 
@@ -104,6 +161,7 @@ class ConnectionModalCreate extends Component {
         ...prevState.config,
         cycle: str,
       },
+      isEnabled: prevState.config.cycle.length <= 4 && /^\d+$/.test(prevState.config.cycle)
     }));
   };
 
@@ -112,6 +170,15 @@ class ConnectionModalCreate extends Component {
       config: {
         ...prevState.config,
         firmware: value,
+      },
+    }));
+  };
+
+  handleChangeModel = (e, { value }) => {
+    this.setState( prevState => ({
+      config: {
+        ...prevState.config,
+        model: value,
       },
     }));
   };
@@ -140,7 +207,13 @@ class ConnectionModalCreate extends Component {
 
   render() {
     const { showModalCreate } = this.props;
-    const { thingsDropdown, channels, firmwares } = this.state;
+    const {
+      models,
+      channels,
+      firmwares,
+      thingsDropdown,
+      isEnabled,
+    } = this.state;
 
     return (
       <Modal closeIcon dimmer="blurring" open={showModalCreate} onClose={this.close}>
@@ -159,6 +232,16 @@ class ConnectionModalCreate extends Component {
                 selection
                 options={firmwares}
                 onChange={this.handleChangeFirmware}
+              />
+            </Form.Field>
+            <Form.Field>
+              <label>Model</label>
+              <Dropdown
+                placeholder='model'
+                fluid
+                selection
+                options={models}
+                onChange={this.handleChangeModel}
               />
             </Form.Field>
             <Form.Field>
@@ -184,7 +267,7 @@ class ConnectionModalCreate extends Component {
             </Form.Field>
             <Form.Field>
               <label>Cycle</label>
-              <input placeholder='cycle' onChange={e => this.handleChangeCycle(e)} />
+              <input placeholder='cycle' className={!isEnabled ? 'showError' : 'showSuccess'} onChange={e => this.handleChangeCycle(e)} />
             </Form.Field>
           </Form>
           </Modal.Content>
@@ -197,6 +280,7 @@ class ConnectionModalCreate extends Component {
               icon='edit outline'
               labelPosition='right'
               content="Yes"
+              disabled={!isEnabled}
               onClick={this.createConnection}
             />
           </Modal.Actions>

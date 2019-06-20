@@ -1,6 +1,6 @@
+#connections {
 
-#channels {
-  .channel_top {
+  .connection_top {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -11,10 +11,12 @@
       color: #ffffff;
     }
   }
+
   .ui.relaxed.items .item {
     width: 100%;
     border: 1px solid #6435c9;
     padding: 10px;
     border-radius: 5px;
   }
+
 }

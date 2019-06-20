@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Bootstrap.scss';
+import './Connections.scss';
 import {
   Button,
   Header,
@@ -19,6 +19,12 @@ class ConnectionModalRemove extends Component {
 
   removeConnection = async id => {
     fetch(`/api/bootstrap/remove/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    fetch(`/api/things/remove/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'

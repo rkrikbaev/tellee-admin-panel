@@ -5,9 +5,8 @@ import './App.scss';
 import 'semantic-ui-css/semantic.min.css';
 import Main from './components/Main';
 import TopBar from './components/TopBar';
-import Things from './components/things/Things'
+import Connections from './components/connections/Connections'
 import Channels from './components/channels/Channels'
-import Bootstrap from './components/bootstrap/Bootstrap'
 import Notfound from './components/NotFound'
 
 class App extends Component {
@@ -16,29 +15,27 @@ class App extends Component {
     // activeItem: 'main',
   };
 
-  handleItemClick = (e, { name }) => this.setState({ activeItem: name });
+  // handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
   render() {
-    // const { activeItem } = this.state
+    // const { activeItem } = this.state;
 
     return (
       <div className="App">
         <TopBar />
         <Router>
-          <div style={{display: 'flex'}}>
+          <div id="sidebar_wrapper">
             <Menu id="sidebar_menu" secondary vertical>
               <ul>
                 <li><Link to="/">Home</Link></li>
-                <li><Link to="/things">Things</Link></li>
                 <li><Link to="/channels">Channels</Link></li>
-                <li><Link to="/bootstrap">Bootstrap</Link></li>
+                <li><Link to="/connections">Connections</Link></li>
               </ul>
             </Menu>
             <Switch>
               <Route exact path="/" component={Main} />
-              <Route path="/things" component={Things} />
               <Route path="/channels" component={Channels} />
-              <Route path="/bootstrap" component={Bootstrap} />
+              <Route path="/connections" component={Connections} />
               <Route component={Notfound} />
             </Switch>
           </div>
@@ -49,12 +46,3 @@ class App extends Component {
 }
 
 export default App;
-
-// {/* <Dropdown item text='Bootstrap'>
-//   <Dropdown.Menu>
-//     <Dropdown.Header>Connection</Dropdown.Header>
-//     <Dropdown.Item>Create</Dropdown.Item>
-//     <Dropdown.Item>Show</Dropdown.Item>
-//     <Dropdown.Item>Remove</Dropdown.Item>
-//   </Dropdown.Menu>
-// </Dropdown> */}

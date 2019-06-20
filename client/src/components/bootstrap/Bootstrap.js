@@ -15,6 +15,7 @@ class Bootstrap extends Component {
     this.state = {
       connections: [],
       showModalRemove: false,
+      showModalEdit: false,
       removingConnection: {},
       edittingConnection: {},
     };

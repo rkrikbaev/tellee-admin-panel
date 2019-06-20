@@ -13,31 +13,38 @@ class ChannelModalCreate extends Component {
 
     this.state = {
       showModalCreate: false,
-      name: '',
-      metadata: {},
+      channel: {
+        name: '',
+        metadata: {},
+      },
     }
   }
 
   createChannel = async name => {
-    const { metadata } = this.state;
+    const { channel } = this.state;
     fetch('/api/channels/create', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({name, metadata})
+      body: JSON.stringify({channel})
     });
     this.close();
   };
 
-  show = () => this.setState({ showModalCreate: true });
   close = () => {
     this.setState({ showModalCreate: false });
     this.props.callbackFromParent(this.state.showModalCreate);
   };
 
-  handleChangeName = (e) => {
-    this.setState({ name: e.target.value });
+  handleChangeName = e => {
+    let str = e.target.value;
+    this.setState( prevState => ({
+      channel: {
+        ...prevState.channel,
+        name: str,
+      },
+    }));
   };
 
   render() {

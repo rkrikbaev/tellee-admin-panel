@@ -38,7 +38,7 @@ ChannelRouter.route('/create').post( async (req, res, next) => {
   }
 
   const token = req.cookies.auth;
-  const { name, metadata } = req.body;
+  const { name, metadata } = req.body.channel;
   const config = {
     headers: {
       'Content-Type': 'application/json',

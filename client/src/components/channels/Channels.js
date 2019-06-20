@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import './Channels.scss';
 import {
-  Button,
   Item,
+  Button,
+  Icon,
 } from 'semantic-ui-react';
+import ChannelModalCreate from './ChannelModalCreate';
 import ChannelModalRemove from './ChannelModalRemove';
 import ChannelModalEdit from './ChannelModalEdit';
 
@@ -14,10 +16,11 @@ class Channels extends Component {
 
     this.state = {
       channels: [],
+      edittingChannel: {},
+      removingChannel: {},
       showModalRemove: false,
       showModalEdit: false,
-      removingChannel: {},
-      edittingChannel: {}
+      showModalCreate: false,
     }
   }
 
@@ -40,12 +43,8 @@ class Channels extends Component {
       },
     })
       .then( res =>  res.json())
-      .then( channels => this.setState({channels}, () => {
-        console.log('fetched');
-      }))
-      .catch( err => {
-        console.log(err);
-      });
+      .then( channels => this.setState({channels}) )
+      .catch( err => console.log(err) );
   };
 
   removeModalCallback = (showModalRemove, id) => {
@@ -60,6 +59,11 @@ class Channels extends Component {
     this.setState({ showModalEdit });
   };
 
+  createChannelModalCallback = (showModalCreate) => {
+    this.setState({ showModalCreate });
+    this.getChannels();
+  };
+
   componentDidMount() {
     this.getToken();
     this.getChannels();
@@ -67,42 +71,65 @@ class Channels extends Component {
 
   render() {
 
-    const { channels, showModalRemove, showModalEdit, removingChannel, edittingChannel } = this.state;
+    const {
+      channels,
+      showModalEdit,
+      showModalCreate,
+      showModalRemove,
+      removingChannel,
+      edittingChannel,
+    } = this.state;
 
     return (
-      <div id="channels">
-        <h1>Channels</h1>
+      <div id="channels" className="main_wrapper">
+        <div className="channel_top">
+          <h1>Channels</h1>
+          <Button
+            icon
+            labelPosition='left'
+            onClick={() => this.setState({ showModalCreate: true })}
+          >
+            <Icon name='podcast' />
+            Create Channel
+          </Button>
+        </div>
         <hr />
         <Item.Group relaxed>
+          {
+            channels.length === 0
+            ? <p>
+                Unfortunately we did not find your channels.
+                <span role="img" aria-label="Sad">🙁</span>
+              </p>
+            : channels.map( item =>
+              <Item key={item.id}>
 
-          {channels.map( item =>
-            <Item key={item.id}>
+                <Item.Content verticalAlign='middle'>
+                  <Item.Header>{item.name}</Item.Header>
+                  <Item.Description>{item.id}</Item.Description>
+                  <Item.Extra>
+                    <Button
+                      color="red"
+                      floated='right'
+                      icon='trash alternate outline'
+                      labelPosition='right'
+                      content="Remove"
+                      onClick={() => this.setState({ showModalRemove: true, removingChannel: item })}
+                    />
+                    <Button
+                      color="yellow"
+                      floated='right'
+                      icon='edit outline'
+                      labelPosition='right'
+                      content="Edit"
+                      onClick={() => this.setState({ showModalEdit: true, edittingChannel: item })}
+                    />
+                  </Item.Extra>
+                </Item.Content>
 
-              <Item.Content verticalAlign='middle'>
-                <Item.Header>{item.name}</Item.Header>
-                <Item.Description>{item.id}</Item.Description>
-                <Item.Extra>
-                  <Button
-                    color="red"
-                    floated='right'
-                    icon='trash alternate outline'
-                    labelPosition='right'
-                    content="Remove"
-                    onClick={() => this.setState({ showModalRemove: true, removingChannel: item })}
-                  />
-                  <Button
-                    color="yellow"
-                    floated='right'
-                    icon='edit outline'
-                    labelPosition='right'
-                    content="Edit"
-                    onClick={() => this.setState({ showModalEdit: true, edittingChannel: item })}
-                  />
-                </Item.Extra>
-              </Item.Content>
-
-            </Item>
-          )}
+              </Item>
+            )
+          }
         </Item.Group>
         <ChannelModalRemove
           showModalRemove={showModalRemove}
@@ -113,6 +140,10 @@ class Channels extends Component {
           showModalEdit={showModalEdit}
           channel={edittingChannel}
           callbackFromParent={this.editModalCallback}
+        />
+        <ChannelModalCreate
+          showModalCreate={showModalCreate}
+          callbackFromParent={this.createChannelModalCallback}
         />
       </div>
     );

@@ -6,11 +6,11 @@ require('dotenv').config();
 
 const BootstrapRouter = express.Router();
 
-// -- Connect edge device to Channels --
-BootstrapRouter.route('/create').post( async (req, res, next) => {
+// -- Connect edge device to Channel (App ***) --
+BootstrapRouter.route('/create/app').post( async (req, res, next) => {
 
   const token = req.cookies.auth;
-  const { mac, id, channels, name, firmware, cycle, state } = req.body;
+  const { mac, id, channels, name } = req.body;
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -20,7 +20,6 @@ BootstrapRouter.route('/create').post( async (req, res, next) => {
       rejectUnauthorized: false,
     }),
   };
-  console.log(req.body)
 
   const pref_name = `zsse/${name}`;
 
@@ -32,9 +31,55 @@ BootstrapRouter.route('/create').post( async (req, res, next) => {
     "channels": typeof channels === "string"
       ? [channels]
       : channels,
-    "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(pref_name)}, "cycle": ${JSON.stringify(cycle)}}`,
-    "state": state
+    "content": `{"type":"app", "name": ${JSON.stringify(pref_name)}, "mac":${JSON.stringify(mac)},"hash":${JSON.stringify(md5(req.body))}, "models": []}`,
+    "state": 1,
   };
+
+  try {
+    axios.post(`http://${process.env.MAINFLUX_URL}:8200/things/configs`, JSON.stringify(newConnection), config)
+      .then( response => {
+        res.sendStatus(response.status);
+        next();
+      })
+      .catch( err => {
+        return next(err);
+      });
+  } catch(err) {
+    return next(err);
+  };
+
+});
+
+// -- Connect edge device to Channels (Device ***) --
+BootstrapRouter.route('/create/device').post( async (req, res, next) => {
+
+  const token = req.cookies.auth;
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token,
+    },
+    httpsAgent: new https.Agent({
+      rejectUnauthorized: false,
+    }),
+  };
+
+  const { mac, id, channels, name, firmware, cycle, sendToApp, model, app, } = req.body;
+  const pref_name = `zsse/${name}`;
+  const newConnection = {
+    "external_id": `${mac}`,
+    "external_key": `${md5(mac.toLowerCase())}`,
+    "thing_id": `${id}`,
+    "name": `${pref_name}`,
+    "channels": typeof channels === "string"
+      ? [channels]
+      : channels,
+    "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(pref_name)}, "cycle": ${JSON.stringify(cycle)}, "sendToApp": ${sendToApp}, "type": "device", "model":${JSON.stringify(model)}, "app":${JSON.stringify(app)}}`,
+    "state": 1
+  };
+
+  console.log(model, app)
+  console.log(newConnection);
 
   try {
     axios.post(`http://${process.env.MAINFLUX_URL}:8200/things/configs`, JSON.stringify(newConnection), config)
@@ -119,7 +164,7 @@ BootstrapRouter.route('/edit/channels/:id').put( async (req, res, next) => {
   }
 
   const token = req.cookies.auth;
-  const { mac, id, channels, name, firmware, cycle, state } = req.body.obj;
+
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -130,19 +175,37 @@ BootstrapRouter.route('/edit/channels/:id').put( async (req, res, next) => {
     })
   };
 
-  // const pref_name = `zsse/${name}`;
+  let editedConfig = {};
 
-  const editedConfig = {
-    "external_id": `${mac}`,
-    "external_key": `${md5(mac.toLowerCase())}`,
-    "thing_id": `${id}`,
-    "name": `${name}`,
-    "channels": typeof channels === "string"
-      ? [channels]
-      : channels,
-    "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(name)}, "cycle": ${JSON.stringify(cycle)}}`,
-    "state": state
-  };
+  if(req.body.obj.type === "app") {
+    const { mac, id, channels, name, type } = req.body.obj;
+
+    editedConfig = {
+      "external_id": `${mac}`,
+      "external_key": `${md5(mac.toLowerCase())}`,
+      "thing_id": `${id}`,
+      "name": `${name}`,
+      "channels": typeof channels === "string"
+        ? [channels]
+        : channels,
+      "content": `{"type": ${JSON.stringify(type)},"name": ${JSON.stringify(name)}, "mac": ${JSON.stringify(mac)}, "hash": ${JSON.stringify(md5(req.body.obj))},
+      }`,
+    };
+  } else if(req.body.obj.type === "device") {
+    const { mac, id, channels, name, firmware, cycle, state, model } = req.body.obj;
+
+    editedConfig = {
+      "external_id": `${mac}`,
+      "external_key": `${md5(mac.toLowerCase())}`,
+      "thing_id": `${id}`,
+      "name": `${name}`,
+      "channels": typeof channels === "string"
+        ? [channels]
+        : channels,
+      "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(name)}, "cycle": ${JSON.stringify(cycle)}, "model": ${JSON.stringify(model)}}`,
+      "state": state
+    };
+  }
 
   try {
     axios.put(`http://${process.env.MAINFLUX_URL}:8200/things/configs/connections/${req.params.id}`,
@@ -170,7 +233,6 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
   }
 
   const token = req.cookies.auth;
-  const { mac, id, channels, name, firmware, cycle, state } = req.body.obj;
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -180,20 +242,34 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
       rejectUnauthorized: false,
     })
   };
+  let editedConfig = {};
+  if(req.body.obj.type === "app") {
+    const { mac, id, channels, name, type } = req.body.obj;
 
-  const pref_name = `zsse/${name}`;
+    editedConfig = {
+      "external_id": `${mac}`,
+      "external_key": `${md5(mac.toLowerCase())}`,
+      "thing_id": `${id}`,
+      "name": `${name}`,
+      "channels": typeof channels === "string"
+        ? [channels]
+        : channels,
+      "content": `{"type": ${JSON.stringify(type)},"name": ${JSON.stringify(name)}, "mac": ${JSON.stringify(mac)}, "hash": ${JSON.stringify(md5(req.body.obj))}}`,
+    };
+  } else if(req.body.obj.type === "device") {
+    const { mac, id, channels, name, firmware, cycle, state, model } = req.body.obj;
 
-  const editedConfig = {
-    "mainflux_id": `${mac}`,
-    "external_key": `${md5(mac.toLowerCase())}`,
-    "thing_id": `${id}`,
-    "name": `${name}`,
-    "channels": typeof channels === "string"
-      ? [channels]
-      : channels,
-    "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(name)}, "cycle": ${JSON.stringify(cycle)}}`,
-    "state": state
-  };
+    editedConfig = {
+      "external_id": `${mac}`,
+      "external_key": `${md5(mac.toLowerCase())}`,
+      "thing_id": `${id}`,
+      "name": `${name}`,
+      "channels": typeof channels === "string"
+        ? [channels]
+        : channels,
+      "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(name)}, "cycle": ${JSON.stringify(cycle)}, "model": ${JSON.stringify(model)}}`,
+    };
+  }
 
   try {
     axios.put(`http://${process.env.MAINFLUX_URL}:8200/things/configs/${req.params.id}`,
@@ -221,7 +297,7 @@ BootstrapRouter.route('/edit/state/:id').put( async (req, res, next) => {
   }
 
   const token = req.cookies.auth;
-  const { mac, id, channels, name, firmware, cycle, state } = req.body.obj;
+  const { mac, id, channels, name, firmware, cycle, state, model } = req.body.obj;
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -232,8 +308,6 @@ BootstrapRouter.route('/edit/state/:id').put( async (req, res, next) => {
     })
   };
 
-  const pref_name = `zsse/${name}`;
-
   const editedConfig = {
     "external_id": `${mac}`,
     "external_key": `${md5(mac.toLowerCase())}`,
@@ -242,7 +316,7 @@ BootstrapRouter.route('/edit/state/:id').put( async (req, res, next) => {
     "channels": typeof channels === "string"
       ? [channels]
       : channels,
-    "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(name)}, "cycle": ${JSON.stringify(cycle)}}`,
+    "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(name)}, "cycle": ${JSON.stringify(cycle)}, "model": ${JSON.stringify(model)}}`,
     "state": state
   };
 

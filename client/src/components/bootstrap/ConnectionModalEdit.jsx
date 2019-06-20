@@ -6,7 +6,6 @@ import {
   Modal,
   Dropdown
 } from 'semantic-ui-react';
-require('dotenv').config();
 
 class ConnectionModalEdit extends Component {
 
@@ -17,9 +16,12 @@ class ConnectionModalEdit extends Component {
       showModalEdit: false,
       firmwares: [],
       channels: [],
+      models: [],
       config: {},
       selectedFirmware: '',
+      selectedModel: '',
       selectedChannels: [],
+      isEnabled: true
     };
   }
 
@@ -32,15 +34,29 @@ class ConnectionModalEdit extends Component {
     })
       .then( res =>  res.json())
       .then( config => {
+        const { firmwares, models } = this.state;
+        const selectedChannels = [];
+
         config.content = JSON.parse(config.content);
-        const selectedFirmware = this.state.firmwares.filter( item => {
+
+        const selectedFirmware = firmwares.filter( item => {
           return item.text === config.content.firmware;
         });
-        const selectedChannels = [];
+
+        const selectedModel = models.filter( item => {
+          return item.text === config.content.model;
+        });
+
         for (let i = 0; i < config.mainflux_channels.length; i++) {
           selectedChannels.push(config.mainflux_channels[i].id);
         }
-        this.setState({ config, selectedFirmware, selectedChannels });
+
+        this.setState({
+          selectedFirmware,
+          selectedModel,
+          selectedChannels,
+          config
+        });
       })
       .catch( err => console.log(err) );
   };
@@ -86,7 +102,7 @@ class ConnectionModalEdit extends Component {
   };
 
   getFirmwares = async () => {
-    fetch('/api/firmwares', {
+    fetch('/api/other/firmwares', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -98,6 +114,23 @@ class ConnectionModalEdit extends Component {
           return { text: item, value: item}
         });
         this.setState({ firmwares: firm });
+      })
+      .catch( err => console.log(err) );
+  };
+
+  getModels = async () => {
+    fetch('/api/other/models', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+      .then( res => res.json())
+      .then( models => {
+        const mod = models.map( item => {
+          return { text: item, value: item}
+        });
+        this.setState({ models: mod });
       })
       .catch( err => console.log(err) );
   };
@@ -122,6 +155,7 @@ class ConnectionModalEdit extends Component {
   componentDidMount() {
     this.getFirmwares();
     this.getChannels();
+    this.getModels();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -147,10 +181,16 @@ class ConnectionModalEdit extends Component {
     this.setState({ config: obj });
   };
 
+  handleChangeModel = (e, { value }) => {
+    const obj = this.state.config;
+    obj.content.model = value;
+    this.setState({ config: obj });
+  };
+
   handleChangeCycle = (e) => {
     let obj = this.state.config;
     obj.content.cycle = e.target.value;
-    this.setState({ config: obj });
+    this.setState({ config: obj, isEnabled: obj.content.cycle.length <= 5 && /^\d+$/.test(obj.content.cycle) });
   };
 
   handleChangeChannel = (e, { value }) => {
@@ -161,10 +201,18 @@ class ConnectionModalEdit extends Component {
 
   render() {
     const { showModalEdit, connection } = this.props;
-    const { firmwares, channels, config, selectedFirmware, selectedChannels } = this.state;
+    const {
+      firmwares,
+      channels,
+      models,
+      config,
+      selectedFirmware,
+      selectedChannels,
+      selectedModel,
+      isEnabled
+    } = this.state;
 
-    console.log(this.state);
-
+    // console.log(this.state);
     return (
       <Modal closeIcon dimmer="blurring" open={showModalEdit} onClose={this.close}>
         <Modal.Header>EDIT CONNECTION</Modal.Header>
@@ -185,16 +233,19 @@ class ConnectionModalEdit extends Component {
                 fluid
                 selection
                 options={firmwares}
-                defaultValue={`${selectedFirmware}`}
+                defaultValue={selectedFirmware[0] !== undefined ? selectedFirmware[0].value : ''}
                 onChange={this.handleChangeFirmware}
               />
             </Form.Field>
             <Form.Field>
-              <label>Cycle (per/sec)</label>
-              <input
-                placeholder='cycle'
-                value={config.content !== undefined ? config.content.cycle : ''}
-                onChange={e => this.handleChangeCycle(e)}
+              <label>Model</label>
+              <Dropdown
+                placeholder='model'
+                fluid
+                selection
+                options={models}
+                defaultValue={selectedModel[0] !== undefined ? selectedModel[0].value : ''}
+                onChange={this.handleChangeModel}
               />
             </Form.Field>
             <Form.Field>
@@ -209,6 +260,14 @@ class ConnectionModalEdit extends Component {
                 onChange={this.handleChangeChannel}
               />
             </Form.Field>
+            <Form.Field>
+              <label>Cycle (per/sec)</label>
+              <input
+                placeholder='cycle'
+                value={config.content !== undefined ? config.content.cycle : ''}
+                onChange={e => this.handleChangeCycle(e)}
+              />
+            </Form.Field>
           </Form>
           </Modal.Content>
           <Modal.Actions>
@@ -220,6 +279,7 @@ class ConnectionModalEdit extends Component {
               icon='edit outline'
               labelPosition='right'
               content="Yes"
+              disabled={!isEnabled}
               onClick={() => this.editConnection(connection)}
             />
           </Modal.Actions>
