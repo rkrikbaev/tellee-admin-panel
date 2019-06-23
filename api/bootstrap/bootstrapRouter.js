@@ -66,17 +66,33 @@ BootstrapRouter.route('/create/device').post( async (req, res, next) => {
 
   const { mac, id, channels, name, firmware, cycle, sendToApp, model, app, } = req.body;
   const pref_name = `zsse/${name}`;
-  const newConnection = {
-    "external_id": `${mac}`,
-    "external_key": `${md5(mac.toLowerCase())}`,
-    "thing_id": `${id}`,
-    "name": `${pref_name}`,
-    "channels": typeof channels === "string"
-      ? [channels]
-      : channels,
-    "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(pref_name)}, "cycle": ${JSON.stringify(cycle)}, "sendToApp": ${sendToApp}, "type": "device", "model":${JSON.stringify(model)}, "app":${JSON.stringify(app)}}`,
-    "state": 1
-  };
+  let newConnection = {};
+
+  if(!sendToApp) {
+    newConnection = {
+      "external_id": `${mac}`,
+      "external_key": `${md5(mac.toLowerCase())}`,
+      "thing_id": `${id}`,
+      "name": `${pref_name}`,
+      "channels": typeof channels === "string"
+        ? [channels]
+        : channels,
+      "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(pref_name)}, "cycle": ${JSON.stringify(cycle)}, "sendToApp": ${sendToApp}, "type": "device"}`,
+      "state": 1
+    };
+  } else {
+    newConnection = {
+      "external_id": `${mac}`,
+      "external_key": `${md5(mac.toLowerCase())}`,
+      "thing_id": `${id}`,
+      "name": `${pref_name}`,
+      "channels": typeof channels === "string"
+        ? [channels]
+        : channels,
+      "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(pref_name)}, "cycle": ${JSON.stringify(cycle)}, "sendToApp": ${sendToApp}, "type": "device", "model":${JSON.stringify(model)}, "app":${JSON.stringify(app)}}`,
+      "state": 1
+    };
+  }
 
   console.log(model, app)
   console.log(newConnection);
@@ -154,74 +170,74 @@ BootstrapRouter.route('/:id').get( async (req, res, next) => {
 
 });
 
-// -- Edit config's channels by it's mainflux_id in Bootstrap (channels***) --
-BootstrapRouter.route('/edit/channels/:id').put( async (req, res, next) => {
+// // -- Edit config's channels by it's mainflux_id in Bootstrap (channels***) --
+// BootstrapRouter.route('/edit/channels/:id').put( async (req, res, next) => {
 
-  // Chech for JSON
-  if(!req.is('application/json')) {
-    next();
-    throw new Error("Expects content-type 'application/json'");
-  }
+//   // Chech for JSON
+//   if(!req.is('application/json')) {
+//     next();
+//     throw new Error("Expects content-type 'application/json'");
+//   }
 
-  const token = req.cookies.auth;
+//   const token = req.cookies.auth;
 
-  const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token,
-    },
-    httpsAgent: new https.Agent({
-      rejectUnauthorized: false,
-    })
-  };
+//   const config = {
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'Authorization': token,
+//     },
+//     httpsAgent: new https.Agent({
+//       rejectUnauthorized: false,
+//     })
+//   };
 
-  let editedConfig = {};
+//   let editedConfig = {};
 
-  if(req.body.obj.type === "app") {
-    const { mac, id, channels, name, type } = req.body.obj;
+//   if(req.body.obj.type === "app") {
+//     const { mac, id, channels, name, type } = req.body.obj;
 
-    editedConfig = {
-      "external_id": `${mac}`,
-      "external_key": `${md5(mac.toLowerCase())}`,
-      "thing_id": `${id}`,
-      "name": `${name}`,
-      "channels": typeof channels === "string"
-        ? [channels]
-        : channels,
-      "content": `{"type": ${JSON.stringify(type)},"name": ${JSON.stringify(name)}, "mac": ${JSON.stringify(mac)}, "hash": ${JSON.stringify(md5(req.body.obj))},
-      }`,
-    };
-  } else if(req.body.obj.type === "device") {
-    const { mac, id, channels, name, firmware, cycle, state, model } = req.body.obj;
+//     editedConfig = {
+//       "external_id": `${mac}`,
+//       "external_key": `${md5(mac.toLowerCase())}`,
+//       "thing_id": `${id}`,
+//       "name": `${name}`,
+//       "channels": typeof channels === "string"
+//         ? [channels]
+//         : channels,
+//       "content": `{"type": ${JSON.stringify(type)},"name": ${JSON.stringify(name)}, "mac": ${JSON.stringify(mac)}, "hash": ${JSON.stringify(md5(req.body.obj))},
+//       }`,
+//     };
+//   } else if(req.body.obj.type === "device") {
+//     const { mac, id, channels, name, firmware, cycle, state, model } = req.body.obj;
 
-    editedConfig = {
-      "external_id": `${mac}`,
-      "external_key": `${md5(mac.toLowerCase())}`,
-      "thing_id": `${id}`,
-      "name": `${name}`,
-      "channels": typeof channels === "string"
-        ? [channels]
-        : channels,
-      "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(name)}, "cycle": ${JSON.stringify(cycle)}, "model": ${JSON.stringify(model)}}`,
-      "state": state
-    };
-  }
+//     editedConfig = {
+//       "external_id": `${mac}`,
+//       "external_key": `${md5(mac.toLowerCase())}`,
+//       "thing_id": `${id}`,
+//       "name": `${name}`,
+//       "channels": typeof channels === "string"
+//         ? [channels]
+//         : channels,
+//       "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(name)}, "cycle": ${JSON.stringify(cycle)}, "model": ${JSON.stringify(model)}}`,
+//       "state": state
+//     };
+//   }
 
-  try {
-    axios.put(`http://${process.env.MAINFLUX_URL}:8200/things/configs/connections/${req.params.id}`,
-    editedConfig, config)
-      .then( response => {
-        res.sendStatus(response.status);
-        next();
-      })
-      .catch( err => {
-        return next(err);
-      });
-  } catch(err) {
-    return next(err);
-  };
+//   try {
+//     axios.put(`http://${process.env.MAINFLUX_URL}:8200/things/configs/connections/${req.params.id}`,
+//     editedConfig, config)
+//       .then( response => {
+//         res.sendStatus(response.status);
+//         next();
+//       })
+//       .catch( err => {
+//         return next(err);
+//       });
+//   } catch(err) {
+//     return next(err);
+//   };
 
-});
+// });
 
 // -- Edit config info by it's mainflux_id in Bootstrap (name, content***) --
 BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
@@ -243,32 +259,48 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
     })
   };
   let editedConfig = {};
-  if(req.body.obj.type === "app") {
-    const { mac, id, channels, name, type } = req.body.obj;
+  if(req.body.obj !== undefined) {
+    if(req.body.obj.type === "app") {
+      const { mac, id, channels, name, type, models } = req.body.obj;
 
-    editedConfig = {
-      "external_id": `${mac}`,
-      "external_key": `${md5(mac.toLowerCase())}`,
-      "thing_id": `${id}`,
-      "name": `${name}`,
-      "channels": typeof channels === "string"
-        ? [channels]
-        : channels,
-      "content": `{"type": ${JSON.stringify(type)},"name": ${JSON.stringify(name)}, "mac": ${JSON.stringify(mac)}, "hash": ${JSON.stringify(md5(req.body.obj))}}`,
-    };
-  } else if(req.body.obj.type === "device") {
-    const { mac, id, channels, name, firmware, cycle, state, model } = req.body.obj;
+      editedConfig = {
+        "external_id": `${mac}`,
+        "external_key": `${md5(mac.toLowerCase())}`,
+        "thing_id": `${id}`,
+        "name": `${name}`,
+        "channels": typeof channels === "string"
+          ? [channels]
+          : channels,
+        "content": `{"type": ${JSON.stringify(type)},"name": ${JSON.stringify(name)}, "mac": ${JSON.stringify(mac)}, "hash": ${JSON.stringify(md5(req.body.obj))}, "models": ${JSON.stringify(models)}}`,
+      };
+    } else if(req.body.obj.type === "device") {
+      const { mac, id, channels, name, firmware, cycle, state, model } = req.body.obj;
 
-    editedConfig = {
-      "external_id": `${mac}`,
-      "external_key": `${md5(mac.toLowerCase())}`,
-      "thing_id": `${id}`,
-      "name": `${name}`,
-      "channels": typeof channels === "string"
-        ? [channels]
-        : channels,
-      "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(name)}, "cycle": ${JSON.stringify(cycle)}, "model": ${JSON.stringify(model)}}`,
-    };
+      editedConfig = {
+        "external_id": `${mac}`,
+        "external_key": `${md5(mac.toLowerCase())}`,
+        "thing_id": `${id}`,
+        "name": `${name}`,
+        "channels": typeof channels === "string"
+          ? [channels]
+          : channels,
+        "content": `{"firmware": ${JSON.stringify(firmware)}, "name": ${JSON.stringify(name)}, "cycle": ${JSON.stringify(cycle)}, "model": ${JSON.stringify(model)}}`,
+      };
+    }
+  } else if (req.body.response !== undefined) {
+    const { mainflux_id, mainflux_channels, content } = req.body.response;
+    if(req.body.response.content.type === "app") {
+      editedConfig = {
+        "external_id": `${content.type}`,
+        "external_key": `${md5(content.mac.toLowerCase())}`,
+        "thing_id": `${mainflux_id}`,
+        "name": `${content.name}`,
+        "channels": typeof mainflux_channels === "string"
+          ? [mainflux_channels]
+          : mainflux_channels,
+        "content": JSON.stringify(content),
+      };
+    }
   }
 
   try {

@@ -73,6 +73,7 @@ class AppModalEdit extends Component {
       channels: config.mainflux_channels,
       name: config.content.name,
       type: "app",
+      models: config.content.models,
     };
     fetch(`/api/bootstrap/edit/info/${config.mainflux_id}`, {
       method: 'PUT',
@@ -93,13 +94,13 @@ class AppModalEdit extends Component {
 
     obj.channels = arr;
 
-    fetch(`/api/bootstrap/edit/channels/${config.mainflux_id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ obj })
-    });
+    // fetch(`/api/bootstrap/edit/channels/${config.mainflux_id}`, {
+    //   method: 'PUT',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({ obj })
+    // });
 
     this.close();
   };

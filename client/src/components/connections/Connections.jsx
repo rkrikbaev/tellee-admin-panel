@@ -6,8 +6,9 @@ import {
   Icon,
 } from 'semantic-ui-react';
 import AppModalCreate from './AppModalCreate';
-import DeviceModalCreate from './DeviceModalCreate';
 import AppModalEdit from './AppModalEdit';
+import DeviceModalCreate from './DeviceModalCreate';
+import DeviceModalEdit from './DeviceModalEdit';
 import ConnectionModalRemove from './ConnectionModalRemove';
 import ErrorModal from '../errorModal';
 
@@ -19,10 +20,12 @@ class Connections extends Component {
     this.state = {
       connections: [],
       showModalCreateApp: false,
-      showModalCreateDevice: false,
-      showModalError: false,
       showModalEditApp: false,
+      showModalCreateDevice: false,
+      showModalEditDevice: false,
+      showModalError: false,
       edittingApp: {},
+      edittingDevice: {},
       removingConnection: {},
       errorText: '',
     };
@@ -89,6 +92,11 @@ class Connections extends Component {
     this.getConnections();
   };
 
+  editDeviceModalCallback = showModalEditDevice => {
+    this.setState({ showModalEditDevice });
+    this.getConnections();
+  };
+
   errorModalCallback = showModalError => {
     this.setState({ showModalError });
   };
@@ -98,12 +106,14 @@ class Connections extends Component {
       connections,
       showModalCreateApp,
       showModalCreateDevice,
-      showModalError,
       showModalRemove,
       showModalEditApp,
+      showModalEditDevice,
+      showModalError,
       edittingApp,
-      errorText,
+      edittingDevice,
       removingConnection,
+      errorText,
     } = this.state;
 
     return (
@@ -157,7 +167,9 @@ class Connections extends Component {
                       icon='edit outline'
                       labelPosition='right'
                       content="Edit"
-                      onClick={() => this.setState({ showModalEditApp: true, edittingApp: item })}
+                      onClick={() => item.content.type === 'app'
+                        ? this.setState({ showModalEditApp: true, edittingApp: item })
+                        : this.setState({ showModalEditDevice: true, edittingDevice: item })}
                     />
                   </Item.Extra>
                 </Item.Content>
@@ -193,6 +205,12 @@ class Connections extends Component {
           showModalEditApp={showModalEditApp}
           connection={edittingApp}
           callbackFromParent={this.editAppModalCallback}
+        />
+
+        <DeviceModalEdit
+          showModalEditDevice={showModalEditDevice}
+          connection={edittingDevice}
+          callbackFromParent={this.editDeviceModalCallback}
         />
 
       </div>

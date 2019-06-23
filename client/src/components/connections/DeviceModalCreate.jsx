@@ -67,7 +67,6 @@ class DeviceModalCreate extends Component {
       this.setState({ apps });
     })
     .catch( err => console.log(err) );
-    // return;
   };
 
   createThing = async () => {
@@ -175,6 +174,7 @@ class DeviceModalCreate extends Component {
         await fetch(`/api/bootstrap/${app}`)
           .then( response => response.json())
           .then( response => {
+            console.log(response)
             response.content = JSON.parse(response.content);
             let findModel = response.content.models.filter( item => {
               return item.model_name === model;
@@ -187,22 +187,28 @@ class DeviceModalCreate extends Component {
             findModel = response.content.models.filter( item => {
               return item.model_name === model;
             });
-            let modelId = response.content.models.map( (item, i) => {
-              if(item.model_name === model) {
-                return i;
-              }
-            });
+
+            let modelId = response.content.models.findIndex( item => {
+              return item.model_name === model
+            })
+
             let findThing = findModel[0].thing_list.filter( item => {
               return item.thing_id === thing[0].id;
             });
 
             if( findThing.length < 1 ) {
-              console.log(response.content.models)
               response.content.models[modelId].thing_list.push(thing[0]);
             } else {
-              console.log('Thing already there')
+              return ('Thing already there')
             }
-            console.log(response.content);
+            console.log(response);
+            fetch(`/api/bootstrap/edit/info/${response.mainflux_id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ response })
+            });
           });
       }
 
@@ -218,7 +224,13 @@ class DeviceModalCreate extends Component {
       // Close and send data to parent
       const { showModalCreateDevice, oldConnections } = this.state;
       this.setState({ showModalCreateDevice: false });
-      this.props.callbackFromParent(showModalCreateDevice, oldConnections)
+      this.props.callbackFromParent(showModalCreateDevice, oldConnections);
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          sendToApp: false,
+        },
+      }));
     } catch(err) {
       console.log(err);
     }
@@ -228,6 +240,12 @@ class DeviceModalCreate extends Component {
   close = async () => {
     const { showModalCreateDevice, oldConnections } = this.state;
     this.setState({ showModalCreateDevice: false });
+    this.setState( prevState => ({
+      config: {
+        ...prevState.config,
+        sendToApp: false,
+      },
+    }));
     this.props.callbackFromParent(showModalCreateDevice, oldConnections)
   };
 
@@ -269,7 +287,7 @@ class DeviceModalCreate extends Component {
   handleChangeConnectionName = e => {
     let str = e.target.value;
     let arr = this.state.oldConnections.filter( item => {
-      return item.name === str;
+      return item.name === `zsse/${str}`;
     });
     if(arr.length !== 0) {
       this.setState({ isConnectionNameEnabled: true });
@@ -287,8 +305,6 @@ class DeviceModalCreate extends Component {
       config: {
         ...prevState.config,
         cycle: str,
-        model: undefined,
-        app: undefined,
       },
       isEnabled: prevState.config.cycle.length <= 4 && /^\d+$/.test(prevState.config.cycle)
     }));
@@ -349,6 +365,7 @@ class DeviceModalCreate extends Component {
       config,
     } = this.state;
 
+    console.log(config)
     return (
       <Modal
         closeIcon
@@ -380,6 +397,7 @@ class DeviceModalCreate extends Component {
               <input
                 placeholder='connection name'
                 onChange={e => this.handleChangeConnectionName(e)}
+                className={isConnectionNameEnabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field>
