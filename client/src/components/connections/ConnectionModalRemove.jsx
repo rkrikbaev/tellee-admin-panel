@@ -24,7 +24,6 @@ class ConnectionModalRemove extends Component {
         'Content-Type': 'application/json'
       }
     });
-    console.log(connection)
     const { sendToApp, app } = connection.content;
     if(sendToApp) {
       await fetch(`/api/bootstrap/${app}`)
@@ -64,7 +63,6 @@ class ConnectionModalRemove extends Component {
   render() {
 
     const { showModalRemove, connection } = this.props;
-    console.log(connection)
     return (
       <Modal basic size='small' open={showModalRemove}>
         <Header icon='archive' content='REMOVE CONNECTION?' />

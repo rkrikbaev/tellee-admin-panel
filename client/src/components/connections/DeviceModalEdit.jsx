@@ -150,7 +150,6 @@ class DeviceModalEdit extends Component {
         .then( response => {
           response.content = JSON.parse(response.content);
           const { content } = response;
-          console.log(response);
           const editThing = content.things_list.filter( item => {
             return item.thing_id === config.mainflux_id;
           });
@@ -170,7 +169,6 @@ class DeviceModalEdit extends Component {
             name: `${config.content.model}.${config.mainflux_id}`,
             type: config.content.model,
           };
-          console.log(response);
 
 
           fetch(`/api/bootstrap/edit/info/${response.mainflux_id}`, {
