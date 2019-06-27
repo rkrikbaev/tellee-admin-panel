@@ -21,7 +21,7 @@ class AppModalEdit extends Component {
   };
 
   getConfigById = async id => {
-    fetch(`https://zsse.zeinetsse.com:5000/api/bootstrap/${id}`, {
+    fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -49,7 +49,7 @@ class AppModalEdit extends Component {
   };
 
   getChannels = async () => {
-    fetch('https://zsse.zeinetsse.com:5000/api/channels', {
+    fetch('http://zsse.zeinetsse.com:5000/api/channels', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ class AppModalEdit extends Component {
       type: "app",
       content: config.content,
     };
-    await fetch(`https://zsse.zeinetsse.com:5000/api/bootstrap/edit/info/${config.mainflux_id}`, {
+    await fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/edit/info/${config.mainflux_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -96,7 +96,7 @@ class AppModalEdit extends Component {
 
     // obj.channels = arr;
 
-    // fetch(`https://zsse.zeinetsse.com:5000/api/bootstrap/edit/channels/${config.mainflux_id}`, {
+    // fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/edit/channels/${config.mainflux_id}`, {
     //   method: 'PUT',
     //   headers: {
     //     'Content-Type': 'application/json'
