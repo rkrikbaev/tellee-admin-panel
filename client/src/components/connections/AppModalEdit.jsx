@@ -135,8 +135,8 @@ class AppModalEdit extends Component {
   };
 
   render() {
-    const { showModalEditApp, connection } = this.props;
-    const { config, channels, selectedChannels } = this.state;
+    const { showModalEditApp } = this.props;
+    const { config, channels } = this.state;
 
     return (
       <Modal closeIcon dimmer="blurring" open={showModalEditApp} onClose={this.close}>
@@ -161,11 +161,6 @@ class AppModalEdit extends Component {
                 fluid
                 selection
                 options={channels}
-                // defaultValue={
-                //   selectedChannels.length > 0
-                //   ? selectedChannels[0]
-                //   :{value: "18cafc24-4a24-4150-9e2d-a0ecdedf58a9"}
-                // }
                 onChange={this.handleChangeChannel}
               />
             </Form.Field>

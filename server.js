@@ -1,10 +1,11 @@
-import Keycloak from 'keycloak-connect';
 import express from 'express';
-import session from 'express-session';
+// import Keycloak from 'keycloak-connect';
+// import session from 'express-session';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import {connectDb} from './models/index';
+const path = require('path');
 require('dotenv').config();
 
 import UserRouter from './api/user/userRouter';
@@ -39,18 +40,17 @@ app.use( (req, res, next) => {
   next();
 });
 
-const memoryStore = new session.MemoryStore();
-const keycloak = new Keycloak({ store: memoryStore });
+// const memoryStore = new session.MemoryStore();
+// const keycloak = new Keycloak({ store: memoryStore });
 
 // Session
-app.use( session({
-  secret: 'thisShouldBeLongAndSecret',
-  resave: false,
-  saveUninitialized: true,
-  store: memoryStore
-}));
-app.use(keycloak.middleware());
-
+// app.use( session({
+//   secret: 'thisShouldBeLongAndSecret',
+//   resave: false,
+//   saveUninitialized: true,
+//   store: memoryStore
+// }));
+// app.use(keycloak.middleware());
 
 // Routes
 app.use('/api/users', UserRouter);
@@ -61,7 +61,7 @@ app.use('/api/bootstrap', BootstrapRouter);
 app.use('/api/connection', ConnectionRouter);
 
 // Logout
-app.use( keycloak.middleware( { logout: '/'} ));
+// app.use( keycloak.middleware( { logout: '/'} ));
 
 connectDb().then( async () => {
   app.listen(process.env.PORT, () =>
