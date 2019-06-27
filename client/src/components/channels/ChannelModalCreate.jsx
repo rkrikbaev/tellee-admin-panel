@@ -22,11 +22,10 @@ class ChannelModalCreate extends Component {
 
   createChannel = async name => {
     const { channel } = this.state;
-    fetch('https://zsse.zeinetsse.com:5000/api/channels/create', {
+    fetch('http://zsse.zeinetsse.com:5000/api/channels/create', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({channel})
     });

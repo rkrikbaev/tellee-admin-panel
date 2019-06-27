@@ -25,23 +25,21 @@ class Channels extends Component {
   }
 
   getToken = async () => {
-    fetch('https://zsse.zeinetsse.com:5000/api/users/login', {
+    fetch('http://zsse.zeinetsse.com:5000/api/users/login', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({email: "hero12@email.com"})
     });
   };
 
   getChannels = async () => {
-    fetch('https://zsse.zeinetsse.com:5000/api/channels', {
+    fetch('http://zsse.zeinetsse.com:5000/api/channels', {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        'Content-Type': 'application/json'
       },
     })
       .then( res =>  res.json())
