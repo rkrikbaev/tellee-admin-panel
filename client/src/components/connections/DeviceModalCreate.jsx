@@ -46,7 +46,7 @@ class DeviceModalCreate extends Component {
   };
 
   getConnections = async () => {
-    await fetch('http://localhost:5000/api/bootstrap')
+    await fetch('https://zsse.zeinetsse.com:5000/api/bootstrap')
     .then( res =>  res.json() )
     .then( oldConnections => {
       this.setState({oldConnections});
@@ -63,7 +63,7 @@ class DeviceModalCreate extends Component {
   };
 
   getFirmwares = async () => {
-    fetch('http://localhost:5000/api/other/firmwares')
+    fetch('https://zsse.zeinetsse.com:5000/api/other/firmwares')
     .then( res => res.json())
     .then( firmwares => {
       const firm = firmwares.map( item => {
@@ -75,7 +75,7 @@ class DeviceModalCreate extends Component {
     };
 
   getModels = async () => {
-    fetch('http://localhost:5000/api/other/models')
+    fetch('https://zsse.zeinetsse.com:5000/api/other/models')
     .then( res => res.json())
     .then( models => {
       const mod = models.map( item => {
@@ -87,7 +87,7 @@ class DeviceModalCreate extends Component {
   };
 
   getThings = async () => {
-    await fetch('http://localhost:5000/api/things')
+    await fetch('https://zsse.zeinetsse.com:5000/api/things')
       .then( res =>  res.json() )
       .then( oldThings => {
         this.oldThings = oldThings;
@@ -97,7 +97,7 @@ class DeviceModalCreate extends Component {
   };
 
   createThing = async () => {
-    await fetch('http://localhost:5000/api/things/create', {
+    await fetch('https://zsse.zeinetsse.com:5000/api/things/create', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -159,7 +159,7 @@ class DeviceModalCreate extends Component {
     };
 
     try {
-      await fetch('http://localhost:5000/api/bootstrap/create/device', {
+      await fetch('https://zsse.zeinetsse.com:5000/api/bootstrap/create/device', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -168,7 +168,7 @@ class DeviceModalCreate extends Component {
       });
 
       if(sendToApp) {
-        await fetch(`http://localhost:5000/api/bootstrap/${app}`)
+        await fetch(`https://zsse.zeinetsse.com:5000/api/bootstrap/${app}`)
           .then( response => response.json())
           .then( response => {
             response.content = JSON.parse(response.content);
@@ -183,7 +183,7 @@ class DeviceModalCreate extends Component {
               name: `${obj.model}.${createdThing[0].id}`,
               type: obj.model
             });
-            fetch(`http://localhost:5000/api/bootstrap/edit/info/${response.mainflux_id}`, {
+            fetch(`https://zsse.zeinetsse.com:5000/api/bootstrap/edit/info/${response.mainflux_id}`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json'
@@ -193,7 +193,7 @@ class DeviceModalCreate extends Component {
           });
       };
       await fetch(
-        `http://localhost:5000/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${createdThing[0].id}`, {
+        `https://zsse.zeinetsse.com:5000/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${createdThing[0].id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
