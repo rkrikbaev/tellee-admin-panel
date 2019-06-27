@@ -29,7 +29,8 @@ class Channels extends Component {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({email: "hero12@email.com"})
     });
@@ -39,7 +40,8 @@ class Channels extends Component {
     fetch('https://zsse.zeinetsse.com:5000/api/channels', {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
       },
     })
       .then( res =>  res.json())

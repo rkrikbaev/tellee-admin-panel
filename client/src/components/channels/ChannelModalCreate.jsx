@@ -25,7 +25,8 @@ class ChannelModalCreate extends Component {
     fetch('https://zsse.zeinetsse.com:5000/api/channels/create', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({channel})
     });

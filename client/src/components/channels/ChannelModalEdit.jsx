@@ -21,7 +21,8 @@ class ChannelModalEdit extends Component {
     fetch(`https://zsse.zeinetsse.com:5000/api/channels/edit/${channel.id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({name: channel.name, metadata: channel.metadata})
     });

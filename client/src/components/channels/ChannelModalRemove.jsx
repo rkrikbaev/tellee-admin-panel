@@ -21,7 +21,8 @@ class ChannelModalRemove extends Component {
     fetch(`https://zsse.zeinetsse.com:5000/api/channels/remove/${id}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
       }
     });
     this.setState({ showModalRemove: false });
