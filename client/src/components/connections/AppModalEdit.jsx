@@ -67,15 +67,16 @@ class AppModalEdit extends Component {
 
   editApp = async () => {
     const { config } = this.state;
+    const { mac, name } = this.state.config.content;
     const obj = {
-      mac: config.content.mac,
+      mac,
       id: config.mainflux_id,
       channels: config.mainflux_channels,
-      name: config.content.name,
+      name,
       type: "app",
-      models: config.content.models,
+      content: config.content,
     };
-    fetch(`/api/bootstrap/edit/info/${config.mainflux_id}`, {
+    await fetch(`/api/bootstrap/edit/info/${config.mainflux_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -83,16 +84,17 @@ class AppModalEdit extends Component {
       body: JSON.stringify({ obj })
     });
 
-    let arr = [];
-    if(config.mainflux_channels[0].id) {
-      arr = config.mainflux_channels.map( item => {
-        return item.id;
-      });
-    } else {
-      arr = config.mainflux_channels;
-    }
+    // -- FOR EDITTING CONFIG'S CHANNELS -- //
+    // let arr = [];
+    // if(config.mainflux_channels[0].id) {
+    //   arr = config.mainflux_channels.map( item => {
+    //     return item.id;
+    //   });
+    // } else {
+    //   arr = config.mainflux_channels;
+    // }
 
-    obj.channels = arr;
+    // obj.channels = arr;
 
     // fetch(`/api/bootstrap/edit/channels/${config.mainflux_id}`, {
     //   method: 'PUT',
@@ -126,12 +128,6 @@ class AppModalEdit extends Component {
     this.setState({ config: obj });
   };
 
-  handleChangeMac = e => {
-    const obj = this.state.config;
-    obj.content.mac = e.target.value;
-    this.setState({ config: obj });
-  };
-
   handleChangeChannel = (e, { value }) => {
     let obj = this.state.config;
     obj.mainflux_channels = value;
@@ -147,6 +143,7 @@ class AppModalEdit extends Component {
         <Modal.Header>EDIT CONNECTION</Modal.Header>
         <Modal.Content>
           <Form>
+
             <Form.Field>
               <label>Name</label>
               <input
@@ -155,14 +152,7 @@ class AppModalEdit extends Component {
                 onChange={e => this.handleChangeName(e)}
               />
             </Form.Field>
-            <Form.Field>
-              <label>Mac</label>
-              <input
-                placeholder='mac'
-                value={config.content !== undefined ? config.content.mac : ''}
-                onChange={e => this.handleChangeMac(e)}
-              />
-            </Form.Field>
+
             <Form.Field>
               <label>Channels</label>
               <Dropdown
@@ -179,24 +169,24 @@ class AppModalEdit extends Component {
                 onChange={this.handleChangeChannel}
               />
             </Form.Field>
-          </Form>
-          </Modal.Content>
-          <Modal.Actions>
-            <Button color='black' onClick={this.close}>
-              No
-            </Button>
-            <Button
-              positive
-              icon='edit outline'
-              labelPosition='right'
-              content="Yes"
-              onClick={this.editApp}
-            />
-          </Modal.Actions>
-        </Modal>
-    )
-  }
 
+          </Form>
+        </Modal.Content>
+        <Modal.Actions>
+          <Button color='black' onClick={this.close}>
+            No
+          </Button>
+          <Button
+            positive
+            icon='edit outline'
+            labelPosition='right'
+            content="Yes"
+            onClick={this.editApp}
+          />
+        </Modal.Actions>
+      </Modal>
+    );
+  };
 };
 
 export default AppModalEdit;

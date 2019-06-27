@@ -17,21 +17,43 @@ class ConnectionModalRemove extends Component {
     }
   }
 
-  removeConnection = async id => {
-    fetch(`/api/bootstrap/remove/${id}`, {
+  removeConnection = async connection => {
+    fetch(`/api/things/remove/${connection.mainflux_id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
       }
     });
-    fetch(`/api/things/remove/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    console.log(connection)
+    const { sendToApp, app } = connection.content;
+    if(sendToApp) {
+      await fetch(`/api/bootstrap/${app}`)
+        .then( response => response.json())
+        .then( response => {
+          response.content = JSON.parse(response.content);
+          const { content } = response;
+
+          content.things_list = content.things_list.filter( item => {
+            return item.thing_id !== connection.mainflux_id;
+          });
+
+          content.models_list = content.models_list.filter( item => {
+            return item.name.split(".")[1] !== connection.mainflux_id;
+          });
+
+          console.log(response);
+
+          fetch(`/api/bootstrap/edit/info/${response.mainflux_id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ response })
+          });
+        });
+    }
     this.setState({ showModalRemove: false });
-    this.props.callbackFromParent(this.state.showModalRemove, id);
+    this.props.callbackFromParent(this.state.showModalRemove, connection.mainflux_id);
   }
 
   close = () => {
@@ -42,7 +64,7 @@ class ConnectionModalRemove extends Component {
   render() {
 
     const { showModalRemove, connection } = this.props;
-
+    console.log(connection)
     return (
       <Modal basic size='small' open={showModalRemove}>
         <Header icon='archive' content='REMOVE CONNECTION?' />
@@ -55,7 +77,7 @@ class ConnectionModalRemove extends Component {
           <Button basic color='green' inverted onClick={this.close}>
             <Icon name='remove' /> No
           </Button>
-          <Button color='red' inverted onClick={() => {this.removeConnection(connection.mainflux_id)} }>
+          <Button color='red' inverted onClick={() => {this.removeConnection(connection)} }>
             <Icon name='checkmark' /> Yes
           </Button>
         </Modal.Actions>

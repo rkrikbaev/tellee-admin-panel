@@ -59,7 +59,7 @@ UserRouter.route('/login').post( async (req, res, next) => {
   };
 
   const { email } = req.body;
-
+  
   try {
 
     const user = await User.findOne({ email });

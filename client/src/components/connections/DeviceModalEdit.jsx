@@ -18,7 +18,6 @@ class DeviceModalEdit extends Component {
       models: [],
       apps: [],
       config: {},
-      currentThing: undefined,
     };
   };
 
@@ -32,7 +31,7 @@ class DeviceModalEdit extends Component {
       .then( res =>  res.json())
       .then( config => {
         config.content = JSON.parse(config.content);
-        this.setState({config});
+        this.setState({ config });
       })
       .catch( err => console.log(err) );
   };
@@ -58,7 +57,7 @@ class DeviceModalEdit extends Component {
         return item.content.type === 'app';
       });
       const apps = connections.map( item => {
-        return { key: item.id, text: item.name, value: item.external_id}
+        return { key: item.id, text: item.name.split(".")[0], value: item.external_id}
       })
       this.setState({ apps });
     })
@@ -70,7 +69,7 @@ class DeviceModalEdit extends Component {
       .then( res => res.json())
       .then( firmwares => {
         const firm = firmwares.map( item => {
-          return { text: item, value: item}
+          return { text: item.split(".")[0], value: item.split(".")[0]}
         });
         this.setState({ firmwares: firm });
       })
@@ -82,7 +81,7 @@ class DeviceModalEdit extends Component {
       .then( res => res.json())
       .then( models => {
         const mod = models.map( item => {
-          return { text: item, value: item}
+          return { text: item.split(".")[0], value: item.split(".")[0]}
         });
         this.setState({ models: mod });
       })
@@ -105,69 +104,171 @@ class DeviceModalEdit extends Component {
   };
 
   close = () => {
-    this.setState({ showModalEditApp: false });
-    this.props.callbackFromParent(this.state.showModalEditApp);
+    this.setState({ showModalEditDevice: false });
+    this.props.callbackFromParent(this.state.showModalEditDevice);
   };
 
-  handleChangeName = e => {
-    const obj = this.state.config;
-    obj.content.name = e.target.value;
-    this.setState({ config: obj });
-  };
+  editDevice = async () => {
+    const { config } = this.state;
+    const { name, firmware, cycle, model, app, sendToApp, mac } = this.state.config.content;
+    let obj = {};
 
-  handleChangeMac = e => {
-    const obj = this.state.config;
-    obj.content.mac = e.target.value;
-    this.setState({ config: obj });
+    if(sendToApp) {
+      obj = {
+        type: "device",
+        id: config.mainflux_id,
+        mac,
+        sendToApp,
+        name,
+        firmware,
+        cycle,
+        model,
+        app,
+      };
+    } else {
+      obj = {
+        type: "device",
+        id: config.mainflux_id,
+        mac,
+        sendToApp,
+        name,
+        firmware,
+        cycle,
+      };
+    };
+    await fetch(`/api/bootstrap/edit/info/${config.mainflux_id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ obj })
+    });
+
+    if(sendToApp) {
+      await fetch(`/api/bootstrap/${app}`)
+        .then( response => response.json())
+        .then( response => {
+          response.content = JSON.parse(response.content);
+          const { content } = response;
+          console.log(response);
+          const editThing = content.things_list.filter( item => {
+            return item.thing_id === config.mainflux_id;
+          });
+          const editThingIndex = content.things_list.indexOf(editThing[0]);
+          content.things_list[editThingIndex] = {
+            model_name: model,
+            thing_id: config.mainflux_id,
+            thing_key: config.mainflux_key,
+            thing_ch: config.mainflux_channels[0].id
+          };
+
+          const editModel = content.models_list.filter( item => {
+            return item.name.split(".")[1] === config.mainflux_id;
+          });
+          const editModelIndex = content.models_list.indexOf(editModel[0]);
+          content.models_list[editModelIndex] = {
+            name: `${config.content.model}.${config.mainflux_id}`,
+            type: config.content.model,
+          };
+          console.log(response);
+
+
+          fetch(`/api/bootstrap/edit/info/${response.mainflux_id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ response })
+          });
+        });
+    };
+    // await fetch(
+    //   `/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${createdThing[0].id}`, {
+    //     method: 'PUT',
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     },
+    //   });
+    await this.getConnections();
+
+    this.close();
   };
 
   handleChangeConnectionName = e => {
-    let str = e.target.value;
-    this.setState({ connectionName: str });
-  };
-
-  handleChangeCycle = e => {
-    let str = e.target.value;
+    const currentValue = e.target.value;
     this.setState( prevState => ({
       config: {
         ...prevState.config,
-        cycle: str,
+        content: {
+          ...prevState.config.content,
+          name: currentValue,
+        },
       },
-      isEnabled: prevState.config.cycle.length <= 4 && /^\d+$/.test(prevState.config.cycle)
+    }));
+  };
+
+  handleChangeFirmware = (e, { value }) => {
+    const currentValue = value;
+    this.setState( prevState => ({
+      config: {
+        ...prevState.config,
+        content: {
+          ...prevState.config.content,
+          firmware: currentValue,
+        },
+      },
+    }));
+  };
+
+  handleChangeCycle = e => {
+    const currentValue = e.target.value;
+    this.setState( prevState => ({
+      config: {
+        ...prevState.config,
+        content: {
+          ...prevState.config.content,
+          cycle: currentValue,
+        }
+      },
+      isEnabled: prevState.config.content.cycle.length <= 4 && /^\d+$/.test(prevState.config.content.cycle)
     }));
   };
 
   handleChangeModel = (e, { value }) => {
+    const currentValue = value;
     this.setState( prevState => ({
       config: {
         ...prevState.config,
-        model: value,
+        content: {
+          ...prevState.config.content,
+          model: currentValue,
+        },
       },
     }));
   };
 
   handleChangeApp = (e, { value }) => {
+    const currentValue = value;
     this.setState( prevState => ({
       config: {
         ...prevState.config,
-        app: value,
+        content: {
+          ...prevState.config.content,
+          app: currentValue,
+        },
       },
     }));
   };
 
   render() {
-    const { showModalEditDevice, connection } = this.props;
+    const { showModalEditDevice } = this.props;
     const {
       config,
       firmwares,
       isEnabled,
       models,
       apps,
-      currentThing,
     } = this.state;
-
-    console.log(config);
-    console.log(connection);
 
     return (
       <Modal
@@ -179,22 +280,6 @@ class DeviceModalEdit extends Component {
         <Modal.Header>EDIT DEVICE</Modal.Header>
         <Modal.Content>
           <Form>
-            <Form.Field>
-              <label>Name</label>
-              <input
-                placeholder='name'
-                value={currentThing !== undefined ? currentThing.name : ''}
-                onChange={e => this.handleChangeName(e)}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label>Mac</label>
-              <input
-                placeholder='mac'
-                value={connection.external_id}
-                onChange={e => this.handleChangeMac(e)}
-              />
-            </Form.Field>
             <Form.Field>
               <label> Connection Name </label>
               <input

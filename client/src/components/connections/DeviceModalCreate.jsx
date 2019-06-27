@@ -41,15 +41,8 @@ class DeviceModalCreate extends Component {
         cycle: '',
       },
     };
-  };
 
-  getThings = async () => {
-    await fetch('/api/things')
-      .then( res =>  res.json() )
-      .then( oldThings => {
-        this.setState({oldThings});
-      })
-      .catch( err => console.log(err) );
+    this.oldThings = [];
   };
 
   getConnections = async () => {
@@ -69,6 +62,40 @@ class DeviceModalCreate extends Component {
     .catch( err => console.log(err) );
   };
 
+  getFirmwares = async () => {
+    fetch('/api/other/firmwares')
+    .then( res => res.json())
+    .then( firmwares => {
+      const firm = firmwares.map( item => {
+        return { text: item.split(".")[0], value: item.split(".")[0]}
+      });
+      this.setState({ firmwares: firm });
+    })
+    .catch( err => console.log(err) );
+    };
+
+  getModels = async () => {
+    fetch('/api/other/models')
+    .then( res => res.json())
+    .then( models => {
+      const mod = models.map( item => {
+        return { text: item.split(".")[0], value: item.split(".")[0]}
+      });
+      this.setState({ models: mod });
+    })
+    .catch( err => console.log(err) );
+  };
+
+  getThings = async () => {
+    await fetch('/api/things')
+      .then( res =>  res.json() )
+      .then( oldThings => {
+        this.oldThings = oldThings;
+        this.setState({oldThings});
+      })
+      .catch( err => console.log(err) );
+  };
+
   createThing = async () => {
     await fetch('/api/things/create', {
       method: 'POST',
@@ -79,36 +106,12 @@ class DeviceModalCreate extends Component {
     });
   };
 
-  getFirmwares = async () => {
-    fetch('/api/other/firmwares')
-      .then( res => res.json())
-      .then( firmwares => {
-        const firm = firmwares.map( item => {
-          return { text: item, value: item}
-        });
-        this.setState({ firmwares: firm });
-      })
-      .catch( err => console.log(err) );
-  };
-
-  getModels = async () => {
-    fetch('/api/other/models')
-      .then( res => res.json())
-      .then( models => {
-        const mod = models.map( item => {
-          return { text: item, value: item}
-        });
-        this.setState({ models: mod });
-      })
-      .catch( err => console.log(err) );
-  };
-
   // -- Start of creating device --
   createDeviceConnection = async () => {
     const {
       newThing,
       connectionName,
-      config
+      config,
     } = this.state;
     const {
       firmware,
@@ -117,19 +120,15 @@ class DeviceModalCreate extends Component {
       app,
       model
     } = config;
-    try {
-      let arr = [];
-      await this.createThing();
-      await fetch('/api/things')
-        .then( res =>  res.json() )
-        .then( oldThings => {
-          arr = oldThings;
-        })
-        .catch( err => console.log(err) );
 
-      var thing = arr.filter( item => {
+    try {
+      await this.createThing();
+      await this.getThings();
+
+      var createdThing = this.oldThings.filter( item => {
         return item.name === newThing.name;
       });
+
     } catch(err) {
       console.log(err);
     }
@@ -138,7 +137,7 @@ class DeviceModalCreate extends Component {
     if(sendToApp) {
       obj = {
         mac: newThing.metadata.mac,
-        id: thing[0].id,
+        id: createdThing[0].id,
         channels: '18cafc24-4a24-4150-9e2d-a0ecdedf58a9',
         name: connectionName,
         firmware,
@@ -150,7 +149,7 @@ class DeviceModalCreate extends Component {
     } else {
       obj = {
         mac: newThing.metadata.mac,
-        id: thing[0].id,
+        id: createdThing[0].id,
         channels: '18cafc24-4a24-4150-9e2d-a0ecdedf58a9',
         name: connectionName,
         firmware,
@@ -158,8 +157,6 @@ class DeviceModalCreate extends Component {
         sendToApp,
       };
     };
-
-    // console.log(obj);
 
     try {
       await fetch('/api/bootstrap/create/device', {
@@ -174,34 +171,18 @@ class DeviceModalCreate extends Component {
         await fetch(`/api/bootstrap/${app}`)
           .then( response => response.json())
           .then( response => {
-            console.log(response)
             response.content = JSON.parse(response.content);
-            let findModel = response.content.models.filter( item => {
-              return item.model_name === model;
+            let { content } = response;
+            content.things_list.push({
+              model_name: obj.model,
+              thing_id: createdThing[0].id,
+              thing_key: createdThing[0].key,
+              thing_ch: obj.channels,
             });
-
-            if(findModel.length < 1) {
-              response.content.models.push({"model_name": model, "thing_list":[]});
-            };
-
-            findModel = response.content.models.filter( item => {
-              return item.model_name === model;
+            content.models_list.push({
+              name: `${obj.model}.${createdThing[0].id}`,
+              type: obj.model
             });
-
-            let modelId = response.content.models.findIndex( item => {
-              return item.model_name === model
-            })
-
-            let findThing = findModel[0].thing_list.filter( item => {
-              return item.thing_id === thing[0].id;
-            });
-
-            if( findThing.length < 1 ) {
-              response.content.models[modelId].thing_list.push(thing[0]);
-            } else {
-              return ('Thing already there')
-            }
-            console.log(response);
             fetch(`/api/bootstrap/edit/info/${response.mainflux_id}`, {
               method: 'PUT',
               headers: {
@@ -210,10 +191,9 @@ class DeviceModalCreate extends Component {
               body: JSON.stringify({ response })
             });
           });
-      }
-
+      };
       await fetch(
-        `/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${thing[0].id}`, {
+        `/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${createdThing[0].id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -365,7 +345,6 @@ class DeviceModalCreate extends Component {
       config,
     } = this.state;
 
-    console.log(config)
     return (
       <Modal
         closeIcon

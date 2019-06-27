@@ -43,7 +43,7 @@ class Connections extends Component {
   };
 
   getConnections = async () => {
-    fetch('/api/bootstrap', {
+    await fetch('/api/bootstrap', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -120,22 +120,24 @@ class Connections extends Component {
       <div id='connections' className="main_wrapper">
         <div className="connection_top">
           <h1>Connections</h1>
-          <Button
-            icon
-            labelPosition='left'
-            onClick={() => this.setState({ showModalCreateApp: true })}
-          >
-            <Icon name='chain' />
-            Create App
-          </Button>
-          <Button
-            icon
-            labelPosition='left'
-            onClick={() => this.setState({ showModalCreateDevice: true })}
-          >
-            <Icon name='chain' />
-            Create Device
-          </Button>
+          <div className="connection_btn__wrapper">
+            <Button
+              icon
+              labelPosition='left'
+              onClick={() => this.setState({ showModalCreateApp: true })}
+            >
+              <Icon name='chain' />
+              Create App
+            </Button>
+            <Button
+              icon
+              labelPosition='left'
+              onClick={() => this.setState({ showModalCreateDevice: true })}
+            >
+              <Icon name='chain' />
+              Create Device
+            </Button>
+          </div>
         </div>
         <hr />
         <Item.Group relaxed>

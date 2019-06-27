@@ -44,7 +44,6 @@ class AppModalCreate extends Component {
       this.setState({oldConnections});
       })
       .catch( err => console.log(err) );
-    // return;
   };
 
   createThing = async () => {
