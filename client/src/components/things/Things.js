@@ -22,7 +22,7 @@ class Things extends Component {
   }
 
   getToken = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/users/login', {
+    fetch('https://zsse.zeinetsse.com:5000/api/users/login', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -33,7 +33,7 @@ class Things extends Component {
   };
 
   getThings = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/things')
+    fetch('https://zsse.zeinetsse.com:5000/api/things')
       .then( res =>  res.json())
       .then( things => this.setState({things}, () => {
         console.log("fetched");

@@ -29,7 +29,7 @@ class AppModalCreate extends Component {
   };
 
   getThings = async () => {
-    await fetch('http://zsse.zeinetsse.com:5000/api/things')
+    await fetch('https://zsse.zeinetsse.com:5000/api/things')
       .then( res =>  res.json() )
       .then( oldThings => {
         this.setState({oldThings});
@@ -38,7 +38,7 @@ class AppModalCreate extends Component {
   };
 
   getConnections = async () => {
-    await fetch('http://zsse.zeinetsse.com:5000/api/bootstrap')
+    await fetch('https://zsse.zeinetsse.com:5000/api/bootstrap')
     .then( res =>  res.json() )
     .then( oldConnections => {
       this.setState({oldConnections});
@@ -47,7 +47,7 @@ class AppModalCreate extends Component {
   };
 
   createThing = async () => {
-    await fetch('http://zsse.zeinetsse.com:5000/api/things/create', {
+    await fetch('https://zsse.zeinetsse.com:5000/api/things/create', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ class AppModalCreate extends Component {
     try {
       let arr = [];
       await this.createThing();
-      await fetch('http://zsse.zeinetsse.com:5000/api/things')
+      await fetch('https://zsse.zeinetsse.com:5000/api/things')
         .then( res =>  res.json() )
         .then( oldThings => {
           arr = oldThings;
@@ -83,7 +83,7 @@ class AppModalCreate extends Component {
     };
 
     try {
-      await fetch('http://zsse.zeinetsse.com:5000/api/bootstrap/create/app', {
+      await fetch('https://zsse.zeinetsse.com:5000/api/bootstrap/create/app', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ class AppModalCreate extends Component {
       });
 
       await fetch(
-        `http://zsse.zeinetsse.com:5000/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${thing[0].id}`, {
+        `https://zsse.zeinetsse.com:5000/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${thing[0].id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'

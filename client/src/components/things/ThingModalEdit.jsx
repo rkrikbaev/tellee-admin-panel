@@ -17,7 +17,7 @@ class ThingModalEdit extends Component {
   }
 
   editThing = async thing => {
-    fetch(`http://zsse.zeinetsse.com:5000/api/things/edit/${thing.id}`, {
+    fetch(`https://zsse.zeinetsse.com:5000/api/things/edit/${thing.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'

@@ -32,7 +32,7 @@ class Connections extends Component {
   }
 
   getToken = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/users/login', {
+    fetch('https://zsse.zeinetsse.com:5000/api/users/login', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -43,7 +43,7 @@ class Connections extends Component {
   };
 
   getConnections = async () => {
-    await fetch('http://zsse.zeinetsse.com:5000/api/bootstrap', {
+    await fetch('https://zsse.zeinetsse.com:5000/api/bootstrap', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'

@@ -18,7 +18,7 @@ class ThingModalRemove extends Component {
   }
 
   removeThing = async (id, event) => {
-    fetch(`http://zsse.zeinetsse.com:5000/api/things/remove/${id}`, {
+    fetch(`https://zsse.zeinetsse.com:5000/api/things/remove/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
