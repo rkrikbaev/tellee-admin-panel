@@ -18,7 +18,7 @@ class ConnectionModalRemove extends Component {
   }
 
   removeConnection = async connection => {
-    fetch(`/api/things/remove/${connection.mainflux_id}`, {
+    fetch(`http://localhost:5000/api/things/remove/${connection.mainflux_id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -26,7 +26,7 @@ class ConnectionModalRemove extends Component {
     });
     const { sendToApp, app } = connection.content;
     if(sendToApp) {
-      await fetch(`/api/bootstrap/${app}`)
+      await fetch(`http://localhost:5000/api/bootstrap/${app}`)
         .then( response => response.json())
         .then( response => {
           response.content = JSON.parse(response.content);
@@ -42,7 +42,7 @@ class ConnectionModalRemove extends Component {
 
           console.log(response);
 
-          fetch(`/api/bootstrap/edit/info/${response.mainflux_id}`, {
+          fetch(`http://localhost:5000/api/bootstrap/edit/info/${response.mainflux_id}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json'

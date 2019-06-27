@@ -21,7 +21,7 @@ class AppModalEdit extends Component {
   };
 
   getConfigById = async id => {
-    fetch(`/api/bootstrap/${id}`, {
+    fetch(`http://localhost:5000/api/bootstrap/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -49,7 +49,7 @@ class AppModalEdit extends Component {
   };
 
   getChannels = async () => {
-    fetch('/api/channels', {
+    fetch('http://localhost:5000/api/channels', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ class AppModalEdit extends Component {
       type: "app",
       content: config.content,
     };
-    await fetch(`/api/bootstrap/edit/info/${config.mainflux_id}`, {
+    await fetch(`http://localhost:5000/api/bootstrap/edit/info/${config.mainflux_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -96,7 +96,7 @@ class AppModalEdit extends Component {
 
     // obj.channels = arr;
 
-    // fetch(`/api/bootstrap/edit/channels/${config.mainflux_id}`, {
+    // fetch(`http://localhost:5000/api/bootstrap/edit/channels/${config.mainflux_id}`, {
     //   method: 'PUT',
     //   headers: {
     //     'Content-Type': 'application/json'

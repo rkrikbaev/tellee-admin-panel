@@ -26,7 +26,7 @@ class ConnectionModalEdit extends Component {
   }
 
   getConfigById = async id => {
-    fetch(`/api/bootstrap/${id}`, {
+    fetch(`http://localhost:5000/api/bootstrap/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -71,7 +71,7 @@ class ConnectionModalEdit extends Component {
       firmware: config.content.firmware,
       cycle: config.content.cycle
     };
-    fetch(`/api/bootstrap/edit/info/${config.mainflux_id}`, {
+    fetch(`http://localhost:5000/api/bootstrap/edit/info/${config.mainflux_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -90,7 +90,7 @@ class ConnectionModalEdit extends Component {
 
     obj.channels = arr;
 
-    fetch(`/api/bootstrap/edit/channels/${config.mainflux_id}`, {
+    fetch(`http://localhost:5000/api/bootstrap/edit/channels/${config.mainflux_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -102,7 +102,7 @@ class ConnectionModalEdit extends Component {
   };
 
   getFirmwares = async () => {
-    fetch('/api/other/firmwares', {
+    fetch('http://localhost:5000/api/other/firmwares', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -119,7 +119,7 @@ class ConnectionModalEdit extends Component {
   };
 
   getModels = async () => {
-    fetch('/api/other/models', {
+    fetch('http://localhost:5000/api/other/models', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -136,7 +136,7 @@ class ConnectionModalEdit extends Component {
   };
 
   getChannels = async () => {
-    fetch('/api/channels', {
+    fetch('http://localhost:5000/api/channels', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'

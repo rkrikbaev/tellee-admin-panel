@@ -38,7 +38,7 @@ class ConnectionModalCreate extends Component {
     const { id, channels } = this.state.config;
 
     try {
-      let response = await fetch('/api/bootstrap/create', {
+      let response = await fetch('http://localhost:5000/api/bootstrap/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -56,7 +56,7 @@ class ConnectionModalCreate extends Component {
         for( let i = 0; i < channels.length; i++ ) {
 
           let response = await fetch(
-            `/api/connection/create/channels/${channels[i]}/things/${id}`, {
+            `http://localhost:5000/api/connection/create/channels/${channels[i]}/things/${id}`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json'
@@ -90,7 +90,7 @@ class ConnectionModalCreate extends Component {
   }
 
   getFirmwares = async () => {
-    fetch('/api/other/firmwares')
+    fetch('http://localhost:5000/api/other/firmwares')
       .then( res => res.json())
       .then( firmwares => {
         const firm = firmwares.map( item => {
@@ -102,7 +102,7 @@ class ConnectionModalCreate extends Component {
   };
 
   getModels = async () => {
-    fetch('/api/other/models')
+    fetch('http://localhost:5000/api/other/models')
       .then( res => res.json())
       .then( models => {
         const mod = models.map( item => {
@@ -114,7 +114,7 @@ class ConnectionModalCreate extends Component {
   };
 
   getChannels = async () => {
-    fetch('/api/channels')
+    fetch('http://localhost:5000/api/channels')
       .then( res =>  res.json())
       .then( channels => {
         const arr = channels.map( (item, i) => {
@@ -126,7 +126,7 @@ class ConnectionModalCreate extends Component {
   };
 
   getThings = async () => {
-    fetch('/api/things')
+    fetch('http://localhost:5000/api/things')
       .then( res =>  res.json())
       .then( things => {
         const arr = things.map( (item, i) => {

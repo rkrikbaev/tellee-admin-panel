@@ -25,7 +25,7 @@ class Channels extends Component {
   }
 
   getToken = async () => {
-    fetch('/api/users/login', {
+    fetch('http://localhost:5000/api/users/login', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -36,7 +36,7 @@ class Channels extends Component {
   };
 
   getChannels = async () => {
-    fetch('/api/channels', {
+    fetch('http://localhost:5000/api/channels', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'

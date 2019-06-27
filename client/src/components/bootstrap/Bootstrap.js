@@ -22,7 +22,7 @@ class Bootstrap extends Component {
   }
 
   getToken = async () => {
-    fetch('/api/users/login', {
+    fetch('http://localhost:5000/api/users/login', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -33,7 +33,7 @@ class Bootstrap extends Component {
   };
 
   getConnections = async () => {
-    fetch('/api/bootstrap', {
+    fetch('http://localhost:5000/api/bootstrap', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'

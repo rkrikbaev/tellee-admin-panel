@@ -18,7 +18,7 @@ class ChannelModalRemove extends Component {
   }
 
   removeChannel = async (id, event) => {
-    fetch(`/api/channels/remove/${id}`, {
+    fetch(`http://localhost:5000/api/channels/remove/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'

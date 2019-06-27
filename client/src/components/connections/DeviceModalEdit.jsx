@@ -22,7 +22,7 @@ class DeviceModalEdit extends Component {
   };
 
   getConfigById = async id => {
-    fetch(`/api/bootstrap/${id}`, {
+    fetch(`http://localhost:5000/api/bootstrap/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -37,7 +37,7 @@ class DeviceModalEdit extends Component {
   };
 
   getThings = async () => {
-    await fetch('/api/things')
+    await fetch('http://localhost:5000/api/things')
       .then( res =>  res.json() )
       .then( oldThings => {
         const currentThing = oldThings.filter( item => {
@@ -49,7 +49,7 @@ class DeviceModalEdit extends Component {
   };
 
   getConnections = async () => {
-    await fetch('/api/bootstrap')
+    await fetch('http://localhost:5000/api/bootstrap')
     .then( res =>  res.json() )
     .then( oldConnections => {
       const connections = oldConnections.filter( item => {
@@ -65,7 +65,7 @@ class DeviceModalEdit extends Component {
   };
 
   getFirmwares = async () => {
-    fetch('/api/other/firmwares')
+    fetch('http://localhost:5000/api/other/firmwares')
       .then( res => res.json())
       .then( firmwares => {
         const firm = firmwares.map( item => {
@@ -77,7 +77,7 @@ class DeviceModalEdit extends Component {
   };
 
   getModels = async () => {
-    fetch('/api/other/models')
+    fetch('http://localhost:5000/api/other/models')
       .then( res => res.json())
       .then( models => {
         const mod = models.map( item => {
@@ -136,7 +136,7 @@ class DeviceModalEdit extends Component {
         cycle,
       };
     };
-    await fetch(`/api/bootstrap/edit/info/${config.mainflux_id}`, {
+    await fetch(`http://localhost:5000/api/bootstrap/edit/info/${config.mainflux_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -145,7 +145,7 @@ class DeviceModalEdit extends Component {
     });
 
     if(sendToApp) {
-      await fetch(`/api/bootstrap/${app}`)
+      await fetch(`http://localhost:5000/api/bootstrap/${app}`)
         .then( response => response.json())
         .then( response => {
           response.content = JSON.parse(response.content);
@@ -171,7 +171,7 @@ class DeviceModalEdit extends Component {
           };
 
 
-          fetch(`/api/bootstrap/edit/info/${response.mainflux_id}`, {
+          fetch(`http://localhost:5000/api/bootstrap/edit/info/${response.mainflux_id}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json'
@@ -181,7 +181,7 @@ class DeviceModalEdit extends Component {
         });
     };
     // await fetch(
-    //   `/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${createdThing[0].id}`, {
+    //   `http://localhost:5000/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${createdThing[0].id}`, {
     //     method: 'PUT',
     //     headers: {
     //       'Content-Type': 'application/json'

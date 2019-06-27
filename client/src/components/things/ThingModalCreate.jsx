@@ -21,7 +21,7 @@ class ThingModalCreate extends Component {
   }
 
   createThing = async (name, metadata) => {
-    fetch('/api/things/create', {
+    fetch('http://localhost:5000/api/things/create', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
