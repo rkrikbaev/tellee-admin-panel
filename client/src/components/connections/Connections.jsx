@@ -32,22 +32,24 @@ class Connections extends Component {
   }
 
   getToken = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/users/login', {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/users/login`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
       body: JSON.stringify({email: "hero12@email.com"})
     });
   };
 
   getConnections = async () => {
-    await fetch('http://zsse.zeinetsse.com:5000/api/bootstrap', {
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
     })
       .then( res =>  res.json())
       .then( connections => {
@@ -70,6 +72,7 @@ class Connections extends Component {
     oldConnections,
   ) => {
     this.setState({ showModalCreateApp, connections: oldConnections})
+    this.getConnections();
   };
 
   createDeviceModalCallback = (
@@ -77,6 +80,7 @@ class Connections extends Component {
     oldConnections,
   ) => {
     this.setState({ showModalCreateDevice, connections: oldConnections})
+    this.getConnections();
   };
 
   removeModalCallback = (showModalRemove, id) => {
@@ -85,6 +89,7 @@ class Connections extends Component {
       this.setState({ connections: this.state.connections.filter( i => i.mainflux_id !== id )
       });
     };
+    this.getConnections();
   };
 
   editAppModalCallback = showModalEditApp => {

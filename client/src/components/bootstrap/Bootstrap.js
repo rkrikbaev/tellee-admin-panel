@@ -22,22 +22,24 @@ class Bootstrap extends Component {
   }
 
   getToken = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/users/login', {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/users/login`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
       body: JSON.stringify({email: "hero12@email.com"})
     });
   };
 
   getConnections = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/bootstrap', {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
     })
       .then( res =>  res.json())
       .then( connections => this.setState({connections}, () => {

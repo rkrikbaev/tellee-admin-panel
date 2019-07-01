@@ -21,11 +21,12 @@ class ThingModalCreate extends Component {
   }
 
   createThing = async (name, metadata) => {
-    fetch('http://zsse.zeinetsse.com:5000/api/things/create', {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
       body: JSON.stringify({name, metadata})
     });
     this.close();

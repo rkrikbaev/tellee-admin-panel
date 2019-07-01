@@ -26,11 +26,12 @@ class ConnectionModalEdit extends Component {
   }
 
   getConfigById = async id => {
-    fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/${id}`, {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
     })
       .then( res =>  res.json())
       .then( config => {
@@ -71,11 +72,12 @@ class ConnectionModalEdit extends Component {
       firmware: config.content.firmware,
       cycle: config.content.cycle
     };
-    fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/edit/info/${config.mainflux_id}`, {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${config.mainflux_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
       body: JSON.stringify({ obj })
     });
 
@@ -90,11 +92,12 @@ class ConnectionModalEdit extends Component {
 
     obj.channels = arr;
 
-    fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/edit/channels/${config.mainflux_id}`, {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/channels/${config.mainflux_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
       body: JSON.stringify({ obj })
     });
 
@@ -102,7 +105,7 @@ class ConnectionModalEdit extends Component {
   };
 
   getFirmwares = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/other/firmwares', {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/firmwares`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -119,7 +122,7 @@ class ConnectionModalEdit extends Component {
   };
 
   getModels = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/other/models', {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/models`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -136,11 +139,12 @@ class ConnectionModalEdit extends Component {
   };
 
   getChannels = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/channels', {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
     })
       .then( res =>  res.json())
       .then( channels => {

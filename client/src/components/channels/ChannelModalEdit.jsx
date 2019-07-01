@@ -18,11 +18,12 @@ class ChannelModalEdit extends Component {
   }
 
   editChannel = async (channel, event) => {
-    fetch(`http://zsse.zeinetsse.com:5000/api/channels/edit/${channel.id}`, {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/edit/${channel.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
       body: JSON.stringify({name: channel.name, metadata: channel.metadata})
     });
     this.close();

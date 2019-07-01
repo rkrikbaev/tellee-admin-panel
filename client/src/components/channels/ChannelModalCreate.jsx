@@ -22,11 +22,12 @@ class ChannelModalCreate extends Component {
 
   createChannel = async name => {
     const { channel } = this.state;
-    fetch('http://zsse.zeinetsse.com:5000/api/channels/create', {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
       body: JSON.stringify({channel})
     });
     this.close();

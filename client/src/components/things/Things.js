@@ -22,18 +22,21 @@ class Things extends Component {
   }
 
   getToken = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/users/login', {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/users/login`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
       body: JSON.stringify({email: "hero12@email.com"})
     });
   };
 
   getThings = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/things')
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
+      'credentials' : 'include',
+    })
       .then( res =>  res.json())
       .then( things => this.setState({things}, () => {
         console.log("fetched");

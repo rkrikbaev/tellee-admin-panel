@@ -17,11 +17,12 @@ class ThingModalEdit extends Component {
   }
 
   editThing = async thing => {
-    fetch(`http://zsse.zeinetsse.com:5000/api/things/edit/${thing.id}`, {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things/edit/${thing.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
       body: JSON.stringify({name: thing.name, metadata: thing.metadata})
     });
     this.close();
@@ -44,14 +45,6 @@ class ThingModalEdit extends Component {
     obj.name = e.target.value;
     this.props.callbackFromParent(true, obj);
   };
-
-  componentDidUpdate() {
-  }
-
-  // handleCreateButton(evt) {
-  //   evt.preventDefault()
-  //   this.close();
-  // };
 
   render() {
     const { showModalEdit, thing } = this.props;

@@ -5,6 +5,7 @@
   "dependencies": {
     "@babel/parser": "^7.4.5",
     "@blueprintjs/core": "^3.15.1",
+    "env-cmd": "^9.0.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.1",
@@ -14,11 +15,10 @@
   },
   "scripts": {
     "start": "PORT=8000 react-scripts start",
-    "build": "react-scripts build",
+    "build": "REACT_APP_EXPRESS_HOST=http://localhost:5000 REACT_APP_MAINFLUX_USER=hero12@email.com react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "proxy": "http://127.0.0.1:5000",
   "eslintConfig": {
     "extends": "react-app"
   },

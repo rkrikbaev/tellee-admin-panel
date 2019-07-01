@@ -57,9 +57,8 @@ UserRouter.route('/login').post( async (req, res, next) => {
     next();
     throw new Error("Expects content-type 'application/json'");
   };
-
   const { email } = req.body;
-  
+
   try {
 
     const user = await User.findOne({ email });

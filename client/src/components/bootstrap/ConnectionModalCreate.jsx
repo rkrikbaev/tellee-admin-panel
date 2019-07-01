@@ -38,11 +38,12 @@ class ConnectionModalCreate extends Component {
     const { id, channels } = this.state.config;
 
     try {
-      let response = await fetch('http://zsse.zeinetsse.com:5000/api/bootstrap/create', {
+      let response = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
+        'credentials' : 'include',
         body: JSON.stringify(this.state.config)
       });
 
@@ -56,11 +57,12 @@ class ConnectionModalCreate extends Component {
         for( let i = 0; i < channels.length; i++ ) {
 
           let response = await fetch(
-            `http://zsse.zeinetsse.com:5000/api/connection/create/channels/${channels[i]}/things/${id}`, {
+            `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${channels[i]}/things/${id}`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json'
-              }
+              },
+              'credentials' : 'include',
             });
 
           // If connection between thing and channel(s) in Mainflux doesn't created, below script show's error
@@ -90,7 +92,7 @@ class ConnectionModalCreate extends Component {
   }
 
   getFirmwares = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/other/firmwares')
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/firmwares`)
       .then( res => res.json())
       .then( firmwares => {
         const firm = firmwares.map( item => {
@@ -102,7 +104,7 @@ class ConnectionModalCreate extends Component {
   };
 
   getModels = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/other/models')
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/models`)
       .then( res => res.json())
       .then( models => {
         const mod = models.map( item => {
@@ -114,7 +116,9 @@ class ConnectionModalCreate extends Component {
   };
 
   getChannels = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/channels')
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
+      'credentials' : 'include',
+    })
       .then( res =>  res.json())
       .then( channels => {
         const arr = channels.map( (item, i) => {
@@ -126,7 +130,9 @@ class ConnectionModalCreate extends Component {
   };
 
   getThings = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/things')
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
+      'credentials' : 'include',
+    })
       .then( res =>  res.json())
       .then( things => {
         const arr = things.map( (item, i) => {

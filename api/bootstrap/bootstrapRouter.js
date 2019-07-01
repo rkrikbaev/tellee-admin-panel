@@ -396,10 +396,10 @@ BootstrapRouter.route('/edit/state/:id').put( async (req, res, next) => {
 BootstrapRouter.route('/remove/:id').delete( async (req, res, next) => {
 
   // Chech for JSON
-  if(!req.is('application/json')) {
-    next();
-    throw new Error("Expects content-type 'application/json'");
-  }
+  // if(!req.is('application/json')) {
+  //   next();
+  //   throw new Error("Expects content-type 'application/json'");
+  // }
 
   const token = req.cookies.auth;
   const config = {

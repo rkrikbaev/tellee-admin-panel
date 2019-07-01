@@ -22,11 +22,12 @@ class DeviceModalEdit extends Component {
   };
 
   getConfigById = async id => {
-    fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/${id}`, {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
     })
       .then( res =>  res.json())
       .then( config => {
@@ -37,7 +38,9 @@ class DeviceModalEdit extends Component {
   };
 
   getThings = async () => {
-    await fetch('http://zsse.zeinetsse.com:5000/api/things')
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
+      'credentials' : 'include',
+    })
       .then( res =>  res.json() )
       .then( oldThings => {
         const currentThing = oldThings.filter( item => {
@@ -49,7 +52,9 @@ class DeviceModalEdit extends Component {
   };
 
   getConnections = async () => {
-    await fetch('http://zsse.zeinetsse.com:5000/api/bootstrap')
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap`, {
+      'credentials' : 'include',
+    })
     .then( res =>  res.json() )
     .then( oldConnections => {
       const connections = oldConnections.filter( item => {
@@ -65,7 +70,7 @@ class DeviceModalEdit extends Component {
   };
 
   getFirmwares = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/other/firmwares')
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/firmwares`)
       .then( res => res.json())
       .then( firmwares => {
         const firm = firmwares.map( item => {
@@ -77,7 +82,7 @@ class DeviceModalEdit extends Component {
   };
 
   getModels = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/other/models')
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/models`)
       .then( res => res.json())
       .then( models => {
         const mod = models.map( item => {
@@ -136,16 +141,19 @@ class DeviceModalEdit extends Component {
         cycle,
       };
     };
-    await fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/edit/info/${config.mainflux_id}`, {
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${config.mainflux_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
       body: JSON.stringify({ obj })
     });
 
     if(sendToApp) {
-      await fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/${app}`)
+      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`, {
+        'credentials' : 'include',
+      })
         .then( response => response.json())
         .then( response => {
           response.content = JSON.parse(response.content);
@@ -171,21 +179,23 @@ class DeviceModalEdit extends Component {
           };
 
 
-          fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/edit/info/${response.mainflux_id}`, {
+          fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json'
             },
+            'credentials' : 'include',
             body: JSON.stringify({ response })
           });
         });
     };
     // await fetch(
-    //   `http://zsse.zeinetsse.com:5000/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${createdThing[0].id}`, {
+    //   `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${createdThing[0].id}`, {
     //     method: 'PUT',
     //     headers: {
     //       'Content-Type': 'application/json'
     //     },
+    //    'credentials' : 'include',
     //   });
     await this.getConnections();
 

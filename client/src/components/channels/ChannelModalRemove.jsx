@@ -18,11 +18,12 @@ class ChannelModalRemove extends Component {
   }
 
   removeChannel = async (id, event) => {
-    fetch(`http://zsse.zeinetsse.com:5000/api/channels/remove/${id}`, {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/remove/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      "credentials" : "include",
     });
     this.setState({ showModalRemove: false });
     this.props.callbackFromParent(this.state.showModalRemove, id);

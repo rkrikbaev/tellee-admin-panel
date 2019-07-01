@@ -29,7 +29,9 @@ class AppModalCreate extends Component {
   };
 
   getThings = async () => {
-    await fetch('http://zsse.zeinetsse.com:5000/api/things')
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
+    'credentials' : 'include',
+    })
       .then( res =>  res.json() )
       .then( oldThings => {
         this.setState({oldThings});
@@ -38,7 +40,9 @@ class AppModalCreate extends Component {
   };
 
   getConnections = async () => {
-    await fetch('http://zsse.zeinetsse.com:5000/api/bootstrap')
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap`, {
+      'credentials' : 'include',
+      })
     .then( res =>  res.json() )
     .then( oldConnections => {
       this.setState({oldConnections});
@@ -47,11 +51,12 @@ class AppModalCreate extends Component {
   };
 
   createThing = async () => {
-    await fetch('http://zsse.zeinetsse.com:5000/api/things/create', {
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      'credentials' : 'include',
       body: JSON.stringify(this.state.newThing),
     });
   };
@@ -61,7 +66,9 @@ class AppModalCreate extends Component {
     try {
       let arr = [];
       await this.createThing();
-      await fetch('http://zsse.zeinetsse.com:5000/api/things')
+      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
+        'credentials' : 'include',
+        })
         .then( res =>  res.json() )
         .then( oldThings => {
           arr = oldThings;
@@ -83,20 +90,22 @@ class AppModalCreate extends Component {
     };
 
     try {
-      await fetch('http://zsse.zeinetsse.com:5000/api/bootstrap/create/app', {
+      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/create/app`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        'credentials' : 'include',
         body: JSON.stringify(obj),
       });
 
       await fetch(
-        `http://zsse.zeinetsse.com:5000/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${thing[0].id}`, {
+        `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${thing[0].id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
           },
+          'credentials' : 'include',
         });
       await this.getConnections();
 

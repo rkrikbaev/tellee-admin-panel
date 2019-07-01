@@ -21,11 +21,12 @@ class AppModalEdit extends Component {
   };
 
   getConfigById = async id => {
-    fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/${id}`, {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
     })
       .then( res =>  res.json())
       .then( config => {
@@ -49,11 +50,12 @@ class AppModalEdit extends Component {
   };
 
   getChannels = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/channels', {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
     })
       .then( res =>  res.json())
       .then( channels => {
@@ -76,11 +78,12 @@ class AppModalEdit extends Component {
       type: "app",
       content: config.content,
     };
-    await fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/edit/info/${config.mainflux_id}`, {
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${config.mainflux_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
+      'credentials' : 'include',
       body: JSON.stringify({ obj })
     });
 
@@ -96,11 +99,12 @@ class AppModalEdit extends Component {
 
     // obj.channels = arr;
 
-    // fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/edit/channels/${config.mainflux_id}`, {
+    // fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/channels/${config.mainflux_id}`, {
     //   method: 'PUT',
     //   headers: {
     //     'Content-Type': 'application/json'
     //   },
+    //   'credentials' : 'include',
     //   body: JSON.stringify({ obj })
     // });
 

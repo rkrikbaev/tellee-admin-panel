@@ -1,11 +1,10 @@
 import express from 'express';
 // import Keycloak from 'keycloak-connect';
-// import session from 'express-session';
+import session from 'express-session';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import {connectDb} from './models/index';
-const path = require('path');
 require('dotenv').config();
 
 import UserRouter from './api/user/userRouter';
@@ -34,23 +33,22 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use( (req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Origin", "http://localhost:8000");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+  res.header("Access-Control-Allow-Credentials", true);
   next();
 });
 
-// const memoryStore = new session.MemoryStore();
-// const keycloak = new Keycloak({ store: memoryStore });
+const memoryStore = new session.MemoryStore();
 
 // Session
-// app.use( session({
-//   secret: 'thisShouldBeLongAndSecret',
-//   resave: false,
-//   saveUninitialized: true,
-//   store: memoryStore
-// }));
-// app.use(keycloak.middleware());
+app.use( session({
+  secret: 'thisShouldBeLongAndSecret',
+  resave: false,
+  saveUninitialized: true,
+  store: memoryStore
+}));
 
 // Routes
 app.use('/api/users', UserRouter);
@@ -59,9 +57,6 @@ app.use('/api/things', ThingRouter);
 app.use('/api/channels', ChannelRouter);
 app.use('/api/bootstrap', BootstrapRouter);
 app.use('/api/connection', ConnectionRouter);
-
-// Logout
-// app.use( keycloak.middleware( { logout: '/'} ));
 
 connectDb().then( async () => {
   app.listen(process.env.PORT, () =>

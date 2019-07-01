@@ -21,26 +21,30 @@ class Channels extends Component {
       showModalRemove: false,
       showModalEdit: false,
       showModalCreate: false,
-    }
+    };
   }
 
   getToken = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/users/login', {
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/users/login`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({email: "hero12@email.com"})
+      credentials : 'include',
+      mode: "cors",
+      body: JSON.stringify({email: `${process.env.REACT_APP_MAINFLUX_USER}`})
     });
   };
 
   getChannels = async () => {
-    fetch('http://zsse.zeinetsse.com:5000/api/channels', {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
+      mode: "cors",
+      credentials : 'include',
     })
       .then( res =>  res.json())
       .then( channels => this.setState({channels}) )

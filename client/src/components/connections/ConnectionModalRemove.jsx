@@ -18,15 +18,18 @@ class ConnectionModalRemove extends Component {
   }
 
   removeConnection = async connection => {
-    fetch(`http://zsse.zeinetsse.com:5000/api/things/remove/${connection.mainflux_id}`, {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things/remove/${connection.mainflux_id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      'credentials' : 'include',
     });
     const { sendToApp, app } = connection.content;
     if(sendToApp) {
-      await fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/${app}`)
+      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`,{
+        'credentials' : 'include',
+      })
         .then( response => response.json())
         .then( response => {
           response.content = JSON.parse(response.content);
@@ -40,13 +43,12 @@ class ConnectionModalRemove extends Component {
             return item.name.split(".")[1] !== connection.mainflux_id;
           });
 
-          console.log(response);
-
-          fetch(`http://zsse.zeinetsse.com:5000/api/bootstrap/edit/info/${response.mainflux_id}`, {
+          fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json'
             },
+            'credentials' : 'include',
             body: JSON.stringify({ response })
           });
         });
