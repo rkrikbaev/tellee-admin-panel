@@ -47,7 +47,7 @@ class DeviceModalCreate extends Component {
 
   getConnections = async () => {
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap`, {
-      'credentials' : 'include',
+      credentials : 'include', mode: 'cors',
     })
     .then( res =>  res.json() )
     .then( oldConnections => {
@@ -90,7 +90,7 @@ class DeviceModalCreate extends Component {
 
   getThings = async () => {
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
-      'credentials' : 'include',
+      credentials : 'include', mode: 'cors',
     })
       .then( res =>  res.json() )
       .then( oldThings => {
@@ -106,7 +106,7 @@ class DeviceModalCreate extends Component {
       headers: {
         'Content-Type': 'application/json',
       },
-      'credentials' : 'include',
+      credentials : 'include', mode: 'cors',
       body: JSON.stringify(this.state.newThing),
     });
   };
@@ -169,13 +169,13 @@ class DeviceModalCreate extends Component {
         headers: {
           'Content-Type': 'application/json',
         },
-        'credentials' : 'include',
+        credentials : 'include', mode: 'cors',
         body: JSON.stringify(obj),
       });
 
       if(sendToApp) {
         await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`, {
-          'credentials' : 'include',
+          credentials : 'include', mode: 'cors',
         })
           .then( response => response.json())
           .then( response => {
@@ -196,7 +196,7 @@ class DeviceModalCreate extends Component {
               headers: {
                 'Content-Type': 'application/json'
               },
-              'credentials' : 'include',
+              credentials : 'include', mode: 'cors',
               body: JSON.stringify({ response })
             });
           });
@@ -207,7 +207,7 @@ class DeviceModalCreate extends Component {
           headers: {
             'Content-Type': 'application/json'
           },
-          'credentials' : 'include',
+          credentials : 'include', mode: 'cors',
         });
       await this.getConnections();
 

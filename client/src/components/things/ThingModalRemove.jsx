@@ -23,7 +23,7 @@ class ThingModalRemove extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      'credentials' : 'include',
+      credentials : 'include', mode: 'cors',
     });
     this.setState({ showModalRemove: false });
     this.props.callbackFromParent(this.state.showModalRemove, id);

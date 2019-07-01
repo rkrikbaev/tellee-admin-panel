@@ -28,14 +28,14 @@ class Things extends Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      'credentials' : 'include',
+      credentials : 'include', mode: 'cors',
       body: JSON.stringify({email: "hero12@email.com"})
     });
   };
 
   getThings = async () => {
     fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
-      'credentials' : 'include',
+      credentials : 'include', mode: 'cors',
     })
       .then( res =>  res.json())
       .then( things => this.setState({things}, () => {

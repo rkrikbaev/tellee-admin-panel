@@ -28,7 +28,7 @@ class Bootstrap extends Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      'credentials' : 'include',
+      credentials : 'include', mode: 'cors',
       body: JSON.stringify({email: "hero12@email.com"})
     });
   };
@@ -39,7 +39,7 @@ class Bootstrap extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      'credentials' : 'include',
+      credentials : 'include', mode: 'cors',
     })
       .then( res =>  res.json())
       .then( connections => this.setState({connections}, () => {

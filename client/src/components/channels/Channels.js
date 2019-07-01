@@ -68,8 +68,8 @@ class Channels extends Component {
     this.getChannels();
   };
 
-  componentDidMount() {
-    this.getToken();
+  async componentDidMount() {
+    await this.getToken();
     this.getChannels();
   }
 

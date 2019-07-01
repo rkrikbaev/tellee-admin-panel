@@ -22,7 +22,7 @@ class ThingModalEdit extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      'credentials' : 'include',
+      credentials : 'include', mode: 'cors',
       body: JSON.stringify({name: thing.name, metadata: thing.metadata})
     });
     this.close();

@@ -23,12 +23,12 @@ class ConnectionModalRemove extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      'credentials' : 'include',
+      credentials : 'include', mode: 'cors',
     });
     const { sendToApp, app } = connection.content;
     if(sendToApp) {
       await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`,{
-        'credentials' : 'include',
+        credentials : 'include', mode: 'cors',
       })
         .then( response => response.json())
         .then( response => {
@@ -48,7 +48,7 @@ class ConnectionModalRemove extends Component {
             headers: {
               'Content-Type': 'application/json'
             },
-            'credentials' : 'include',
+            credentials : 'include', mode: 'cors',
             body: JSON.stringify({ response })
           });
         });
