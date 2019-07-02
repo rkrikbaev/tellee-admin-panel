@@ -88,6 +88,7 @@ class Channels extends Component {
       <div id="channels" className="main_wrapper">
         <div className="channel_top">
           <h1>Channels</h1>
+          <h1>{process.env.REACT_APP_EXPRESS_HOST}</h1>
           <Button
             icon
             labelPosition='left'

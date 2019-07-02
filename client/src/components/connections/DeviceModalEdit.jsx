@@ -196,7 +196,7 @@ class DeviceModalEdit extends Component {
         });
     };
     // await fetch(
-    //   `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${createdThing[0].id}`, {
+    //   `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${createdThing[0].id}`, {
     //     method: 'PUT',
     //     headers: {
     //       'Content-Type': 'application/json'

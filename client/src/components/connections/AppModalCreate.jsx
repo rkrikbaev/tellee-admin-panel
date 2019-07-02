@@ -89,7 +89,7 @@ class AppModalCreate extends Component {
     const obj = {
       mac: newThing.metadata.mac,
       id: thing[0].id,
-      channels: '18cafc24-4a24-4150-9e2d-a0ecdedf58a9',
+      channels: `${process.env.REACT_APP_CHANNEL_ID}`,
       name: connectionName,
     };
 
@@ -105,7 +105,7 @@ class AppModalCreate extends Component {
       });
 
       await fetch(
-        `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/18cafc24-4a24-4150-9e2d-a0ecdedf58a9/things/${thing[0].id}`, {
+        `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${thing[0].id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'

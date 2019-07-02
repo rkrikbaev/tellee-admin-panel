@@ -15,7 +15,7 @@
   },
   "scripts": {
     "start": "PORT=8000 react-scripts start",
-    "build": "REACT_APP_EXPRESS_HOST=http://zsse.zeinetsse.com:5000 REACT_APP_MAINFLUX_USER=hero12@email.com react-scripts build",
+    "build": "env-cmd react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
