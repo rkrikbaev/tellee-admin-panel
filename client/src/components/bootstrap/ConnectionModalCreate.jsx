@@ -43,7 +43,8 @@ class ConnectionModalCreate extends Component {
         headers: {
           'Content-Type': 'application/json'
         },
-        credentials : 'include', mode: 'cors',
+        mode: 'cors',
+        credentials : 'include',
         body: JSON.stringify(this.state.config)
       });
 
@@ -62,7 +63,8 @@ class ConnectionModalCreate extends Component {
               headers: {
                 'Content-Type': 'application/json'
               },
-              credentials : 'include', mode: 'cors',
+              mode: 'cors',
+              credentials : 'include',
             });
 
           // If connection between thing and channel(s) in Mainflux doesn't created, below script show's error
@@ -131,7 +133,8 @@ class ConnectionModalCreate extends Component {
 
   getThings = async () => {
     fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
     })
       .then( res =>  res.json())
       .then( things => {

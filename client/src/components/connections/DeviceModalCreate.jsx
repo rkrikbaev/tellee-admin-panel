@@ -47,7 +47,8 @@ class DeviceModalCreate extends Component {
 
   getConnections = async () => {
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap`, {
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
     })
     .then( res =>  res.json() )
     .then( oldConnections => {
@@ -90,7 +91,8 @@ class DeviceModalCreate extends Component {
 
   getThings = async () => {
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
     })
       .then( res =>  res.json() )
       .then( oldThings => {
@@ -106,7 +108,8 @@ class DeviceModalCreate extends Component {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
       body: JSON.stringify(this.state.newThing),
     });
   };
@@ -169,13 +172,15 @@ class DeviceModalCreate extends Component {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials : 'include', mode: 'cors',
+        mode: 'cors',
+        credentials : 'include',
         body: JSON.stringify(obj),
       });
 
       if(sendToApp) {
         await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`, {
-          credentials : 'include', mode: 'cors',
+          mode: 'cors',
+          credentials : 'include',
         })
           .then( response => response.json())
           .then( response => {
@@ -196,7 +201,8 @@ class DeviceModalCreate extends Component {
               headers: {
                 'Content-Type': 'application/json'
               },
-              credentials : 'include', mode: 'cors',
+              mode: 'cors',
+              credentials : 'include',
               body: JSON.stringify({ response })
             });
           });
@@ -207,7 +213,8 @@ class DeviceModalCreate extends Component {
           headers: {
             'Content-Type': 'application/json'
           },
-          credentials : 'include', mode: 'cors',
+          mode: 'cors',
+          credentials : 'include',
         });
       await this.getConnections();
 

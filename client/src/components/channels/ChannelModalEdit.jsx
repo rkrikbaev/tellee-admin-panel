@@ -23,7 +23,8 @@ class ChannelModalEdit extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
       body: JSON.stringify({name: channel.name, metadata: channel.metadata})
     });
     this.close();

@@ -26,7 +26,8 @@ class ThingModalCreate extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
       body: JSON.stringify({name, metadata})
     });
     this.close();

@@ -26,7 +26,8 @@ class AppModalEdit extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
     })
       .then( res =>  res.json())
       .then( config => {
@@ -55,7 +56,8 @@ class AppModalEdit extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
     })
       .then( res =>  res.json())
       .then( channels => {
@@ -83,7 +85,8 @@ class AppModalEdit extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
       body: JSON.stringify({ obj })
     });
 
@@ -104,7 +107,8 @@ class AppModalEdit extends Component {
     //   headers: {
     //     'Content-Type': 'application/json'
     //   },
-    //   credentials : 'include', mode: 'cors',
+    //   mode: 'cors',
+    //   credentials : 'include',
     //   body: JSON.stringify({ obj })
     // });
 

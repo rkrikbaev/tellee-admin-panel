@@ -30,7 +30,8 @@ class AppModalCreate extends Component {
 
   getThings = async () => {
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
-    credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
     })
       .then( res =>  res.json() )
       .then( oldThings => {
@@ -41,8 +42,9 @@ class AppModalCreate extends Component {
 
   getConnections = async () => {
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap`, {
-      credentials : 'include', mode: 'cors',
-      })
+      mode: 'cors',
+      credentials : 'include',
+    })
     .then( res =>  res.json() )
     .then( oldConnections => {
       this.setState({oldConnections});
@@ -56,7 +58,8 @@ class AppModalCreate extends Component {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
       body: JSON.stringify(this.state.newThing),
     });
   };
@@ -67,7 +70,8 @@ class AppModalCreate extends Component {
       let arr = [];
       await this.createThing();
       await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
-        credentials : 'include', mode: 'cors',
+        mode: 'cors',
+        credentials : 'include',
         })
         .then( res =>  res.json() )
         .then( oldThings => {
@@ -95,7 +99,8 @@ class AppModalCreate extends Component {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials : 'include', mode: 'cors',
+        mode: 'cors',
+        credentials : 'include',
         body: JSON.stringify(obj),
       });
 
@@ -105,7 +110,8 @@ class AppModalCreate extends Component {
           headers: {
             'Content-Type': 'application/json'
           },
-          credentials : 'include', mode: 'cors',
+          mode: 'cors',
+          credentials : 'include',
         });
       await this.getConnections();
 

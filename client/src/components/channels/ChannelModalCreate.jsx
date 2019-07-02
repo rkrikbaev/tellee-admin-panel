@@ -27,8 +27,8 @@ class ChannelModalCreate extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials : 'include',
       mode: 'cors',
+      credentials : 'include',
       body: JSON.stringify({channel})
     });
     this.close();

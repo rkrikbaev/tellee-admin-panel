@@ -23,7 +23,8 @@ class ChannelModalRemove extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      "credentials" : "include",
+      mode: 'cors',
+      credentials : 'include',
     });
     this.setState({ showModalRemove: false });
     this.props.callbackFromParent(this.state.showModalRemove, id);

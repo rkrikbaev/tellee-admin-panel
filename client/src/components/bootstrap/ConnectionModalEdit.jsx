@@ -31,7 +31,8 @@ class ConnectionModalEdit extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
     })
       .then( res =>  res.json())
       .then( config => {
@@ -77,7 +78,8 @@ class ConnectionModalEdit extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
       body: JSON.stringify({ obj })
     });
 
@@ -97,7 +99,8 @@ class ConnectionModalEdit extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
       body: JSON.stringify({ obj })
     });
 
@@ -144,7 +147,8 @@ class ConnectionModalEdit extends Component {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials : 'include', mode: 'cors',
+      mode: 'cors',
+      credentials : 'include',
     })
       .then( res =>  res.json())
       .then( channels => {

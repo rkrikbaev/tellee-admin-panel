@@ -31,8 +31,8 @@ class Channels extends Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
+      mode: 'cors',
       credentials : 'include',
-      mode: "cors",
       body: JSON.stringify({email: `${process.env.REACT_APP_MAINFLUX_USER}`})
     });
   };
@@ -43,7 +43,7 @@ class Channels extends Component {
       headers: {
         'Content-Type': 'application/json',
       },
-      mode: "cors",
+      mode: 'cors',
       credentials : 'include',
     })
       .then( res =>  res.json())
