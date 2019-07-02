@@ -21,7 +21,7 @@ class AppModalEdit extends Component {
   };
 
   getConfigById = async id => {
-    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${id}`, {
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -36,10 +36,7 @@ class AppModalEdit extends Component {
         config.content = JSON.parse(config.content);
 
         for (let i = 0; i < config.mainflux_channels.length; i++) {
-          selectedChannels.push({
-            text: config.mainflux_channels[i].name,
-            value: config.mainflux_channels[i].id,
-          });
+          selectedChannels.push(config.mainflux_channels[i].id);
         };
 
         this.setState({
@@ -62,7 +59,7 @@ class AppModalEdit extends Component {
       .then( res =>  res.json())
       .then( channels => {
         const chan = channels.map( (item, i) => {
-          return {key: item.id, text: item.name, value: item.id}
+          return {value: item.id, text: item.name}
         });
         this.setState({ channels: chan });
       })
@@ -121,6 +118,11 @@ class AppModalEdit extends Component {
     };
   };
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps.connection !== this.props.connection ||
+    nextState !== this.state;
+  };
+
   componentDidMount() {
     this.getChannels();
   }
@@ -144,7 +146,7 @@ class AppModalEdit extends Component {
 
   render() {
     const { showModalEditApp } = this.props;
-    const { config, channels } = this.state;
+    const { config, channels, selectedChannels } = this.state;
 
     return (
       <Modal closeIcon dimmer="blurring" open={showModalEditApp} onClose={this.close}>
@@ -170,6 +172,7 @@ class AppModalEdit extends Component {
                 selection
                 options={channels}
                 onChange={this.handleChangeChannel}
+                value={selectedChannels}
               />
             </Form.Field>
 

@@ -18,6 +18,7 @@ class DeviceModalEdit extends Component {
       models: [],
       apps: [],
       config: {},
+      selectedApp: [],
     };
   };
 
@@ -33,7 +34,8 @@ class DeviceModalEdit extends Component {
       .then( res =>  res.json())
       .then( config => {
         config.content = JSON.parse(config.content);
-        this.setState({ config });
+        let selectedApp = config.content.app;
+        this.setState({ selectedApp, config });
       })
       .catch( err => console.log(err) );
   };
@@ -65,7 +67,7 @@ class DeviceModalEdit extends Component {
         return item.content.type === 'app';
       });
       const apps = connections.map( item => {
-        return { key: item.id, text: item.name.split(".")[0], value: item.external_id}
+        return { value: item.external_id, text: item.name.split(".")[0] }
       })
       this.setState({ apps });
     })
@@ -77,7 +79,7 @@ class DeviceModalEdit extends Component {
       .then( res => res.json())
       .then( firmwares => {
         const firm = firmwares.map( item => {
-          return { text: item.split(".")[0], value: item.split(".")[0]}
+          return { value: item.split(".")[0], text: item.split(".")[0] }
         });
         this.setState({ firmwares: firm });
       })
@@ -89,7 +91,7 @@ class DeviceModalEdit extends Component {
       .then( res => res.json())
       .then( models => {
         const mod = models.map( item => {
-          return { text: item.split(".")[0], value: item.split(".")[0]}
+          return { value: item.split(".")[0], text: item.split(".")[0] }
         });
         this.setState({ models: mod });
       })
@@ -103,6 +105,10 @@ class DeviceModalEdit extends Component {
         this.forceUpdate();
       });
     };
+  };
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps.connection === this.props.connection && nextState !== this.state;
   };
 
   componentDidMount() {
@@ -195,6 +201,7 @@ class DeviceModalEdit extends Component {
           });
         });
     };
+    //- FOR EDITTING DEVICE CONNECTED CHANNELS - //
     // await fetch(
     //   `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${createdThing[0].id}`, {
     //     method: 'PUT',
@@ -283,6 +290,7 @@ class DeviceModalEdit extends Component {
       isEnabled,
       models,
       apps,
+      selectedApp,
     } = this.state;
 
     return (
@@ -332,6 +340,7 @@ class DeviceModalEdit extends Component {
                 fluid
                 selection
                 options={models}
+                defaultValue={config.content !== undefined ? `${config.content.model}` : ''}
                 onChange={this.handleChangeModel}
               />
             </Form.Field>
@@ -343,6 +352,7 @@ class DeviceModalEdit extends Component {
                 selection
                 options={apps}
                 onChange={this.handleChangeApp}
+                value={selectedApp}
               />
             </Form.Field>
           </Form>

@@ -8,7 +8,6 @@ const ChannelRouter = express.Router();
 // -- Get all channels --
 ChannelRouter.route('/').get( async (req, res, next) => {
   const token = req.cookies.auth;
-  console.log(token)
 
   try {
     const channels = await axios.get(`https://${process.env.MAINFLUX_URL}/channels`, {

@@ -100,6 +100,7 @@ class Connections extends Component {
   };
 
   editDeviceModalCallback = showModalEditDevice => {
+    console.log(true)
     this.setState({ showModalEditDevice });
     this.getConnections();
   };

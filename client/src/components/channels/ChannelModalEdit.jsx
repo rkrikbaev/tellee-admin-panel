@@ -47,7 +47,7 @@ class ChannelModalEdit extends Component {
 
     return (
       <Modal closeIcon dimmer="blurring" open={showModalEdit} onClose={this.close}>
-          <Modal.Header>EDIT THING</Modal.Header>
+          <Modal.Header>EDIT CHANNEL</Modal.Header>
           <Modal.Content>
           <Form>
             <Form.Field>
