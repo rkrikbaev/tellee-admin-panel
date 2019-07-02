@@ -19,6 +19,8 @@ class DeviceModalEdit extends Component {
       apps: [],
       config: {},
       selectedApp: [],
+      selectedModel: [],
+      selectedFirmware: [],
     };
   };
 
@@ -35,7 +37,9 @@ class DeviceModalEdit extends Component {
       .then( config => {
         config.content = JSON.parse(config.content);
         let selectedApp = config.content.app;
-        this.setState({ selectedApp, config });
+        let selectedModel = config.content.model;
+        let selectedFirmware = config.content.firmware;
+        this.setState({ selectedApp, selectedModel, selectedFirmware, config });
       })
       .catch( err => console.log(err) );
   };
@@ -291,6 +295,8 @@ class DeviceModalEdit extends Component {
       models,
       apps,
       selectedApp,
+      selectedModel,
+      selectedFirmware,
     } = this.state;
 
     return (
@@ -318,7 +324,7 @@ class DeviceModalEdit extends Component {
                 fluid
                 selection
                 options={firmwares}
-                defaultValue={config.content !== undefined ? `${config.content.firmware}` : ''}
+                value={selectedFirmware}
                 onChange={this.handleChangeFirmware}
               />
             </Form.Field>
@@ -340,7 +346,7 @@ class DeviceModalEdit extends Component {
                 fluid
                 selection
                 options={models}
-                defaultValue={config.content !== undefined ? `${config.content.model}` : ''}
+                value={selectedModel}
                 onChange={this.handleChangeModel}
               />
             </Form.Field>
