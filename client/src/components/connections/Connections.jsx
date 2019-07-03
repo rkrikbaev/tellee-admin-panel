@@ -91,7 +91,7 @@ class Connections extends Component {
       this.setState({ connections: this.state.connections.filter( i => i.mainflux_id !== id )
       });
     };
-    this.getConnections();
+    // this.getConnections();
   };
 
   editAppModalCallback = showModalEditApp => {

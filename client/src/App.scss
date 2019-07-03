@@ -31,6 +31,11 @@ html, body {
   display: flex;
 }
 
+.active_item {
+  border: 1.2px solid blue !important;
+  border-radius: 5px;
+}
+
 #sidebar_menu {
   width: 15rem;
   max-height: 11em;
@@ -49,6 +54,7 @@ html, body {
       border-bottom: 1px rgba(34,36,38,.1) solid;
       text-transform: uppercase;
       a {
+        padding: 0 .5rem;
         color: #6435c9;
       }
     }

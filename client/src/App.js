@@ -11,14 +11,42 @@ import Notfound from './components/NotFound'
 
 class App extends Component {
 
-  state = {
-    // activeItem: 'main',
+  constructor() {
+    super();
+
+    this.state = {
+      home: true,
+      channels: false,
+      connections: false,
+    };
+  }
+
+  handleHome = () => {
+    this.setState({
+      home: true,
+      channels: false,
+      connections: false,
+    });
   };
 
-  // handleItemClick = (e, { name }) => this.setState({ activeItem: name });
+  handleChannels = () => {
+    this.setState({
+      home: false,
+      channels: true,
+      connections: false,
+    });
+  };
+
+  handleConnections = () => {
+    this.setState({
+      home: false,
+      channels: false,
+      connections: true,
+    });
+  };
 
   render() {
-    // const { activeItem } = this.state;
+    const { home, channels, connections } = this.state;
 
     return (
       <div className="App">
@@ -27,9 +55,24 @@ class App extends Component {
           <div id="sidebar_wrapper">
             <Menu id="sidebar_menu" secondary vertical>
               <ul>
-                <li><Link to="/">Home</Link></li>
-                <li><Link to="/channels">Channels</Link></li>
-                <li><Link to="/connections">Connections</Link></li>
+                <li
+                  className={home ? "active_item" : ""}
+                  onClick={this.handleHome}
+                >
+                  <Link to="/">Home</Link>
+                </li>
+                <li
+                  className={channels ? "active_item" : ""}
+                  onClick={this.handleChannels}
+                >
+                  <Link to="/channels">Channels</Link>
+                </li>
+                <li
+                  className={connections ? "active_item" : ""}
+                  onClick={this.handleConnections}
+                >
+                  <Link to="/connections">Connections</Link>
+                </li>
               </ul>
             </Menu>
             <Switch>
