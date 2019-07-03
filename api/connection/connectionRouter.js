@@ -1,7 +1,6 @@
 import express from 'express';
 import https from 'https';
 import axios from 'axios';
-import md5 from 'md5';
 require('dotenv').config();
 
 const ConnectionRouter = express.Router();

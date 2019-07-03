@@ -1,7 +1,7 @@
 import express from 'express';
 import https from 'https';
 import axios from 'axios';
-import md5 from 'md5';
+import md5 from 'blueimp-md5';
 require('dotenv').config();
 
 const BootstrapRouter = express.Router();
@@ -308,7 +308,9 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
   }
   // -- IF EDITTING PROCESS COMES FROM CREATION OF DEVICE -- //
   else if (req.body.response !== undefined) {
+
     const { mainflux_id, mainflux_channels, content } = req.body.response;
+    content.hash = md5(req.body.response);
     if(req.body.response.content.type === "app") {
       editedConfig = {
         external_id: content.mac,
@@ -374,7 +376,7 @@ BootstrapRouter.route('/edit/state/:id').put( async (req, res, next) => {
     state
   };
 
-    editedConfig.content = JSON.stringify(editedConfig.content);
+  editedConfig.content = JSON.stringify(editedConfig.content);
 
   try {
     axios.put(`http://${process.env.MAINFLUX_URL}:8200/things/state/${req.params.id}`,

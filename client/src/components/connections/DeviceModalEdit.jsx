@@ -112,7 +112,7 @@ class DeviceModalEdit extends Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.connection === this.props.connection && nextState !== this.state;
+    return nextProps.connection === this.props.connection || nextState !== this.state;
   };
 
   componentDidMount() {
@@ -193,7 +193,6 @@ class DeviceModalEdit extends Component {
             type: config.content.model,
           };
 
-
           fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {
             method: 'PUT',
             headers: {
@@ -215,7 +214,6 @@ class DeviceModalEdit extends Component {
     //    mode: 'cors',
     //    credentials : 'include',
     //   });
-    await this.getConnections();
 
     this.close();
   };
@@ -243,6 +241,7 @@ class DeviceModalEdit extends Component {
           firmware: currentValue,
         },
       },
+      selectedFirmware: value,
     }));
   };
 
@@ -270,6 +269,7 @@ class DeviceModalEdit extends Component {
           model: currentValue,
         },
       },
+      selectedModel: value,
     }));
   };
 
@@ -283,6 +283,7 @@ class DeviceModalEdit extends Component {
           app: currentValue,
         },
       },
+      selectedApp: value,
     }));
   };
 
