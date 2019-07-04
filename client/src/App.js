@@ -55,23 +55,14 @@ class App extends Component {
           <div id="sidebar_wrapper">
             <Menu id="sidebar_menu" secondary vertical>
               <ul>
-                <li
-                  className={home ? "active_item" : ""}
-                  onClick={this.handleHome}
-                >
-                  <Link to="/">Home</Link>
+                <li className={home ? "active_item" : ""}>
+                  <Link onClick={this.handleHome} to="/">Home</Link>
                 </li>
-                <li
-                  className={channels ? "active_item" : ""}
-                  onClick={this.handleChannels}
-                >
-                  <Link to="/channels">Channels</Link>
+                <li className={channels ? "active_item" : ""}>
+                  <Link onClick={this.handleChannels} to="/channels">Channels</Link>
                 </li>
-                <li
-                  className={connections ? "active_item" : ""}
-                  onClick={this.handleConnections}
-                >
-                  <Link to="/connections">Connections</Link>
+                <li className={connections ? "active_item" : ""}>
+                  <Link onClick={this.handleConnections} to="/connections">Connections</Link>
                 </li>
               </ul>
             </Menu>
