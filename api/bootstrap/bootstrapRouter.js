@@ -310,7 +310,7 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
   else if (req.body.response !== undefined) {
 
     const { mainflux_id, mainflux_channels, content } = req.body.response;
-    content.hash = md5(req.body.response);
+    content.hash = md5(JSON.stringify(req.body.response));
     if(req.body.response.content.type === "app") {
       editedConfig = {
         external_id: content.mac,

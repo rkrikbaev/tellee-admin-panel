@@ -38,7 +38,7 @@ class Channels extends Component {
   };
 
   getChannels = async () => {
-    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -63,9 +63,9 @@ class Channels extends Component {
     this.setState({ showModalEdit });
   };
 
-  createChannelModalCallback = (showModalCreate) => {
+  createChannelModalCallback = async showModalCreate => {
     this.setState({ showModalCreate });
-    this.getChannels();
+    await this.getChannels();
   };
 
   async componentDidMount() {
