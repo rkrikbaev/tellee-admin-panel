@@ -40,7 +40,7 @@ class Connections extends Component {
       },
       mode: 'cors',
       credentials : 'include',
-      body: JSON.stringify({email: "hero12@email.com"})
+      body: JSON.stringify({email: `${process.env.REACT_APP_MAINFLUX_USER}`})
     });
   };
 
