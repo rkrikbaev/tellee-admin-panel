@@ -64,15 +64,15 @@ class DeviceModalCreate extends Component {
     })
     .catch( err => console.log(err) );
   };
-
+  // .split(".")[0]
   getFirmwares = async () => {
     fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/firmwares`)
     .then( res => res.json())
     .then( firmwares => {
-      // const firm = firmwares.map( item => {
-      //   return { text: item.split(".")[0], value: item.split(".")[0]}
-      // });
-      this.setState({ firmwares });
+      const firm = firmwares.map( item => {
+        return { text: item, value: item}
+      });
+      this.setState({ firmwares: firm });
     })
     .catch( err => console.log(err) );
     };
