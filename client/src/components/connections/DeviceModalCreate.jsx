@@ -64,7 +64,7 @@ class DeviceModalCreate extends Component {
     })
     .catch( err => console.log(err) );
   };
-  // .split(".")[0]
+
   getFirmwares = async () => {
     fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/firmwares`)
     .then( res => res.json())

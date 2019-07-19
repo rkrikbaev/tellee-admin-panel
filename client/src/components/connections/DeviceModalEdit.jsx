@@ -83,7 +83,7 @@ class DeviceModalEdit extends Component {
       .then( res => res.json())
       .then( firmwares => {
         const firm = firmwares.map( item => {
-          return { value: item.split(".")[0], text: item.split(".")[0] }
+          return { value: item, text: item }
         });
         this.setState({ firmwares: firm });
       })

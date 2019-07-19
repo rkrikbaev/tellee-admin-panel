@@ -4,6 +4,7 @@ import {
   Item,
   Button,
   Icon,
+  Popup,
 } from 'semantic-ui-react';
 import AppModalCreate from './AppModalCreate';
 import AppModalEdit from './AppModalEdit';
@@ -158,7 +159,17 @@ class Connections extends Component {
               <Item key={item.mainflux_id}>
 
                 <Item.Content verticalAlign='middle'>
-                  <Item.Header>{item.name}</Item.Header>
+                  <Popup
+                    content={
+                      <div>
+                        <p>id: {item.mainflux_id}</p>
+                        <p>key: {item.mainflux_key}</p>
+                      </div>
+                    }
+                    trigger={
+                      <Item.Header>{item.name}</Item.Header>
+                    }
+                  />
                   <Item.Description>{item.content.type}</Item.Description>
                   <Item.Description>{item.external_id}</Item.Description>
                   <Item.Extra>
