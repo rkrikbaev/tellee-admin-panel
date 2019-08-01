@@ -125,7 +125,6 @@ class AppModalEdit extends Component {
   render() {
     const { showModalEditApp } = this.props;
     const { config, channels, selectedChannels } = this.state;
-    console.log(showModalEditApp);
     return (
       <Modal closeIcon dimmer="blurring" open={showModalEditApp} onClose={this.close}>
         <Modal.Header>EDIT CONNECTION</Modal.Header>

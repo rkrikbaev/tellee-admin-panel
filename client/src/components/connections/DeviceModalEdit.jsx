@@ -100,10 +100,11 @@ class DeviceModalEdit extends Component {
         this.forceUpdate();
       });
     };
+    this.getConnections();
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.connection === this.props.connection || nextState !== this.state;
+    return nextProps === this.props || nextState !== this.state;
   };
 
   componentDidMount() {

@@ -56,7 +56,7 @@ class DeviceModalCreate extends Component {
         return item.content.type === 'app';
       });
       const apps = connections.map( item => {
-        return { key: item.id, text: item.name, value: item.external_id}
+        return { key: item.external_id, text: item.name, value: item.external_id}
       })
       this.setState({ apps });
     })
@@ -299,6 +299,7 @@ class DeviceModalCreate extends Component {
         sendToApp: checked,
       },
     }));
+    this.getConnections();
   };
 
   handleChangeDeviceType = (e, { value }) => {
@@ -318,6 +319,10 @@ class DeviceModalCreate extends Component {
       },
     }));
   };
+
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   return nextProps === this.props || nextState !== this.state;
+  // };
 
   componentDidMount() {
     this.getThings();
