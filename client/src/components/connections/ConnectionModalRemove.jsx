@@ -49,10 +49,6 @@ class ConnectionModalRemove extends Component {
             return item.thing_id !== connection.mainflux_id;
           });
 
-          content.models_list = content.models_list.filter( item => {
-            return item.name.split(".")[1] !== connection.mainflux_id;
-          });
-
           fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {
             method: 'PUT',
             headers: {

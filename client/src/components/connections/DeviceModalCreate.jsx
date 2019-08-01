@@ -14,9 +14,8 @@ class DeviceModalCreate extends Component {
     super(props);
 
     this.state = {
-      firmwares: [],
+      deviceTypes: [],
       apps: [],
-      models: [],
       oldThings: [],
       oldConnections: [],
       isEnabled: true,
@@ -32,13 +31,12 @@ class DeviceModalCreate extends Component {
       },
       config: {
         id: '',
-        channels: [],
+        channel: [],
         name: '',
-        sendToApp: false,
-        firmware: '',
-        app: undefined,
-        model: undefined,
         cycle: '',
+        sendToApp: false,
+        deviceType: undefined,
+        app: undefined,
       },
     };
 
@@ -65,28 +63,22 @@ class DeviceModalCreate extends Component {
     .catch( err => console.log(err) );
   };
 
-  getFirmwares = async () => {
-    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/firmwares`)
-    .then( res => res.json())
-    .then( firmwares => {
-      const firm = firmwares.map( item => {
-        return { text: item, value: item}
-      });
-      this.setState({ firmwares: firm });
-    })
-    .catch( err => console.log(err) );
-    };
-
-  getModels = async () => {
-    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/models`)
-    .then( res => res.json())
-    .then( models => {
-      const mod = models.map( item => {
-        return { text: item.split(".")[0], value: item.split(".")[0]}
-      });
-      this.setState({ models: mod });
-    })
-    .catch( err => console.log(err) );
+  getDeviceTypes = async () => {
+    // fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/types`)
+    // .then( res => res.json())
+    // .then( types => {
+    //   const formattedTypes = types.map( item => {
+    //     return { text: item.split(".")[0], value: item.split(".")[0]}
+    //   });
+    //   this.setState({ types: formattedTypes });
+    // })
+    // .catch( err => console.log(err) );
+    const arr = ['pump0', 'pump1', 'pump2', 'pump3'];
+    this.setState({ deviceTypes:
+      arr.map( item => {
+        return { text: item, value: item };
+      })
+    });
   };
 
   getThings = async () => {
@@ -97,7 +89,7 @@ class DeviceModalCreate extends Component {
       .then( res =>  res.json() )
       .then( oldThings => {
         this.oldThings = oldThings;
-        this.setState({oldThings});
+        this.setState({ oldThings });
       })
       .catch( err => console.log(err) );
   };
@@ -122,11 +114,10 @@ class DeviceModalCreate extends Component {
       config,
     } = this.state;
     const {
-      firmware,
       cycle,
       sendToApp,
-      app,
-      model
+      deviceType,
+      app
     } = config;
 
     try {
@@ -146,13 +137,12 @@ class DeviceModalCreate extends Component {
       obj = {
         mac: newThing.metadata.mac,
         id: createdThing[0].id,
-        channels: `${process.env.REACT_APP_CHANNEL_ID}`,
+        channel: `${process.env.REACT_APP_CHANNEL_ID}`,
         name: connectionName,
-        firmware,
         cycle,
         sendToApp,
-        app,
-        model
+        deviceType,
+        app
       };
     } else {
       obj = {
@@ -160,7 +150,6 @@ class DeviceModalCreate extends Component {
         id: createdThing[0].id,
         channels: `${process.env.REACT_APP_CHANNEL_ID}`,
         name: connectionName,
-        firmware,
         cycle,
         sendToApp,
       };
@@ -187,15 +176,10 @@ class DeviceModalCreate extends Component {
             response.content = JSON.parse(response.content);
             let { content } = response;
             content.things_list.push({
-              model_name: obj.model,
               thing_id: createdThing[0].id,
               thing_key: createdThing[0].key,
-              thing_ch: obj.channels,
-            });
-            content.models_list.push({
-              name: `${obj.model}.${createdThing[0].id}`,
-              type: obj.model
-            });
+              deviceType: `${obj.deviceType}:${createdThing[0].id}`
+            })
             fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {
               method: 'PUT',
               headers: {
@@ -307,14 +291,6 @@ class DeviceModalCreate extends Component {
     }));
   };
 
-  handleChangeFirmware = (e, { value }) => {
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        firmware: value,
-      },
-    }));
-  };
 
   handleChangeSendToApp = (e, { checked }) => {
     this.setState( prevState => ({
@@ -325,11 +301,11 @@ class DeviceModalCreate extends Component {
     }));
   };
 
-  handleChangeModel = (e, { value }) => {
+  handleChangeDeviceType = (e, { value }) => {
     this.setState( prevState => ({
       config: {
         ...prevState.config,
-        model: value,
+        deviceType: value,
       },
     }));
   };
@@ -346,8 +322,7 @@ class DeviceModalCreate extends Component {
   componentDidMount() {
     this.getThings();
     this.getConnections();
-    this.getFirmwares();
-    this.getModels();
+    this.getDeviceTypes();
   };
 
   render() {
@@ -355,9 +330,8 @@ class DeviceModalCreate extends Component {
     const {
       isThingNameEnabled,
       isConnectionNameEnabled,
-      firmwares,
       isEnabled,
-      models,
+      deviceTypes,
       apps,
       config,
     } = this.state;
@@ -397,16 +371,6 @@ class DeviceModalCreate extends Component {
               />
             </Form.Field>
             <Form.Field>
-              <label> Firmware </label>
-              <Dropdown
-                placeholder='firmware'
-                fluid
-                selection
-                options={firmwares}
-                onChange={this.handleChangeFirmware}
-              />
-            </Form.Field>
-            <Form.Field>
               <label> Cycle </label>
               <input
                 placeholder='cycle'
@@ -423,13 +387,13 @@ class DeviceModalCreate extends Component {
               />
             </Form.Field>
             <Form.Field className={config.sendToApp ? '' : 'hide'}>
-              <label>Model</label>
+              <label> Device type </label>
               <Dropdown
-                placeholder='model'
+                placeholder='type'
                 fluid
                 selection
-                options={models}
-                onChange={this.handleChangeModel}
+                options={deviceTypes}
+                onChange={this.handleChangeDeviceType}
               />
             </Form.Field>
             <Form.Field className={config.sendToApp ? '' : 'hide'}>

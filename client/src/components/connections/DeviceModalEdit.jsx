@@ -14,13 +14,11 @@ class DeviceModalEdit extends Component {
     this.state = {
       showModalEditDevice: false,
       isEnabled: true,
-      firmwares: [],
-      models: [],
+      deviceTypes: [],
       apps: [],
       config: {},
+      selectedDeviceType: [],
       selectedApp: [],
-      selectedModel: [],
-      selectedFirmware: [],
     };
   };
 
@@ -37,9 +35,8 @@ class DeviceModalEdit extends Component {
       .then( config => {
         config.content = JSON.parse(config.content);
         let selectedApp = config.content.app;
-        let selectedModel = config.content.model;
-        let selectedFirmware = config.content.firmware;
-        this.setState({ selectedApp, selectedModel, selectedFirmware, config });
+        let selectedDeviceType = config.content.deviceType;
+        this.setState({ selectedApp, selectedDeviceType, config });
       })
       .catch( err => console.log(err) );
   };
@@ -78,28 +75,22 @@ class DeviceModalEdit extends Component {
     .catch( err => console.log(err) );
   };
 
-  getFirmwares = async () => {
-    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/firmwares`)
-      .then( res => res.json())
-      .then( firmwares => {
-        const firm = firmwares.map( item => {
-          return { value: item, text: item }
-        });
-        this.setState({ firmwares: firm });
+  getDeviceTypes = async () => {
+    // fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/types`)
+    // .then( res => res.json())
+    // .then( types => {
+    //   const formattedTypes = types.map( item => {
+    //     return { text: item.split(".")[0], value: item.split(".")[0]}
+    //   });
+    //   this.setState({ types: formattedTypes });
+    // })
+    // .catch( err => console.log(err) );
+    const arr = ['pump0', 'pump1', 'pump2', 'pump3'];
+    this.setState({ deviceTypes:
+      arr.map( item => {
+        return { text: item, value: item };
       })
-      .catch( err => console.log(err) );
-  };
-
-  getModels = async () => {
-    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/models`)
-      .then( res => res.json())
-      .then( models => {
-        const mod = models.map( item => {
-          return { value: item.split(".")[0], text: item.split(".")[0] }
-        });
-        this.setState({ models: mod });
-      })
-      .catch( err => console.log(err) );
+    });
   };
 
   componentWillReceiveProps(nextProps) {
@@ -116,8 +107,7 @@ class DeviceModalEdit extends Component {
   };
 
   componentDidMount() {
-    this.getFirmwares();
-    this.getModels();
+    this.getDeviceTypes();
     this.getConnections();
   };
 
@@ -128,7 +118,7 @@ class DeviceModalEdit extends Component {
 
   editDevice = async () => {
     const { config } = this.state;
-    const { name, firmware, cycle, model, app, sendToApp, mac } = this.state.config.content;
+    const { name, cycle, deviceType, app, sendToApp, mac } = this.state.config.content;
     let obj = {};
 
     if(sendToApp) {
@@ -138,9 +128,8 @@ class DeviceModalEdit extends Component {
         mac,
         sendToApp,
         name,
-        firmware,
         cycle,
-        model,
+        deviceType,
         app,
       };
     } else {
@@ -150,7 +139,6 @@ class DeviceModalEdit extends Component {
         mac,
         sendToApp,
         name,
-        firmware,
         cycle,
       };
     };
@@ -178,19 +166,9 @@ class DeviceModalEdit extends Component {
           });
           const editThingIndex = content.things_list.indexOf(editThing[0]);
           content.things_list[editThingIndex] = {
-            model_name: model,
+            deviceType: `${deviceType}:${config.mainflux_id}`,
             thing_id: config.mainflux_id,
             thing_key: config.mainflux_key,
-            thing_ch: config.mainflux_channels[0].id
-          };
-
-          const editModel = content.models_list.filter( item => {
-            return item.name.split(".")[1] === config.mainflux_id;
-          });
-          const editModelIndex = content.models_list.indexOf(editModel[0]);
-          content.models_list[editModelIndex] = {
-            name: `${config.content.model}.${config.mainflux_id}`,
-            type: config.content.model,
           };
 
           fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {
@@ -204,16 +182,6 @@ class DeviceModalEdit extends Component {
           });
         });
     };
-    //- FOR EDITTING DEVICE CONNECTED CHANNELS - //
-    // await fetch(
-    //   `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${createdThing[0].id}`, {
-    //     method: 'PUT',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //    mode: 'cors',
-    //    credentials : 'include',
-    //   });
 
     this.close();
   };
@@ -231,20 +199,6 @@ class DeviceModalEdit extends Component {
     }));
   };
 
-  handleChangeFirmware = (e, { value }) => {
-    const currentValue = value;
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        content: {
-          ...prevState.config.content,
-          firmware: currentValue,
-        },
-      },
-      selectedFirmware: value,
-    }));
-  };
-
   handleChangeCycle = e => {
     const currentValue = e.target.value;
     this.setState( prevState => ({
@@ -259,17 +213,17 @@ class DeviceModalEdit extends Component {
     }));
   };
 
-  handleChangeModel = (e, { value }) => {
+  handleChangeDeviceType = (e, { value }) => {
     const currentValue = value;
     this.setState( prevState => ({
       config: {
         ...prevState.config,
         content: {
           ...prevState.config.content,
-          model: currentValue,
+          deviceType: currentValue,
         },
       },
-      selectedModel: value,
+      selectedDeviceType: value,
     }));
   };
 
@@ -291,13 +245,11 @@ class DeviceModalEdit extends Component {
     const { showModalEditDevice } = this.props;
     const {
       config,
-      firmwares,
       isEnabled,
-      models,
+      deviceTypes,
       apps,
+      selectedDeviceType,
       selectedApp,
-      selectedModel,
-      selectedFirmware,
     } = this.state;
 
     return (
@@ -319,17 +271,6 @@ class DeviceModalEdit extends Component {
               />
             </Form.Field>
             <Form.Field>
-              <label> Firmware </label>
-              <Dropdown
-                placeholder='firmware'
-                fluid
-                selection
-                options={firmwares}
-                value={selectedFirmware}
-                onChange={this.handleChangeFirmware}
-              />
-            </Form.Field>
-            <Form.Field>
               <label> Cycle </label>
               <input
                 placeholder='cycle'
@@ -339,16 +280,16 @@ class DeviceModalEdit extends Component {
                   }
                 onChange={e => this.handleChangeCycle(e)}
               />
-          </Form.Field>
+            </Form.Field>
             <Form.Field className={config.content ? config.content.sendToApp ? '' : 'hide' : ''}>
               <label>Model</label>
               <Dropdown
                 placeholder='model'
                 fluid
                 selection
-                options={models}
-                value={selectedModel}
-                onChange={this.handleChangeModel}
+                options={deviceTypes}
+                value={selectedDeviceType}
+                onChange={this.handleChangeDeviceType}
               />
             </Form.Field>
             <Form.Field className={config.content ? config.content.sendToApp ? '' : 'hide' : ''}>

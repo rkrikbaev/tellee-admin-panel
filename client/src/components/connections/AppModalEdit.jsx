@@ -87,28 +87,6 @@ class AppModalEdit extends Component {
       body: JSON.stringify({ obj })
     });
 
-    // -- FOR EDITTING CONFIG'S CHANNELS -- //
-    // let arr = [];
-    // if(config.mainflux_channels[0].id) {
-    //   arr = config.mainflux_channels.map( item => {
-    //     return item.id;
-    //   });
-    // } else {
-    //   arr = config.mainflux_channels;
-    // }
-
-    // obj.channels = arr;
-
-    // fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/channels/${config.mainflux_id}`, {
-    //   method: 'PUT',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   mode: 'cors',
-    //   credentials : 'include',
-    //   body: JSON.stringify({ obj })
-    // });
-
     this.close();
   };
 
@@ -119,7 +97,7 @@ class AppModalEdit extends Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.connection !== this.props.connection ||
+    return nextProps !== this.props ||
     nextState !== this.state;
   };
 
@@ -147,7 +125,7 @@ class AppModalEdit extends Component {
   render() {
     const { showModalEditApp } = this.props;
     const { config, channels, selectedChannels } = this.state;
-
+    console.log(showModalEditApp);
     return (
       <Modal closeIcon dimmer="blurring" open={showModalEditApp} onClose={this.close}>
         <Modal.Header>EDIT CONNECTION</Modal.Header>
