@@ -13,7 +13,7 @@ class AppModalCreate extends Component {
 
     this.state = {
       showModalCreateApp: false,
-      isThingNameEnabled: false,
+      isThingMacEnabled: false,
       isConnectionNameEnabled: false,
       oldThings: [],
       oldConnections: [],
@@ -135,35 +135,25 @@ class AppModalCreate extends Component {
     this.getConnections();
   }
 
-  handleChangeThingName = e => {
+  handleChangeThingMac = e => {
     let str = e.target.value;
     let arr = this.state.oldThings.filter( item => {
-      return item.name === str;
+      return item.metadata.mac === str;
     });
     if(arr.length !== 0) {
-      this.setState({ isThingNameEnabled: true });
+      this.setState({ isThingMacEnabled: true });
     } else {
       this.setState( prevState => ({
         newThing: {
           ...prevState.newThing,
-          name: str,
+          metadata: {
+            ...prevState.newThing.metadata,
+            mac: str,
+          },
         },
-        isThingNameEnabled: false,
+        isThingMacEnabled: false,
       }));
-    };
-  };
-
-  handleChangeThingMac = e => {
-    let str = e.target.value;
-    this.setState( prevState => ({
-      newThing: {
-        ...prevState.newThing,
-        metadata: {
-          ...prevState.newThing.metadata,
-          mac: str,
-        },
-      },
-    }));
+    }
   };
 
   handleChangeConnectionName = e => {
@@ -174,16 +164,23 @@ class AppModalCreate extends Component {
     if(arr.length !== 0) {
       this.setState({ isConnectionNameEnabled: true });
     } else {
-      this.setState({
+      this.setState( prevState => ({
+        newThing: {
+          ...prevState.newThing,
+          name: str,
+        },
         connectionName: str,
         isConnectionNameEnabled: false,
+      }));
+      this.setState({
+
       });
     };
   };
 
   render() {
     const { showModalCreateApp } = this.props;
-    const { isThingNameEnabled, isConnectionNameEnabled } = this.state;
+    const { isThingMacEnabled, isConnectionNameEnabled } = this.state;
 
     return (
       <Modal
@@ -197,26 +194,19 @@ class AppModalCreate extends Component {
         <Modal.Content>
           <Form>
             <Form.Field>
-              <label> Thing Name </label>
+              <label> Name </label>
               <input
-                placeholder='thing name'
-                onChange={e => this.handleChangeThingName(e)}
-                className={isThingNameEnabled ? 'show_error' : ''}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label> Thing Mac </label>
-              <input
-                placeholder='thing mac'
-                onChange={e => this.handleChangeThingMac(e)}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label> Connection Name </label>
-              <input
-                placeholder='connection name'
+                placeholder='name'
                 onChange={e => this.handleChangeConnectionName(e)}
                 className={isConnectionNameEnabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field>
+              <label> Mac </label>
+              <input
+                placeholder='mac'
+                onChange={e => this.handleChangeThingMac(e)}
+                className={isThingMacEnabled ? 'show_error' : ''}
               />
             </Form.Field>
           </Form>
@@ -231,7 +221,7 @@ class AppModalCreate extends Component {
             icon='plus'
             labelPosition='right'
             content="Create"
-            disabled={isThingNameEnabled || isConnectionNameEnabled}
+            disabled={isThingMacEnabled || isConnectionNameEnabled}
             onClick={this.createAppConnection}
           />
         </Modal.Actions>

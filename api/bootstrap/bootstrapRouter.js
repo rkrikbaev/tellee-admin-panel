@@ -79,7 +79,7 @@ BootstrapRouter.route('/create/device').post( async (req, res, next) => {
       channels: typeof channels === "string"
         ? [channels]
         : channels,
-      content: {name: pref_name, cycle, sendToApp, mac, type: "device"},
+      content: {name: pref_name, cycle, sendToApp, mac, deviceType, type: "device"},
       state: 1
     };
   } else {
@@ -286,7 +286,7 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
     // -- IF EDITTING CONFIG IS DEVICE -- //
     else if(req.body.obj.type === "device") {
       const { type, id, mac, sendToApp, name, cycle, deviceType, app } = req.body.obj;
-      if(deviceType !== undefined && app !== undefined) {
+      if(app !== undefined) {
         editedConfig = {
           external_id: mac,
           external_key: md5(mac.toLowerCase()),
@@ -300,12 +300,12 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
           external_key: md5(mac.toLowerCase()),
           thing_id: id,
           name,
-          content: {name, cycle, mac, type, sendToApp},
+          content: {name, cycle, mac, type, deviceType, sendToApp},
         };
       };
     };
   }
-  // -- IF EDITTING PROCESS COMES FROM CREATION OF DEVICE -- //
+  // -- IF EDITTING PROCESS COMES FROM CREATION OF DEVICE (APP **)-- //
   else if (req.body.response !== undefined) {
 
     const { mainflux_id, mainflux_channels, content } = req.body.response;

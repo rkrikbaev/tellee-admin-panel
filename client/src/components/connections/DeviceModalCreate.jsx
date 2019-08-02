@@ -20,7 +20,7 @@ class DeviceModalCreate extends Component {
       oldConnections: [],
       isEnabled: true,
       showModalCreateDevice: false,
-      isThingNameEnabled: false,
+      isThingMacEnabled: false,
       isConnectionNameEnabled: false,
       newThing: {
         name: '',
@@ -64,15 +64,15 @@ class DeviceModalCreate extends Component {
   };
 
   getDeviceTypes = async () => {
-    // fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/types`)
-    // .then( res => res.json())
-    // .then( types => {
-    //   const formattedTypes = types.map( item => {
-    //     return { text: item.split(".")[0], value: item.split(".")[0]}
-    //   });
-    //   this.setState({ types: formattedTypes });
-    // })
-    // .catch( err => console.log(err) );
+    // fetch('http://192.168.1.38:8180/devices')
+    //   .then(res => res.json())
+    //   .then(types => {
+    //     const formattedTypes = types.map( (type, i) => {
+    //       return { text: type, value: type}
+    //     });
+    //     this.setState({ deviceTypes: formattedTypes });
+    //   })
+    //   .catch( err => console.log(err) );
     const arr = ['pump0', 'pump1', 'pump2', 'pump3'];
     this.setState({ deviceTypes:
       arr.map( item => {
@@ -151,6 +151,7 @@ class DeviceModalCreate extends Component {
         channels: `${process.env.REACT_APP_CHANNEL_ID}`,
         name: connectionName,
         cycle,
+        deviceType,
         sendToApp,
       };
     };
@@ -234,35 +235,25 @@ class DeviceModalCreate extends Component {
     this.setState({ showModalError: false, errorText: '' });
   }
 
-  handleChangeThingName = e => {
+  handleChangeThingMac = e => {
     let str = e.target.value;
     let arr = this.state.oldThings.filter( item => {
-      return item.name === str;
+      return item.metadata.mac === str;
     });
     if(arr.length !== 0) {
-      this.setState({ isThingNameEnabled: true });
+      this.setState({ isThingMacEnabled: true });
     } else {
       this.setState( prevState => ({
         newThing: {
           ...prevState.newThing,
-          name: str,
+          metadata: {
+            ...prevState.newThing.metadata,
+            mac: str,
+          },
         },
-        isThingNameEnabled: false,
+        isThingMacEnabled: false,
       }));
-    };
-  };
-
-  handleChangeThingMac = e => {
-    let str = e.target.value;
-    this.setState( prevState => ({
-      newThing: {
-        ...prevState.newThing,
-        metadata: {
-          ...prevState.newThing.metadata,
-          mac: str,
-        },
-      },
-    }));
+    }
   };
 
   handleChangeConnectionName = e => {
@@ -273,10 +264,14 @@ class DeviceModalCreate extends Component {
     if(arr.length !== 0) {
       this.setState({ isConnectionNameEnabled: true });
     } else {
-      this.setState({
+      this.setState( prevState => ({
+        newThing: {
+          ...prevState.newThing,
+          name: str,
+        },
         connectionName: str,
         isConnectionNameEnabled: false,
-      });
+      }));
     };
   };
 
@@ -333,7 +328,7 @@ class DeviceModalCreate extends Component {
   render() {
     const { showModalCreateDevice } = this.props;
     const {
-      isThingNameEnabled,
+      isThingMacEnabled,
       isConnectionNameEnabled,
       isEnabled,
       deviceTypes,
@@ -353,26 +348,29 @@ class DeviceModalCreate extends Component {
         <Modal.Content>
           <Form>
             <Form.Field>
-              <label> Thing Name </label>
+              <label> Name </label>
               <input
-                placeholder='thing name'
-                onChange={e => this.handleChangeThingName(e)}
-                className={isThingNameEnabled ? 'show_error' : ''}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label> Thing Mac </label>
-              <input
-                placeholder='thing mac'
-                onChange={e => this.handleChangeThingMac(e)}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label> Connection Name </label>
-              <input
-                placeholder='connection name'
+                placeholder='name'
                 onChange={e => this.handleChangeConnectionName(e)}
                 className={isConnectionNameEnabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field>
+              <label> Mac </label>
+              <input
+                placeholder='mac'
+                onChange={e => this.handleChangeThingMac(e)}
+                className={isThingMacEnabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field>
+              <label> Device type </label>
+              <Dropdown
+                placeholder='type'
+                fluid
+                selection
+                options={deviceTypes}
+                onChange={this.handleChangeDeviceType}
               />
             </Form.Field>
             <Form.Field>
@@ -389,16 +387,6 @@ class DeviceModalCreate extends Component {
               <Checkbox
                 label={config.sendToApp ? 'This config will be sent to App' : 'Click checkbox for send this config to App'}
                 onChange={this.handleChangeSendToApp}
-              />
-            </Form.Field>
-            <Form.Field className={config.sendToApp ? '' : 'hide'}>
-              <label> Device type </label>
-              <Dropdown
-                placeholder='type'
-                fluid
-                selection
-                options={deviceTypes}
-                onChange={this.handleChangeDeviceType}
               />
             </Form.Field>
             <Form.Field className={config.sendToApp ? '' : 'hide'}>
@@ -423,7 +411,7 @@ class DeviceModalCreate extends Component {
             icon='plus'
             labelPosition='right'
             content="Create"
-            disabled={isThingNameEnabled || isConnectionNameEnabled || !isEnabled}
+            disabled={isThingMacEnabled || isConnectionNameEnabled || !isEnabled}
             onClick={this.createDeviceConnection}
           />
         </Modal.Actions>

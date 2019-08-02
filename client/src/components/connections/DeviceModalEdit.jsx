@@ -76,15 +76,15 @@ class DeviceModalEdit extends Component {
   };
 
   getDeviceTypes = async () => {
-    // fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/other/types`)
-    // .then( res => res.json())
-    // .then( types => {
-    //   const formattedTypes = types.map( item => {
-    //     return { text: item.split(".")[0], value: item.split(".")[0]}
-    //   });
-    //   this.setState({ types: formattedTypes });
-    // })
-    // .catch( err => console.log(err) );
+    // fetch('http://192.168.1.38:8180/devices')
+    //   .then(res => res.json())
+    //   .then(types => {
+    //     const formattedTypes = types.map( (type, i) => {
+    //       return { text: type, value: type}
+    //     });
+    //     this.setState({ deviceTypes: formattedTypes });
+    //   })
+    //   .catch( err => console.log(err) );
     const arr = ['pump0', 'pump1', 'pump2', 'pump3'];
     this.setState({ deviceTypes:
       arr.map( item => {
@@ -140,6 +140,7 @@ class DeviceModalEdit extends Component {
         mac,
         sendToApp,
         name,
+        deviceType,
         cycle,
       };
     };
@@ -264,9 +265,9 @@ class DeviceModalEdit extends Component {
         <Modal.Content>
           <Form>
             <Form.Field>
-              <label> Connection Name </label>
+              <label> Name </label>
               <input
-                placeholder='connection name'
+                placeholder='name'
                 onChange={e => this.handleChangeConnectionName(e)}
                 value={config.content !== undefined ? config.content.name : ''}
               />
@@ -282,10 +283,10 @@ class DeviceModalEdit extends Component {
                 onChange={e => this.handleChangeCycle(e)}
               />
             </Form.Field>
-            <Form.Field className={config.content ? config.content.sendToApp ? '' : 'hide' : ''}>
-              <label>Model</label>
+            <Form.Field>
+              <label> Device Type </label>
               <Dropdown
-                placeholder='model'
+                placeholder='device type'
                 fluid
                 selection
                 options={deviceTypes}
