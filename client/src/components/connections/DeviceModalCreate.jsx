@@ -64,21 +64,15 @@ class DeviceModalCreate extends Component {
   };
 
   getDeviceTypes = async () => {
-    // fetch('http://192.168.1.38:8180/devices')
-    //   .then(res => res.json())
-    //   .then(types => {
-    //     const formattedTypes = types.map( (type, i) => {
-    //       return { text: type, value: type}
-    //     });
-    //     this.setState({ deviceTypes: formattedTypes });
-    //   })
-    //   .catch( err => console.log(err) );
-    const arr = ['pump0', 'pump1', 'pump2', 'pump3'];
-    this.setState({ deviceTypes:
-      arr.map( item => {
-        return { text: item, value: item };
+    fetch('http://134.209.240.215:8180/devices')
+      .then(res => res.json())
+      .then(types => {
+        const formattedTypes = types.map( (type, i) => {
+          return { text: type, value: type}
+        });
+        this.setState({ deviceTypes: formattedTypes });
       })
-    });
+      .catch( err => console.log(err) );
   };
 
   getThings = async () => {
