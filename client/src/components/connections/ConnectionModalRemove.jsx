@@ -14,6 +14,7 @@ class ConnectionModalRemove extends Component {
 
     this.state = {
       showModalRemove: false,
+      isRemoveable: true,
     }
   }
 
@@ -64,27 +65,39 @@ class ConnectionModalRemove extends Component {
     this.props.callbackFromParent(this.state.showModalRemove, connection.mainflux_id);
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { content } = nextProps.connection;
+    if( content !== undefined && content.type === 'app' && content.devices !== 0) {
+      this.setState({ isRemoveable: false });
+    };
+  };
+
+
   close = () => {
     this.setState({ showModalRemove: false });
     this.props.callbackFromParent(this.state.showModalRemove);
   }
 
   render() {
-
     const { showModalRemove, connection } = this.props;
+    const { isRemoveable } = this.state;
     return (
       <Modal basic size='small' open={showModalRemove}>
-        <Header icon='archive' content='REMOVE CONNECTION?' />
+        <Header icon='archive' content={isRemoveable ? 'REMOVE CONNECTION?': 'CAN NOT REMOVE CONNECTION'} />
         <Modal.Content>
           <p>
-            Do you want to remove connection: {connection.name}
+            {
+              isRemoveable
+              ? `Do you want to remove connection: ${connection.name}`
+              : `CONNECTION '${connection.name}' HAVE CONNECTED DEVICES. FIRST REMOVE CONNECTED DEVICES.`
+            }
           </p>
         </Modal.Content>
         <Modal.Actions>
           <Button basic color='green' inverted onClick={this.close}>
             <Icon name='remove' /> No
           </Button>
-          <Button color='red' inverted onClick={() => {this.removeConnection(connection)} }>
+          <Button color='red' inverted onClick={() => {isRemoveable ? this.removeConnection(connection) : this.close()} }>
             <Icon name='checkmark' /> Yes
           </Button>
         </Modal.Actions>

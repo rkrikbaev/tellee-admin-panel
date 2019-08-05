@@ -142,7 +142,7 @@ class DeviceModalCreate extends Component {
       obj = {
         mac: newThing.metadata.mac,
         id: createdThing[0].id,
-        channels: `${process.env.REACT_APP_CHANNEL_ID}`,
+        channel: `${process.env.REACT_APP_CHANNEL_ID}`,
         name: connectionName,
         cycle,
         device_type,
