@@ -35,7 +35,7 @@ class DeviceModalCreate extends Component {
         name: '',
         cycle: '',
         sendToApp: false,
-        deviceType: undefined,
+        device_type: undefined,
         app: undefined,
       },
     };
@@ -110,7 +110,7 @@ class DeviceModalCreate extends Component {
     const {
       cycle,
       sendToApp,
-      deviceType,
+      device_type,
       app
     } = config;
 
@@ -135,7 +135,7 @@ class DeviceModalCreate extends Component {
         name: connectionName,
         cycle,
         sendToApp,
-        deviceType,
+        device_type,
         app
       };
     } else {
@@ -145,7 +145,7 @@ class DeviceModalCreate extends Component {
         channels: `${process.env.REACT_APP_CHANNEL_ID}`,
         name: connectionName,
         cycle,
-        deviceType,
+        device_type,
         sendToApp,
       };
     };
@@ -173,7 +173,7 @@ class DeviceModalCreate extends Component {
             content.devices.push({
               device_id: createdThing[0].id,
               device_key: createdThing[0].key,
-              deviceType: `${obj.deviceType}:${createdThing[0].id}`
+              device_type: obj.device_type
             })
             fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {
               method: 'PUT',
@@ -295,7 +295,7 @@ class DeviceModalCreate extends Component {
     this.setState( prevState => ({
       config: {
         ...prevState.config,
-        deviceType: value,
+        device_type: value,
       },
     }));
   };

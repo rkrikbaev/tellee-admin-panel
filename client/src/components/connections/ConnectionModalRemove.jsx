@@ -46,7 +46,7 @@ class ConnectionModalRemove extends Component {
           const { content } = response;
 
           content.devices = content.devices.filter( item => {
-            return item.thing_id !== connection.mainflux_id;
+            return item.device_id !== connection.mainflux_id;
           });
 
           fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {

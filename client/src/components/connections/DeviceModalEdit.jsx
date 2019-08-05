@@ -35,7 +35,7 @@ class DeviceModalEdit extends Component {
       .then( config => {
         config.content = JSON.parse(config.content);
         let selectedApp = config.content.app;
-        let selectedDeviceType = config.content.deviceType;
+        let selectedDeviceType = config.content.device_type;
         this.setState({ selectedApp, selectedDeviceType, config });
       })
       .catch( err => console.log(err) );
@@ -113,7 +113,7 @@ class DeviceModalEdit extends Component {
 
   editDevice = async () => {
     const { config } = this.state;
-    const { name, cycle, deviceType, app, sendToApp, mac } = this.state.config.content;
+    const { name, cycle, device_type, app, sendToApp, mac } = this.state.config.content;
     let obj = {};
 
     if(sendToApp) {
@@ -124,7 +124,7 @@ class DeviceModalEdit extends Component {
         sendToApp,
         name,
         cycle,
-        deviceType,
+        device_type,
         app,
       };
     } else {
@@ -134,7 +134,7 @@ class DeviceModalEdit extends Component {
         mac,
         sendToApp,
         name,
-        deviceType,
+        device_type,
         cycle,
       };
     };
@@ -162,9 +162,9 @@ class DeviceModalEdit extends Component {
           });
           const editThingIndex = content.devices.indexOf(editThing[0]);
           content.devices[editThingIndex] = {
-            deviceType: `${deviceType}:${config.mainflux_id}`,
             device_id: config.mainflux_id,
             device_key: config.mainflux_key,
+            device_type,
           };
 
           fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {
@@ -216,7 +216,7 @@ class DeviceModalEdit extends Component {
         ...prevState.config,
         content: {
           ...prevState.config.content,
-          deviceType: currentValue,
+          device_type: currentValue,
         },
       },
       selectedDeviceType: value,
