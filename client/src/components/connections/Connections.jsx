@@ -70,6 +70,12 @@ class Connections extends Component {
     this.getConnections();
   }
 
+  componentWillReceiveProps(nextProps) {
+    if( nextProps !== this.props ) {
+      this.getConnections();
+    };
+  };
+
   createAppModalCallback = (
     showModalCreateApp,
     oldConnections,
@@ -89,10 +95,10 @@ class Connections extends Component {
   removeModalCallback = (showModalRemove, id) => {
     this.setState({ showModalRemove });
     if(id) {
-      this.setState({ connections: this.state.connections.filter( i => i.mainflux_id !== id )
+      this.setState({
+        connections: this.state.connections.filter( i => i.mainflux_id !== id )
       });
     };
-    // this.getConnections();
   };
 
   editAppModalCallback = showModalEditApp => {

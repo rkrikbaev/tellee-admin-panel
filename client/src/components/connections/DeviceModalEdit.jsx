@@ -19,6 +19,7 @@ class DeviceModalEdit extends Component {
       config: {},
       selectedDeviceType: [],
       selectedApp: [],
+      oldConnections: [],
     };
   };
 
@@ -70,7 +71,7 @@ class DeviceModalEdit extends Component {
       const apps = connections.map( item => {
         return { value: item.external_id, text: item.name.split(".")[0] }
       })
-      this.setState({ apps });
+      this.setState({ apps, oldConnections });
     })
     .catch( err => console.log(err) );
   };
@@ -112,7 +113,7 @@ class DeviceModalEdit extends Component {
   };
 
   editDevice = async () => {
-    const { config } = this.state;
+    const { config, oldConnections } = this.state;
     const { name, cycle, device_type, app, sendToApp, mac } = this.state.config.content;
     let obj = {};
 
@@ -159,6 +160,8 @@ class DeviceModalEdit extends Component {
         cycle,
       };
     };
+
+    // -- Update Device
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${config.mainflux_id}`, {
       method: 'PUT',
       headers: {
@@ -170,6 +173,36 @@ class DeviceModalEdit extends Component {
     });
 
     if(sendToApp) {
+      // -- Get current Device config
+      const currentDevice = oldConnections.filter( item => {
+        return item.mainflux_id === config.mainflux_id;
+      });
+
+      if( currentDevice[0].content.app !== obj.app) {
+        await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${currentDevice[0].content.app}`, {
+          mode: 'cors',
+          credentials : 'include',
+        })
+          .then( response => response.json())
+          .then( response => {
+            response.content = JSON.parse(response.content);
+            const { content } = response;
+            content.devices = content.devices.filter( item => {
+              return item.device_id !== currentDevice[0].mainflux_id;
+            });
+
+            fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              mode: 'cors',
+              credentials : 'include',
+              body: JSON.stringify({ response })
+            });
+          });
+      }
+
       await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`, {
         mode: 'cors',
         credentials : 'include',
@@ -181,12 +214,20 @@ class DeviceModalEdit extends Component {
           const editThing = content.devices.filter( item => {
             return item.device_id === config.mainflux_id;
           });
-          const editThingIndex = content.devices.indexOf(editThing[0]);
-          content.devices[editThingIndex] = {
-            device_id: config.mainflux_id,
-            device_key: config.mainflux_key,
-            device_type,
-          };
+          if( editThing.length === 0 ) {
+            content.devices.push({
+              device_id: config.mainflux_id,
+              device_key: config.mainflux_key,
+              device_type,
+            })
+          } else {
+            const editThingIndex = content.devices.indexOf(editThing[0]);
+            content.devices[editThingIndex] = {
+              device_id: config.mainflux_id,
+              device_key: config.mainflux_key,
+              device_type,
+            };
+          }
 
           fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {
             method: 'PUT',
