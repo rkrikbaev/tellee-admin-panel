@@ -69,13 +69,16 @@ class ConnectionModalRemove extends Component {
     const { content } = nextProps.connection;
     if( content !== undefined && content.type === 'app' && content.devices !== 0) {
       this.setState({ isRemoveable: false });
+    } else {
+      this.setState({ isRemoveable: true });
     };
   };
 
 
   close = () => {
-    this.setState({ showModalRemove: false });
-    this.props.callbackFromParent(this.state.showModalRemove);
+    this.setState({ showModalRemove: false, isRemoveable: true }, () => {
+      this.props.callbackFromParent(this.state.showModalRemove);
+    });
   }
 
   render() {

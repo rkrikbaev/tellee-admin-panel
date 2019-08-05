@@ -28,6 +28,29 @@ ThingRouter.route('/').get( async (req, res, next) => {
 
 });
 
+// -- Get thing by id --
+ThingRouter.route('/:id').get( async (req, res, next) => {
+  const token = req.cookies.auth;
+
+  try {
+    const thing = await axios.get(`https://${process.env.MAINFLUX_URL}/things/${req.params.id}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token,
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false,
+      }),
+    });
+
+    res.send(thing.data);
+    next();
+  } catch(err) {
+    return next(err);
+  };
+
+});
+
 // -- Create new Thing --
 ThingRouter.route('/create').post( async (req, res, next) => {
 
@@ -39,6 +62,7 @@ ThingRouter.route('/create').post( async (req, res, next) => {
 
   const token = req.cookies.auth;
   const { name, metadata } = req.body;
+  const pref_name = `zsse/${name}`;
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -50,7 +74,7 @@ ThingRouter.route('/create').post( async (req, res, next) => {
   };
 
   const newThing = {
-    name,
+    name: pref_name,
     metadata
   }
 

@@ -80,7 +80,7 @@ class AppModalCreate extends Component {
         .catch( err => console.log(err) );
 
       var thing = arr.filter( item => {
-        return item.name === newThing.name;
+        return item.name === `zsse/${newThing.name}`;
       });
     } catch(err) {
       console.log(err);

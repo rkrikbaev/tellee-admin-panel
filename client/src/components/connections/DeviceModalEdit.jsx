@@ -116,6 +116,27 @@ class DeviceModalEdit extends Component {
     const { name, cycle, device_type, app, sendToApp, mac } = this.state.config.content;
     let obj = {};
 
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things/${config.mainflux_id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors',
+      credentials: 'include'
+    })
+      .then( response => response.json())
+      .then( async thing => {
+        await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things/edit/${config.mainflux_id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          mode: 'cors',
+          credentials: 'include',
+          body: JSON.stringify({ name, metadata: thing.metadata }),
+        });
+      });
+
     if(sendToApp) {
       obj = {
         type: "device",

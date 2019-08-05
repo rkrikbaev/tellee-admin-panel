@@ -119,7 +119,7 @@ class DeviceModalCreate extends Component {
       await this.getThings();
 
       var createdThing = this.oldThings.filter( item => {
-        return item.name === newThing.name;
+        return item.name === `zsse/${newThing.name}`;
       });
 
     } catch(err) {

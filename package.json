@@ -12,7 +12,7 @@
     "client": "npm start --prefix client",
     "client-prod": "cd client && serve -s build -l 8000",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "prod": "concurrently \"npm run server\" \"npm run client-prod\""
+    "prod": "concurrently \"npm run start\" \"npm run client-prod\""
   },
   "repository": {
     "type": "git",
