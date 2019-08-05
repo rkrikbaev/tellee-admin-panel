@@ -45,7 +45,7 @@ class ConnectionModalRemove extends Component {
           response.content = JSON.parse(response.content);
           const { content } = response;
 
-          content.things_list = content.things_list.filter( item => {
+          content.devices = content.devices.filter( item => {
             return item.thing_id !== connection.mainflux_id;
           });
 

@@ -76,7 +76,7 @@ class DeviceModalEdit extends Component {
   };
 
   getDeviceTypes = async () => {
-    fetch('http://134.209.240.215:8180/devices')
+    fetch('http://134.209.240.215:8300/devices')
       .then(res => res.json())
       .then(types => {
         const formattedTypes = types.map( (type, i) => {
@@ -157,14 +157,14 @@ class DeviceModalEdit extends Component {
         .then( response => {
           response.content = JSON.parse(response.content);
           const { content } = response;
-          const editThing = content.things_list.filter( item => {
-            return item.thing_id === config.mainflux_id;
+          const editThing = content.devices.filter( item => {
+            return item.device_id === config.mainflux_id;
           });
-          const editThingIndex = content.things_list.indexOf(editThing[0]);
-          content.things_list[editThingIndex] = {
+          const editThingIndex = content.devices.indexOf(editThing[0]);
+          content.devices[editThingIndex] = {
             deviceType: `${deviceType}:${config.mainflux_id}`,
-            thing_id: config.mainflux_id,
-            thing_key: config.mainflux_key,
+            device_id: config.mainflux_id,
+            device_key: config.mainflux_key,
           };
 
           fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {

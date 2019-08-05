@@ -64,7 +64,7 @@ class DeviceModalCreate extends Component {
   };
 
   getDeviceTypes = async () => {
-    fetch('http://134.209.240.215:8180/devices')
+    fetch('http://134.209.240.215:8300/devices')
       .then(res => res.json())
       .then(types => {
         const formattedTypes = types.map( (type, i) => {
@@ -170,9 +170,9 @@ class DeviceModalCreate extends Component {
           .then( response => {
             response.content = JSON.parse(response.content);
             let { content } = response;
-            content.things_list.push({
-              thing_id: createdThing[0].id,
-              thing_key: createdThing[0].key,
+            content.devices.push({
+              device_id: createdThing[0].id,
+              device_key: createdThing[0].key,
               deviceType: `${obj.deviceType}:${createdThing[0].id}`
             })
             fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {

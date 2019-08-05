@@ -31,7 +31,7 @@ BootstrapRouter.route('/create/app').post( async (req, res, next) => {
     channels: typeof channels === "string"
       ? [channels]
       : channels,
-    content: {type:"app", name: pref_name, mac, hash: md5(req.body), things_list: []},
+    content: {type:"app", name: pref_name, mac, hash: md5(req.body), devices: []},
     state: 1,
   };
 
@@ -279,7 +279,7 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
           name,
           mac,
           hash: md5(req.body.obj),
-          things_list: content.things_list,
+          devices: content.devices,
         },
       };
     }
