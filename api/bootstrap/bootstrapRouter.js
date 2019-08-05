@@ -66,7 +66,7 @@ BootstrapRouter.route('/create/device').post( async (req, res, next) => {
     }),
   };
 
-  const { mac, id, channels, name, cycle, sendToApp, device_type, app, } = req.body;
+  const { mac, id, channel, name, cycle, sendToApp, device_type, app, } = req.body;
   const pref_name = `zsse/${name}`;
   let newConnection = {};
 
@@ -76,9 +76,9 @@ BootstrapRouter.route('/create/device').post( async (req, res, next) => {
       external_key: md5(mac.toLowerCase()),
       thing_id: id,
       name: pref_name,
-      channels: typeof channels === "string"
-        ? [channels]
-        : channels,
+      channels: typeof channel === "string"
+        ? [channel]
+        : channel,
       content: {name: pref_name, cycle, sendToApp, mac, device_type, type: "device"},
       state: 1
     };
@@ -88,9 +88,9 @@ BootstrapRouter.route('/create/device').post( async (req, res, next) => {
       external_id: mac,
       thing_id: id,
       name: pref_name,
-      channels: typeof channels === "string"
-        ? [channels]
-        : channels,
+      channels: typeof channel === "string"
+        ? [channel]
+        : channel,
       content: {name: pref_name, cycle, mac, sendToApp, type: "device", device_type, app},
       state: 1
     };
