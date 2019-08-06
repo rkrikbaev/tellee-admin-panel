@@ -16,7 +16,8 @@ import ConnectionRouter from './api/connection/connectionRouter';
 
 const app = express();
 const originsWhitelist = [
-  'localhost'
+  'http://localhost',
+  'http://zsse.zeinetsse.com'
 ];
 
 const corsOptions = {
