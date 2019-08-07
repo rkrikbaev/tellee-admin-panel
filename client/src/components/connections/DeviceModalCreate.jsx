@@ -214,6 +214,13 @@ class DeviceModalCreate extends Component {
   };
   // -- End of creating device --
 
+  componentWillReceiveProps(nextProps) {
+    if( nextProps !== this.props ) {
+      this.getConnections();
+      this.getThings();
+    };
+  };
+
   close = async () => {
     const { showModalCreateDevice, oldConnections } = this.state;
     this.setState({ showModalCreateDevice: false });

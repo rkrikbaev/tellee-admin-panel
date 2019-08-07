@@ -95,6 +95,16 @@ class Connections extends Component {
   removeModalCallback = (showModalRemove, id) => {
     this.setState({ showModalRemove });
     if(id) {
+      // FIXME:
+      const connections = this.state.connections
+      let connection = connections.filter( i => i.mainflux_id === id );
+      const { type, app } = connection[0].content;
+      if( type === 'device' && app !== undefined ) {
+        let connectedApp = connections.filter( i => i.external_id === app );
+        const edittedApp = connectedApp[0].content.devices.filter(i => i.device_id !== id );
+        connections[connections.indexOf(connectedApp[0])].content.devices = edittedApp;
+        this.setState({ connections });
+      };
       this.setState({
         connections: this.state.connections.filter( i => i.mainflux_id !== id )
       });
@@ -133,7 +143,7 @@ class Connections extends Component {
     return (
       <div id='connections' className="main_wrapper">
         <div className="connection_top">
-          <h1>Connections</h1>
+          <h1> Connections </h1>
           <div className="connection_btn__wrapper">
             <Button
               icon
