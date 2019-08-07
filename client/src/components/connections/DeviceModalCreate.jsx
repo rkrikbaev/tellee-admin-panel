@@ -171,6 +171,7 @@ class DeviceModalCreate extends Component {
             response.content = JSON.parse(response.content);
             let { content } = response;
             content.devices.push({
+              device_name: `zsse/${connectionName}`,
               device_id: createdThing[0].id,
               device_key: createdThing[0].key,
               device_type: obj.device_type

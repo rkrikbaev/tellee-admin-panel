@@ -216,6 +216,7 @@ class DeviceModalEdit extends Component {
           });
           if( editThing.length === 0 ) {
             content.devices.push({
+              device_name: name,
               device_id: config.mainflux_id,
               device_key: config.mainflux_key,
               device_type,
@@ -223,6 +224,7 @@ class DeviceModalEdit extends Component {
           } else {
             const editThingIndex = content.devices.indexOf(editThing[0]);
             content.devices[editThingIndex] = {
+              device_name: name,
               device_id: config.mainflux_id,
               device_key: config.mainflux_key,
               device_type,
