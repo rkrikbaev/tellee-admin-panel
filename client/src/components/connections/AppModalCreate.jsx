@@ -26,6 +26,8 @@ class AppModalCreate extends Component {
       },
       connectionName: '',
     };
+    this.regexpName = /^\w+$/;
+    this.regexpMac = /^[0-9a-z]{1,2}([.:-])(?:[0-9a-z]{1,2}\1){4}[0-9a-z]{1,2}$/gmi;
   };
 
   getThings = async () => {
@@ -137,13 +139,10 @@ class AppModalCreate extends Component {
 
   handleChangeConnectionName = e => {
     let str = e.target.value;
-    str = str.replace(/ /g,'');
-    console.log(str);
-    console.log(/[a-z A-Z0-9\\_\\"]+$/.test(str));
     let arr = this.state.oldConnections.filter( item => {
       return item.name === str;
     });
-    if(arr.length !== 0) {
+    if(arr.length !== 0 || !this.regexpName.test(str)) {
       this.setState({ isConnectionNameEnabled: true });
     } else {
       this.setState( prevState => ({
@@ -154,9 +153,6 @@ class AppModalCreate extends Component {
         connectionName: str,
         isConnectionNameEnabled: false,
       }));
-      this.setState({
-
-      });
     };
   };
 
@@ -165,7 +161,7 @@ class AppModalCreate extends Component {
     let arr = this.state.oldThings.filter( item => {
       return item.metadata.mac === str;
     });
-    if(arr.length !== 0) {
+    if(arr.length !== 0 || !this.regexpMac.test(str)) {
       this.setState({ isThingMacEnabled: true });
     } else {
       this.setState( prevState => ({

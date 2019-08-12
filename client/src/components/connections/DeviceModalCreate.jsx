@@ -20,8 +20,8 @@ class DeviceModalCreate extends Component {
       oldConnections: [],
       isEnabled: true,
       showModalCreateDevice: false,
-      isThingMacEnabled: false,
-      isConnectionNameEnabled: false,
+      isThingMacDisabled: false,
+      isConnectionNameDisabled: false,
       newThing: {
         name: '',
         metadata: {
@@ -41,6 +41,8 @@ class DeviceModalCreate extends Component {
     };
 
     this.oldThings = [];
+    this.regexpName = /^\w+$/;
+    this.regexpMac = /^[0-9a-z]{1,2}([.:-])(?:[0-9a-z]{1,2}\1){4}[0-9a-z]{2}$/gmi;
   };
 
   getConnections = async () => {
@@ -242,8 +244,8 @@ class DeviceModalCreate extends Component {
     let arr = this.state.oldThings.filter( item => {
       return item.metadata.mac === str;
     });
-    if(arr.length !== 0) {
-      this.setState({ isThingMacEnabled: true });
+    if(arr.length !== 0 || !this.regexpMac.test(str)) {
+      this.setState({ isThingMacDisabled: true });
     } else {
       this.setState( prevState => ({
         newThing: {
@@ -253,7 +255,7 @@ class DeviceModalCreate extends Component {
             mac: str,
           },
         },
-        isThingMacEnabled: false,
+        isThingMacDisabled: false,
       }));
     }
   };
@@ -263,8 +265,8 @@ class DeviceModalCreate extends Component {
     let arr = this.state.oldConnections.filter( item => {
       return item.name === `zsse/${str}`;
     });
-    if(arr.length !== 0) {
-      this.setState({ isConnectionNameEnabled: true });
+    if(arr.length !== 0 || !this.regexpName.test(str)) {
+      this.setState({ isConnectionNameDisabled: true });
     } else {
       this.setState( prevState => ({
         newThing: {
@@ -272,7 +274,7 @@ class DeviceModalCreate extends Component {
           name: str,
         },
         connectionName: str,
-        isConnectionNameEnabled: false,
+        isConnectionNameDisabled: false,
       }));
     };
   };
@@ -330,8 +332,8 @@ class DeviceModalCreate extends Component {
   render() {
     const { showModalCreateDevice } = this.props;
     const {
-      isThingMacEnabled,
-      isConnectionNameEnabled,
+      isThingMacDisabled,
+      isConnectionNameDisabled,
       isEnabled,
       deviceTypes,
       apps,
@@ -354,7 +356,7 @@ class DeviceModalCreate extends Component {
               <input
                 placeholder='name'
                 onChange={e => this.handleChangeConnectionName(e)}
-                className={isConnectionNameEnabled ? 'show_error' : ''}
+                className={isConnectionNameDisabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field>
@@ -362,7 +364,7 @@ class DeviceModalCreate extends Component {
               <input
                 placeholder='mac'
                 onChange={e => this.handleChangeThingMac(e)}
-                className={isThingMacEnabled ? 'show_error' : ''}
+                className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field>
@@ -413,7 +415,7 @@ class DeviceModalCreate extends Component {
             icon='plus'
             labelPosition='right'
             content="Create"
-            disabled={isThingMacEnabled || isConnectionNameEnabled || !isEnabled}
+            disabled={isThingMacDisabled || isConnectionNameDisabled || !isEnabled}
             onClick={this.createDeviceConnection}
           />
         </Modal.Actions>

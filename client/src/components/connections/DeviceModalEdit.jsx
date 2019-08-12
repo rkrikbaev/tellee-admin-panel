@@ -20,7 +20,10 @@ class DeviceModalEdit extends Component {
       selectedDeviceType: [],
       selectedApp: [],
       oldConnections: [],
+      isConnectionNameDisabled: false,
     };
+
+    // this.regexpName = /^\w+$/;
   };
 
   getConfigById = async id => {
@@ -248,15 +251,23 @@ class DeviceModalEdit extends Component {
 
   handleChangeConnectionName = e => {
     const currentValue = e.target.value;
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        content: {
-          ...prevState.config.content,
-          name: currentValue,
+    let arr = this.state.oldConnections.filter( item => {
+      return item.name === `zsse/${currentValue}`;
+    });
+    if(arr.length !== 0) {
+      this.setState({ isConnectionNameDisabled: true });
+    } else {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          content: {
+            ...prevState.config.content,
+            name: currentValue,
+          },
         },
-      },
-    }));
+        isConnectionNameDisabled: false,
+      }));
+    };
   };
 
   handleChangeCycle = e => {
@@ -310,6 +321,7 @@ class DeviceModalEdit extends Component {
       apps,
       selectedDeviceType,
       selectedApp,
+      isConnectionNameDisabled,
     } = this.state;
 
     return (
@@ -328,6 +340,7 @@ class DeviceModalEdit extends Component {
                 placeholder='name'
                 onChange={e => this.handleChangeConnectionName(e)}
                 value={config.content !== undefined ? config.content.name : ''}
+                className={isConnectionNameDisabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field>
@@ -375,7 +388,7 @@ class DeviceModalEdit extends Component {
             labelPosition='right'
             content="Yes"
             onClick={this.editDevice}
-            disabled={!isEnabled}
+            disabled={isConnectionNameDisabled || !isEnabled}
           />
         </Modal.Actions>
       </Modal>
