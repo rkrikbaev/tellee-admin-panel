@@ -133,7 +133,32 @@ class AppModalCreate extends Component {
   componentDidMount() {
     this.getThings();
     this.getConnections();
-  }
+  };
+
+  handleChangeConnectionName = e => {
+    let str = e.target.value;
+    str = str.replace(/ /g,'');
+    console.log(str);
+    console.log(/[a-z A-Z0-9\\_\\"]+$/.test(str));
+    let arr = this.state.oldConnections.filter( item => {
+      return item.name === str;
+    });
+    if(arr.length !== 0) {
+      this.setState({ isConnectionNameEnabled: true });
+    } else {
+      this.setState( prevState => ({
+        newThing: {
+          ...prevState.newThing,
+          name: str,
+        },
+        connectionName: str,
+        isConnectionNameEnabled: false,
+      }));
+      this.setState({
+
+      });
+    };
+  };
 
   handleChangeThingMac = e => {
     let str = e.target.value;
@@ -154,28 +179,6 @@ class AppModalCreate extends Component {
         isThingMacEnabled: false,
       }));
     }
-  };
-
-  handleChangeConnectionName = e => {
-    let str = e.target.value;
-    let arr = this.state.oldConnections.filter( item => {
-      return item.name === str;
-    });
-    if(arr.length !== 0) {
-      this.setState({ isConnectionNameEnabled: true });
-    } else {
-      this.setState( prevState => ({
-        newThing: {
-          ...prevState.newThing,
-          name: str,
-        },
-        connectionName: str,
-        isConnectionNameEnabled: false,
-      }));
-      this.setState({
-
-      });
-    };
   };
 
   render() {

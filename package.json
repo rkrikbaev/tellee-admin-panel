@@ -6,8 +6,8 @@
   "scripts": {
     "client-install": "cd client && npm install",
     "client-build": "cd client && npm run build",
-    "start": "node -r esm server.js",
-    "server": "nodemon -r esm server.js",
+    "start": "LOG_LEVEL=debug node -r esm server.js > output.log | ./node_modules/.bin/pino-pretty",
+    "server": "LOG_LEVEL=debug nodemon -r esm server.js > output.log | ./node_modules/.bin/pino-pretty",
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "npm start --prefix client",
     "client-prod": "cd client && serve -s build -l 8000",
@@ -28,16 +28,19 @@
     "cors": "^2.8.5",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
+    "express-pino-logger": "^4.0.0",
     "express-session": "^1.16.2",
     "https": "^1.0.0",
     "keycloak-connect": "^6.0.1",
     "mongoose": "^5.5.14",
     "mongoose-timestamp": "^0.6.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "pino": "^5.13.2"
   },
   "devDependencies": {
     "concurrently": "^4.1.0",
     "esm": "^3.2.25",
-    "nodemon": "^1.19.1"
+    "nodemon": "^1.19.1",
+    "pino-pretty": "^3.2.0"
   }
 }

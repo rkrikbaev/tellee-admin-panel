@@ -7,6 +7,9 @@ import cors from 'cors';
 import {connectDb} from './models/index';
 require('dotenv').config();
 
+const pino = require('pino');
+const expressPino = require('express-pino-logger');
+
 import UserRouter from './api/user/userRouter';
 import ThingRouter from './api/thing/thingRouter';
 import ChannelRouter from './api/channel/channelRouter';
@@ -17,8 +20,10 @@ import ConnectionRouter from './api/connection/connectionRouter';
 const app = express();
 const originsWhitelist = [
   'http://localhost',
-  'http://zsse.zeinetsse.com'
 ];
+
+const logger = pino({ level: process.env.LOG_LEVEL || 'info' });
+const expressLogger = expressPino({ logger });
 
 const corsOptions = {
   origin: (origin, callback) => {
@@ -29,12 +34,13 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
+app.use(expressLogger);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use( (req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://zsse.zeinetsse.com");
+  res.header("Access-Control-Allow-Origin", "http://localhost:8000");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   res.header("Access-Control-Allow-Credentials", true);
@@ -61,6 +67,7 @@ app.use('/api/connection', ConnectionRouter);
 
 connectDb().then( async () => {
   app.listen(process.env.PORT, () =>
-    console.log(`Mainflux admin server listening on port ${process.env.PORT}!`),
+    logger.debug(`Mainflux admin server listening on port ${process.env.PORT}!`)
+    // console.log(),
   );
 });
