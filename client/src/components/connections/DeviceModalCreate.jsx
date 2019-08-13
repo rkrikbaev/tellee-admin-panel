@@ -237,7 +237,26 @@ class DeviceModalCreate extends Component {
 
   closeError = () => {
     this.setState({ showModalError: false, errorText: '' });
-  }
+  };
+
+  handleChangeConnectionName = e => {
+    let str = e.target.value;
+    let arr = this.state.oldConnections.filter( item => {
+      return item.name === `zsse/${str}`;
+    });
+    if(arr.length !== 0 || !this.regexpName.test(str)) {
+      this.setState({ isConnectionNameDisabled: true });
+    } else {
+      this.setState( prevState => ({
+        newThing: {
+          ...prevState.newThing,
+          name: str,
+        },
+        connectionName: str,
+        isConnectionNameDisabled: false,
+      }));
+    };
+  };
 
   handleChangeThingMac = e => {
     let str = e.target.value;
@@ -258,25 +277,6 @@ class DeviceModalCreate extends Component {
         isThingMacDisabled: false,
       }));
     }
-  };
-
-  handleChangeConnectionName = e => {
-    let str = e.target.value;
-    let arr = this.state.oldConnections.filter( item => {
-      return item.name === `zsse/${str}`;
-    });
-    if(arr.length !== 0 || !this.regexpName.test(str)) {
-      this.setState({ isConnectionNameDisabled: true });
-    } else {
-      this.setState( prevState => ({
-        newThing: {
-          ...prevState.newThing,
-          name: str,
-        },
-        connectionName: str,
-        isConnectionNameDisabled: false,
-      }));
-    };
   };
 
   handleChangeCycle = e => {

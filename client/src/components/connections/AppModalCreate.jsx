@@ -27,7 +27,7 @@ class AppModalCreate extends Component {
       connectionName: '',
     };
     this.regexpName = /^\w+$/;
-    this.regexpMac = /^[0-9a-z]{1,2}([.:-])(?:[0-9a-z]{1,2}\1){4}[0-9a-z]{1,2}$/gmi;
+    this.regexpMac = /^[0-9a-z]{1,2}([.:-])(?:[0-9a-z]{1,2}\1){4}[0-9a-z]{2}$/gmi;
   };
 
   getThings = async () => {
