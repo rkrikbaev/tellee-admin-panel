@@ -249,6 +249,8 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
     throw new Error("Expects content-type 'application/json'");
   }
 
+  console.log(req.body.response);
+
   const token = req.cookies.auth;
   const config = {
     headers: {
@@ -325,6 +327,7 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
   };
 
   editedConfig.content = JSON.stringify(editedConfig.content);
+  console.log(editedConfig)
 
   try {
     axios.put(`http://${process.env.MAINFLUX_URL}:8200/things/configs/${req.params.id}`,

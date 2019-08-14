@@ -389,7 +389,7 @@ class DeviceModalCreate extends Component {
             </Form.Field>
             <Form.Field>
               <Checkbox
-                label={config.sendToApp ? 'This config will be sent to App' : 'Click checkbox for send this config to App'}
+                label={config.sendToApp ? 'This device will be sent to App' : 'Click checkbox for send this config to App'}
                 onChange={this.handleChangeSendToApp}
               />
             </Form.Field>
