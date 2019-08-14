@@ -5,6 +5,7 @@ import {
   Modal,
   Form,
   Dropdown,
+  Checkbox,
 } from 'semantic-ui-react';
 
 class DeviceModalEdit extends Component {
@@ -21,9 +22,8 @@ class DeviceModalEdit extends Component {
       selectedApp: [],
       oldConnections: [],
       isConnectionNameDisabled: false,
+      handleSendToApp: undefined,
     };
-
-    // this.regexpName = /^\w+$/;
   };
 
   getConfigById = async id => {
@@ -40,7 +40,8 @@ class DeviceModalEdit extends Component {
         config.content = JSON.parse(config.content);
         let selectedApp = config.content.app;
         let selectedDeviceType = config.content.device_type;
-        this.setState({ selectedApp, selectedDeviceType, config });
+        let handleSendToApp = config.content.sendToApp;
+        this.setState({ selectedApp, selectedDeviceType, config, handleSendToApp });
       })
       .catch( err => console.log(err) );
   };
@@ -116,7 +117,7 @@ class DeviceModalEdit extends Component {
   };
 
   editDevice = async () => {
-    const { config, oldConnections } = this.state;
+    const { config, oldConnections, handleSendToApp } = this.state;
     const { name, cycle, device_type, app, sendToApp, mac } = this.state.config.content;
     let obj = {};
 
@@ -141,12 +142,12 @@ class DeviceModalEdit extends Component {
         });
       });
 
-    if(sendToApp) {
+    if(handleSendToApp) {
       obj = {
         type: "device",
         id: config.mainflux_id,
         mac,
-        sendToApp,
+        sendToApp: handleSendToApp,
         name,
         cycle,
         device_type,
@@ -157,7 +158,7 @@ class DeviceModalEdit extends Component {
         type: "device",
         id: config.mainflux_id,
         mac,
-        sendToApp,
+        sendToApp: handleSendToApp,
         name,
         device_type,
         cycle,
@@ -174,6 +175,81 @@ class DeviceModalEdit extends Component {
       credentials : 'include',
       body: JSON.stringify({ obj })
     });
+
+    // -- IF DEVICE CONNECTED TO APP BUT IT SHOULD BE DISCONNECTED -- //
+    if( sendToApp === true && handleSendToApp === false ) {
+      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`,{
+        mode: 'cors',
+        credentials : 'include',
+      })
+        .then( response => response.json())
+        .then( response => {
+          response.content = JSON.parse(response.content);
+          const { content } = response;
+
+          content.devices = content.devices.filter( item => {
+            return item.device_id !== config.mainflux_id;
+          });
+
+          fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            mode: 'cors',
+            credentials : 'include',
+            body: JSON.stringify({ response }),
+          });
+        });
+      await fetch(
+        `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${config.mainflux_id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          mode: 'cors',
+          credentials : 'include',
+        });
+      this.close();
+      return;
+    }
+    // -- IF DEVICE DOESN'T CONNECTED TO APP BUT IT SHOULD BE CONNECTED -- //
+    else if( sendToApp === false && handleSendToApp === true ) {
+      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`, {
+        mode: 'cors',
+        credentials : 'include',
+      })
+        .then( response => response.json())
+        .then( response => {
+          response.content = JSON.parse(response.content);
+          let { content } = response;
+          content.devices.push({
+            device_name: `zsse/${obj.name}`,
+            device_id: config.mainflux_id,
+            device_key: config.mainflux_key,
+            device_type: obj.device_type
+          })
+          fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            mode: 'cors',
+            credentials : 'include',
+            body: JSON.stringify({ response })
+          });
+        });
+      await fetch(
+        `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${config.mainflux_id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          mode: 'cors',
+          credentials : 'include',
+        });
+      await this.getConnections();
+    };
 
     if(sendToApp) {
       // -- Get current Device config
@@ -203,6 +279,15 @@ class DeviceModalEdit extends Component {
               credentials : 'include',
               body: JSON.stringify({ response })
             });
+            fetch(
+              `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${config.mainflux_id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                mode: 'cors',
+                credentials : 'include',
+              });
           });
       }
 
@@ -243,6 +328,15 @@ class DeviceModalEdit extends Component {
             credentials : 'include',
             body: JSON.stringify({ response })
           });
+          fetch(
+            `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${config.mainflux_id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              mode: 'cors',
+              credentials : 'include',
+            });
         });
     };
 
@@ -298,6 +392,11 @@ class DeviceModalEdit extends Component {
     }));
   };
 
+  handleChangeSendToApp = (e, { checked }) => {
+    this.setState({ handleSendToApp : checked });
+    this.getConnections();
+  };
+
   handleChangeApp = (e, { value }) => {
     const currentValue = value;
     this.setState( prevState => ({
@@ -322,6 +421,7 @@ class DeviceModalEdit extends Component {
       selectedDeviceType,
       selectedApp,
       isConnectionNameDisabled,
+      handleSendToApp,
     } = this.state;
 
     return (
@@ -365,7 +465,14 @@ class DeviceModalEdit extends Component {
                 onChange={this.handleChangeDeviceType}
               />
             </Form.Field>
-            <Form.Field className={config.content ? config.content.sendToApp ? '' : 'hide' : ''}>
+            <Form.Field>
+              <Checkbox
+                label={handleSendToApp ? "This device's config sent to App" : "Click checkbox for send this device's config to App"}
+                onChange={this.handleChangeSendToApp}
+                checked={handleSendToApp}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToApp ? '' : 'hide'}>
               <label>Apps</label>
               <Dropdown
                 placeholder='apps'
