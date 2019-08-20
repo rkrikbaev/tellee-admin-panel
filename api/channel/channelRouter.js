@@ -29,7 +29,6 @@ ChannelRouter.route('/').get( async (req, res, next) => {
 
 // -- Create new Channel --
 ChannelRouter.route('/create').post( async (req, res, next) => {
-
   // Chech for JSON
   if(!req.is('application/json')) {
     next();
@@ -49,7 +48,7 @@ ChannelRouter.route('/create').post( async (req, res, next) => {
   };
 
   const newChannel = {
-    name,
+    name: `zsse/${name}`,
     metadata
   }
 

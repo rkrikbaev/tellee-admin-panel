@@ -102,6 +102,27 @@ class DeviceModalCreate extends Component {
     });
   };
 
+  getChannel = async appMac => {
+    const { oldConnections } = this.state;
+    let app = oldConnections.filter( item => {
+      return item.external_id === appMac;
+    });
+    let arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
+      mode: 'cors',
+      credentials: 'include'
+    })
+    .then( res => res.json())
+    .then( oldChannels => {
+      return oldChannels;
+    })
+    .catch( err => console.log(err));
+
+    var channel = arr.filter( item => {
+      return item.name === app[0].name;
+    });
+    return channel[0];
+  }
+
   // -- Start of creating device --
   createDeviceConnection = async () => {
     const {
@@ -130,10 +151,11 @@ class DeviceModalCreate extends Component {
 
     let obj = {};
     if(sendToApp) {
+      let channel = await this.getChannel(app);
       obj = {
         mac: newThing.metadata.mac,
         id: createdThing[0].id,
-        channel: `${process.env.REACT_APP_CHANNEL_ID}`,
+        channel: channel.id,
         name: connectionName,
         cycle,
         sendToApp,
@@ -187,17 +209,28 @@ class DeviceModalCreate extends Component {
               credentials : 'include',
               body: JSON.stringify({ response })
             });
+            // - Connecting to App's channel - //
+            fetch(
+              `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${response.mainflux_channels[0].id}/things/${createdThing[0].id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                mode: 'cors',
+                credentials : 'include',
+              });
+          });
+      } else {
+        await fetch(
+          `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${createdThing[0].id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            mode: 'cors',
+            credentials : 'include',
           });
       };
-      await fetch(
-        `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${createdThing[0].id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          mode: 'cors',
-          credentials : 'include',
-        });
       await this.getConnections();
 
       // Close and send data to parent

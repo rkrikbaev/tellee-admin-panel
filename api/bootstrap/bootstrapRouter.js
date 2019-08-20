@@ -327,7 +327,6 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
   };
 
   editedConfig.content = JSON.stringify(editedConfig.content);
-  console.log(editedConfig)
 
   try {
     axios.put(`http://${process.env.MAINFLUX_URL}:8200/things/configs/${req.params.id}`,

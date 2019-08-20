@@ -24,6 +24,10 @@ class AppModalCreate extends Component {
           mac: '',
         },
       },
+      channel:  {
+        name: '',
+        metadata: {},
+      },
       connectionName: '',
     };
     this.regexpName = /^\w+$/;
@@ -66,18 +70,44 @@ class AppModalCreate extends Component {
     });
   };
 
+  createChannel = async () => {
+    const { channel } = this.state;
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      mode: 'cors',
+      credentials: 'include',
+      body: JSON.stringify({channel})
+    });
+  };
+
   createAppConnection = async () => {
     const { newThing, connectionName } = this.state;
     try {
       let arr = [];
+      await this.createChannel();
+      arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
+        mode: 'cors',
+        credentials: 'include'
+      })
+      .then( res => res.json())
+      .then( oldChannels => {
+        return oldChannels;
+      })
+      .catch( err => console.log(err));
+      var channel = arr.filter( item => {
+        return item.name === `zsse/${newThing.name}`;
+      });
       await this.createThing();
-      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
+      arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
         mode: 'cors',
         credentials : 'include',
         })
         .then( res =>  res.json() )
         .then( oldThings => {
-          arr = oldThings;
+          return oldThings;
         })
         .catch( err => console.log(err) );
 
@@ -91,7 +121,7 @@ class AppModalCreate extends Component {
     const obj = {
       mac: newThing.metadata.mac,
       id: thing[0].id,
-      channels: `${process.env.REACT_APP_CHANNEL_ID}`,
+      channels: `${channel[0].id}`,
       name: connectionName,
     };
 
@@ -107,7 +137,7 @@ class AppModalCreate extends Component {
       });
 
       await fetch(
-        `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${thing[0].id}`, {
+        `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${channel[0].id}/things/${thing[0].id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -148,6 +178,10 @@ class AppModalCreate extends Component {
       this.setState( prevState => ({
         newThing: {
           ...prevState.newThing,
+          name: str,
+        },
+        channel: {
+          ...prevState.channel,
           name: str,
         },
         connectionName: str,
