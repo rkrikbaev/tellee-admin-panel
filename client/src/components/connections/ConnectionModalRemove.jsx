@@ -18,6 +18,23 @@ class ConnectionModalRemove extends Component {
     }
   }
 
+  getChannel = async app => {
+    let arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
+      mode: 'cors',
+      credentials: 'include'
+    })
+    .then( res => res.json())
+    .then( oldChannels => {
+      return oldChannels;
+    })
+    .catch( err => console.log(err));
+
+    var channel = arr.filter( item => {
+      return item.name === app;
+    });
+    return channel[0];
+  }
+
   removeConnection = async connection => {
     fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things/remove/${connection.mainflux_id}`, {
       method: 'DELETE',
@@ -61,6 +78,17 @@ class ConnectionModalRemove extends Component {
           });
         });
     }
+
+    let arr = await this.getChannel(connection.name);
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/remove/${arr.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      mode: 'cors',
+      credentials : 'include',
+    });
+
     this.setState({ showModalRemove: false });
     this.props.callbackFromParent(this.state.showModalRemove, connection.mainflux_id);
   }

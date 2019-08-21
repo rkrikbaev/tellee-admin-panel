@@ -172,73 +172,73 @@ BootstrapRouter.route('/:id').get( async (req, res, next) => {
 });
 
 // // -- Edit config's channels by it's mainflux_id in Bootstrap (channels***) --
-// BootstrapRouter.route('/edit/channels/:id').put( async (req, res, next) => {
+BootstrapRouter.route('/edit/channels/:id').put( async (req, res, next) => {
 
-//   // Chech for JSON
-//   if(!req.is('application/json')) {
-//     next();
-//     throw new Error("Expects content-type 'application/json'");
-//   }
+  // Chech for JSON
+  if(!req.is('application/json')) {
+    next();
+    throw new Error("Expects content-type 'application/json'");
+  }
 
-//   const token = req.cookies.auth;
+  const token = req.cookies.auth;
 
-//   const config = {
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'Authorization': token,
-//     },
-//     httpsAgent: new https.Agent({
-//       rejectUnauthorized: false,
-//     })
-//   };
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token,
+    },
+    httpsAgent: new https.Agent({
+      rejectUnauthorized: false,
+    })
+  };
 
-//   let editedConfig = {};
+  let editedConfig = {};
 
-//   if(req.body.obj.type === "app") {
-//     const { mac, id, channels, name, content } = req.body.obj;
+  if(req.body.obj.type === "app") {
+    const { mac, id, channel, name, content } = req.body.obj;
 
-//     editedConfig = {
-//       external_id: mac,
-//       external_key: md5(mac.toLowerCase()),
-//       thing_id: id,
-//       name,
-//       channels: typeof channels === "string"
-//         ? [channels]
-//         : channels,
-//       content,
-//     };
-//   } else if(req.body.obj.type === "device") {
-//     const { mac, id, channels, name, firmware, cycle, state, model } = req.body.obj;
+    editedConfig = {
+      external_id: mac,
+      external_key: md5(mac.toLowerCase()),
+      thing_id: id,
+      name,
+      channels: typeof channel === "string"
+        ? [channel]
+        : channel,
+      content,
+    };
+  } else if(req.body.obj.type === "device") {
+    const { mac, id, channel, name, firmware, cycle, state, model } = req.body.obj;
 
-//     editedConfig = {
-//       external_id: mac,
-//       external_key: md5(mac.toLowerCase()),
-//       thing_id: id,
-//       name,
-//       channels: typeof channels === "string"
-//         ? [channels]
-//         : channels,
-//       content: {firmware, name, cycle, model},
-//       state
-//     };
-//   };
+    editedConfig = {
+      external_id: mac,
+      external_key: md5(mac.toLowerCase()),
+      thing_id: id,
+      name,
+      channels: typeof channel === "string"
+        ? [channel]
+        : channel,
+      content: {firmware, name, cycle, model},
+      state
+    };
+  };
 
-//   editedConfig.content = JSON.stringify(editedConfig.content);
+  editedConfig.content = JSON.stringify(editedConfig.content);
 
-//   try {
-//     axios.put(`http://${process.env.MAINFLUX_URL}:8200/things/configs/connections/${req.params.id}`,
-//     editedConfig, config)
-//       .then( response => {
-//         res.sendStatus(response.status);
-//         next();
-//       })
-//       .catch( err => {
-//         return next(err);
-//       });
-//   } catch(err) {
-//     return next(err);
-//   };
-// });
+  try {
+    axios.put(`http://${process.env.MAINFLUX_URL}:8200/things/configs/connections/${req.params.id}`,
+    editedConfig, config)
+      .then( response => {
+        res.sendStatus(response.status);
+        next();
+      })
+      .catch( err => {
+        return next(err);
+      });
+  } catch(err) {
+    return next(err);
+  };
+});
 
 // -- Edit config info by it's mainflux_id in Bootstrap (name, content***) --
 BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
@@ -248,8 +248,6 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
     next();
     throw new Error("Expects content-type 'application/json'");
   }
-
-  console.log(req.body.response);
 
   const token = req.cookies.auth;
   const config = {

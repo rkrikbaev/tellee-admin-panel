@@ -92,6 +92,27 @@ class DeviceModalEdit extends Component {
       .catch( err => console.log(err) );
   };
 
+  getChannel = async appMac => {
+    const { oldConnections } = this.state;
+    let app = oldConnections.filter( item => {
+      return item.external_id === appMac;
+    });
+    let arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
+      mode: 'cors',
+      credentials: 'include'
+    })
+    .then( res => res.json())
+    .then( oldChannels => {
+      return oldChannels;
+    })
+    .catch( err => console.log(err));
+
+    var channel = arr.filter( item => {
+      return item.name === app[0].name;
+    });
+    return channel[0];
+  }
+
   componentWillReceiveProps(nextProps) {
     if(nextProps.connection !== this.props.connection){
       this.getConfigById(nextProps.connection.external_id);
@@ -143,10 +164,12 @@ class DeviceModalEdit extends Component {
       });
 
     if(handleSendToApp) {
+      let channel = await this.getChannel(app);
       obj = {
         type: "device",
         id: config.mainflux_id,
         mac,
+        channel: channel.id,
         sendToApp: handleSendToApp,
         name,
         cycle,
@@ -158,6 +181,7 @@ class DeviceModalEdit extends Component {
         type: "device",
         id: config.mainflux_id,
         mac,
+        channel: process.env.REACT_APP_CHANNEL_ID,
         sendToApp: handleSendToApp,
         name,
         device_type,
@@ -167,6 +191,15 @@ class DeviceModalEdit extends Component {
 
     // -- Update Device
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${config.mainflux_id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      mode: 'cors',
+      credentials : 'include',
+      body: JSON.stringify({ obj })
+    });
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/channels/${config.mainflux_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
