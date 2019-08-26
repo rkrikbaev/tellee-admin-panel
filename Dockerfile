@@ -1,13 +1,23 @@
-FROM mhart/alpine-node:8.11.4
+FROM node:8-alpine
+
+MAINTAINER GALYMZHAN ALMABEK
 
 WORKDIR /api
 
-COPY package*.json /api/
+COPY . /api/
+
+ENV PORT=5000
+ENV DATABASE_URL=mongodb://mainflux-db:27017/mainflux_admin
+ENV MAINFLUX_URL=134.209.240.215
+ENV BOOTSTRAP_URL=134.209.240.215:8200
+ENV UI_URL=http://localhost:8000
 
 RUN npm install
 
-COPY . /api/
+EXPOSE 5000
 
-EXPOSE 80
+## THE LIFE SAVER
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
+RUN chmod +x /wait
 
-CMD ["npm", "start"]
+CMD /wait && npm start

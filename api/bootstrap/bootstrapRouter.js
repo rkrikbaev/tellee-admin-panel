@@ -38,7 +38,7 @@ BootstrapRouter.route('/create/app').post( async (req, res, next) => {
   newConnection.content = JSON.stringify(newConnection.content);
 
   try {
-    axios.post(`http://${process.env.MAINFLUX_URL}:8200/things/configs`, JSON.stringify(newConnection), config)
+    axios.post(`http://${process.env.BOOTSTRAP_URL}/things/configs`, JSON.stringify(newConnection), config)
       .then( response => {
         res.sendStatus(response.status);
         next();
@@ -99,7 +99,7 @@ BootstrapRouter.route('/create/device').post( async (req, res, next) => {
   newConnection.content = JSON.stringify(newConnection.content);
 
   try {
-    axios.post(`http://${process.env.MAINFLUX_URL}:8200/things/configs`, JSON.stringify(newConnection), config)
+    axios.post(`http://${process.env.BOOTSTRAP_URL}/things/configs`, JSON.stringify(newConnection), config)
       .then( response => {
         res.sendStatus(response.status);
         next();
@@ -128,7 +128,7 @@ BootstrapRouter.route('/').get( async (req, res, next) => {
   };
 
   try {
-    axios.get(`http://${process.env.MAINFLUX_URL}:8200/things/configs?offset=0&limit=100`, config)
+    axios.get(`http://${process.env.BOOTSTRAP_URL}/things/configs?offset=0&limit=100`, config)
       .then( response => {
         res.send(response.data.configs);
         next();
@@ -157,7 +157,7 @@ BootstrapRouter.route('/:id').get( async (req, res, next) => {
   };
 
   try {
-    axios.get(`http://${process.env.MAINFLUX_URL}:8200/things/bootstrap/${req.params.id}`, config)
+    axios.get(`http://${process.env.BOOTSTRAP_URL}/things/bootstrap/${req.params.id}`, config)
       .then( response => {
         res.send(response.data);
         next();
@@ -226,7 +226,7 @@ BootstrapRouter.route('/edit/channels/:id').put( async (req, res, next) => {
   editedConfig.content = JSON.stringify(editedConfig.content);
 
   try {
-    axios.put(`http://${process.env.MAINFLUX_URL}:8200/things/configs/connections/${req.params.id}`,
+    axios.put(`http://${process.env.BOOTSTRAP_URL}/things/configs/connections/${req.params.id}`,
     editedConfig, config)
       .then( response => {
         res.sendStatus(response.status);
@@ -327,7 +327,7 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
   editedConfig.content = JSON.stringify(editedConfig.content);
 
   try {
-    axios.put(`http://${process.env.MAINFLUX_URL}:8200/things/configs/${req.params.id}`,
+    axios.put(`http://${process.env.BOOTSTRAP_URL}/things/configs/${req.params.id}`,
     editedConfig, config)
       .then( response => {
         res.sendStatus(response.status);
@@ -378,7 +378,7 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
 //   editedConfig.content = JSON.stringify(editedConfig.content);
 
 //   try {
-//     axios.put(`http://${process.env.MAINFLUX_URL}:8200/things/state/${req.params.id}`,
+//     axios.put(`http://${process.env.BOOTSTRAP_URL}/things/state/${req.params.id}`,
 //     editedConfig, config)
 //       .then( response => {
 //         res.sendStatus(response.status);
@@ -408,7 +408,7 @@ BootstrapRouter.route('/remove/:id').delete( async (req, res, next) => {
   };
 
   try {
-    axios.delete(`http://${process.env.MAINFLUX_URL}:8200/things/configs/${req.params.id}`, config)
+    axios.delete(`http://${process.env.BOOTSTRAP_URL}/things/configs/${req.params.id}`, config)
       .then( response => {
         res.sendStatus(response.status);
         next();

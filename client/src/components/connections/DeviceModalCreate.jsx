@@ -123,6 +123,22 @@ class DeviceModalCreate extends Component {
     return channel[0];
   }
 
+  getGlobalChannel = async channelName => {
+    let arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
+      mode: 'cors',
+      credentials: 'include'
+    })
+    .then( res => res.json())
+    .then( oldChannels => {
+      return oldChannels;
+    })
+    .catch( err => console.log(err));
+    const globalChannel = arr.filter( item => {
+      return item.name === `zsse/${channelName}`;
+    });
+    return globalChannel[0];
+  }
+
   // -- Start of creating device --
   createDeviceConnection = async () => {
     const {
@@ -149,9 +165,10 @@ class DeviceModalCreate extends Component {
       console.log(err);
     }
 
-    let obj = {};
+    let obj = {},
+        channel = {};
     if(sendToApp) {
-      let channel = await this.getChannel(app);
+      channel = await this.getChannel(app);
       obj = {
         mac: newThing.metadata.mac,
         id: createdThing[0].id,
@@ -163,10 +180,11 @@ class DeviceModalCreate extends Component {
         app
       };
     } else {
+      channel = await this.getGlobalChannel(process.env.REACT_APP_CHANNEL_NAME);
       obj = {
         mac: newThing.metadata.mac,
         id: createdThing[0].id,
-        channel: `${process.env.REACT_APP_CHANNEL_ID}`,
+        channel: channel.id,
         name: connectionName,
         cycle,
         device_type,
@@ -222,7 +240,7 @@ class DeviceModalCreate extends Component {
           });
       } else {
         await fetch(
-          `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${createdThing[0].id}`, {
+          `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${channel.id}/things/${createdThing[0].id}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json'

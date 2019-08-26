@@ -111,6 +111,22 @@ class DeviceModalEdit extends Component {
       return item.name === app[0].name;
     });
     return channel[0];
+  };
+
+  getGlobalChannel = async channelName => {
+    let arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
+      mode: 'cors',
+      credentials: 'include'
+    })
+    .then( res => res.json())
+    .then( oldChannels => {
+      return oldChannels;
+    })
+    .catch( err => console.log(err));
+    const globalChannel = arr.filter( item => {
+      return item.name === `zsse/${channelName}`;
+    });
+    return globalChannel[0];
   }
 
   componentWillReceiveProps(nextProps) {
@@ -163,8 +179,9 @@ class DeviceModalEdit extends Component {
         });
       });
 
+    let channel = {};
     if(handleSendToApp) {
-      let channel = await this.getChannel(app);
+      channel = await this.getChannel(app);
       obj = {
         type: "device",
         id: config.mainflux_id,
@@ -177,11 +194,12 @@ class DeviceModalEdit extends Component {
         app,
       };
     } else {
+      channel = await this.getGlobalChannel(process.env.REACT_APP_CHANNEL_NAME);
       obj = {
         type: "device",
         id: config.mainflux_id,
         mac,
-        channel: process.env.REACT_APP_CHANNEL_ID,
+        channel: channel.id,
         sendToApp: handleSendToApp,
         name,
         device_type,
@@ -235,7 +253,7 @@ class DeviceModalEdit extends Component {
           });
         });
       await fetch(
-        `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${config.mainflux_id}`, {
+        `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${channel.id}/things/${config.mainflux_id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -273,7 +291,7 @@ class DeviceModalEdit extends Component {
           });
         });
       await fetch(
-        `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${config.mainflux_id}`, {
+        `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${channel.id}/things/${config.mainflux_id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -313,7 +331,7 @@ class DeviceModalEdit extends Component {
               body: JSON.stringify({ response })
             });
             fetch(
-              `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${config.mainflux_id}`, {
+              `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${channel.id}/things/${config.mainflux_id}`, {
                 method: 'PUT',
                 headers: {
                   'Content-Type': 'application/json'
@@ -362,7 +380,7 @@ class DeviceModalEdit extends Component {
             body: JSON.stringify({ response })
           });
           fetch(
-            `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${process.env.REACT_APP_CHANNEL_ID}/things/${config.mainflux_id}`, {
+            `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${channel.id}/things/${config.mainflux_id}`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json'

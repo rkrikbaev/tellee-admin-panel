@@ -67,6 +67,7 @@ UserRouter.route('/login').post( async (req, res, next) => {
       'email': user.email,
       'password': `${user.mainflux_pwd}`
     }, config);
+
     res.cookie('auth', token.data.token);
     res.send(token.data);
     next();

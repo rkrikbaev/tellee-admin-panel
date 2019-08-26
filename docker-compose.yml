@@ -1,46 +1,58 @@
 version: "2"
 
 services:
-  client:
-    image: webapp-client
-    restart: always
+  mainflux-interface:
+    container_name: mainflux_interface
+    restart: on-failure
+    build:
+      context: ./client/
+      dockerfile: ./Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - ./client:/client
-      - ./client/node_modules
     links:
-      - api
+      - mainflux-api
     networks:
-      webappnetwork
+      - mainflux-base-net
 
-  api:
-    image: webapp-api
-    restart: always
+  mainflux-api:
+    container_name: mainflux_api
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     ports:
-      - "3000:3000"
+      - "5000:5000"
     volumes:
-      - ./api:/api
-      - ./node_modules
+      - ./mainflux_api:/mainflux_api
     depends_on:
-      - mongodb
+      - mainflux-db
+    links:
+      - mainflux-db
     networks:
-      webappnetwork
+      - mainflux-base-net
+    environment:
+      WAIT_HOSTS: mongodb:27017
+      DATABASE_URL: mongodb://mainflux-db:27017/mainflux_admin
+      # Write down relevant bootstrap and mainflux urls
+      MAINFLUX_URL: 134.209.240.215
+      BOOTSTRAP_URL: 134.209.240.215:8200
+      UI_URL: http://localhost:8000
 
-  mongodb:
+  mainflux-db:
+    container_name: mainflux_db
     image: mongo
     restart: always
-    container_name: mongodb
     volumes:
-      - ./data-node:/data/db
-    ports:
-      - 27017:27017
-    command: mongod --noauth --smallfiles
+      - ./data:/data/db
+    command: mongod
     networks:
-      -webappnetwork
+      - mainflux-base-net
 
 networks:
-  webappnetwork:
+  mainflux-base-net:
     driver: bridge
+
+volumes:
+  mongo_data:
 
 
