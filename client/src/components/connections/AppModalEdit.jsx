@@ -132,6 +132,24 @@ class AppModalEdit extends Component {
           <Form>
 
             <Form.Field>
+              <label>Thing ID</label>
+              <input
+                placeholder='mainflux_id'
+                value={config.content !== undefined ? config.mainflux_id : ''}
+                readOnly
+              />
+            </Form.Field>
+
+            <Form.Field>
+              <label>Thing Key</label>
+              <input
+                placeholder='mainflux_key'
+                value={config.content !== undefined ? config.mainflux_key : ''}
+                readOnly
+              />
+            </Form.Field>
+
+            <Form.Field>
               <label>Name</label>
               <input
                 placeholder='name'

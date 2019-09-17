@@ -2,3 +2,5 @@ node_modules
 .idea
 structure.json
 output.log
+env.txt
+data

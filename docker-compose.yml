@@ -52,7 +52,7 @@ networks:
   mainflux-base-net:
     driver: bridge
 
-volumes:
-  mongo_data:
+# volumes:
+#   mongo_data:
 
 
