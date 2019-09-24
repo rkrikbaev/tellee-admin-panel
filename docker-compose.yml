@@ -6,7 +6,7 @@ services:
     restart: on-failure
     build:
       context: ./client/
-      dockerfile: ./Dockerfile
+      dockerfile: .
     ports:
       - "8000:8000"
     links:
@@ -19,7 +19,7 @@ services:
     restart: on-failure
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: .
     ports:
       - "5000:5000"
     volumes:
