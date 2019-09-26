@@ -13,7 +13,9 @@ html, body {
   height: 4em;
   margin: 1em 2em;
   .top_logo {
-    width: 6em;
+    height: 2.5rem;
+    width: 5em;
+    margin-top: -5px;
   }
   .topbar_right {
     font-size: 1rem;
@@ -72,7 +74,7 @@ hr {
 }
 
 .main_wrapper {
-  width: 80%;
+  width: 100%;
   min-height: 10em;
   border-radius: 5px;
   margin-right: 2em;

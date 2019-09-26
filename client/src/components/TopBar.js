@@ -10,7 +10,7 @@ import {
 
 const trigger = (
   <span>
-    <Image avatar src={faker.internet.avatar()} /> {faker.name.findName()}
+    <Image avatar src='http://zsse.zeinetsse.com/favicon.ico' /> User Admin
   </span>
 );
 
@@ -28,7 +28,7 @@ class TopBar extends Component {
       <div id='TopBar'>
         <Segment clearing id='top_menu'>
           <Header className='topbar_left' floated='left'>
-            <img className="top_logo" alt="Zeinetsse" src="/ZeinetSSE.png" />
+            <img className="top_logo" alt="Tellee_logo" src="/Tellee_logo.svg" />
           </Header>
           <Header className='topbar_right' floated='right'>
             <Dropdown

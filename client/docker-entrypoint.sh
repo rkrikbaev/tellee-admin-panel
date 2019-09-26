@@ -1,3 +1,5 @@
+#!/bin/bash
+
 HOST_DOMAIN="host.docker.internal"
 ping -q -c1 $HOST_DOMAIN > /dev/null 2>&1
 if [ $? -ne 0 ]; then
@@ -5,4 +7,6 @@ if [ $? -ne 0 ]; then
   echo -e "$HOST_IP\t$HOST_DOMAIN" >> /etc/hosts
 fi
 
-{main entrypoint}
+# Here is the original entry point.
+curl -sS host.docker.internal:5000
+cat /etc/hosts
