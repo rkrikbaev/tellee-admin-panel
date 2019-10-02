@@ -8,6 +8,7 @@ import {
 } from 'semantic-ui-react';
 
 class ConnectionModalRemove extends Component {
+  _isMounted = false;
 
   constructor(props) {
     super(props);
@@ -16,6 +17,14 @@ class ConnectionModalRemove extends Component {
       showModalRemove: false,
       isRemoveable: true,
     }
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   getChannel = async app => {
@@ -89,24 +98,26 @@ class ConnectionModalRemove extends Component {
       credentials : 'include',
     });
 
-    this.setState({ showModalRemove: false });
+    if(this._isMounted) this.setState({ showModalRemove: false });
     this.props.callbackFromParent(this.state.showModalRemove, connection.mainflux_id);
   }
 
   componentWillReceiveProps(nextProps) {
     const { content } = nextProps.connection;
     if( content !== undefined && content.type === 'app' && content.devices.length !== 0) {
-      this.setState({ isRemoveable: false });
+      if(this._isMounted) this.setState({ isRemoveable: false });
     } else {
-      this.setState({ isRemoveable: true });
+      if(this._isMounted) this.setState({ isRemoveable: true });
     };
   };
 
 
   close = () => {
-    this.setState({ showModalRemove: false, isRemoveable: true }, () => {
-      this.props.callbackFromParent(this.state.showModalRemove);
-    });
+    if(this._isMounted) {
+      this.setState({ showModalRemove: false, isRemoveable: true }, () => {
+        this.props.callbackFromParent(this.state.showModalRemove);
+      });
+    }
   }
 
   render() {

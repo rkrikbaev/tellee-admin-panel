@@ -98,7 +98,6 @@ ThingRouter.route('/remove/:id').delete( async (req, res, next) => {
 
   // Chech for JSON
   // if(!req.is('application/json')) {
-  //   console.log(true)
   //   next();
   //   throw new Error("Expects content-type 'application/json'");
   // }

@@ -9,6 +9,7 @@ import {
 } from 'semantic-ui-react';
 
 class DeviceModalCreate extends Component {
+  _isMounted = false;
 
   constructor(props) {
     super(props);
@@ -60,7 +61,7 @@ class DeviceModalCreate extends Component {
       const apps = connections.map( item => {
         return { key: item.external_id, text: item.name, value: item.external_id}
       })
-      this.setState({ apps });
+      if(this._isMounted) this.setState({ apps });
     })
     .catch( err => console.log(err) );
   };
@@ -72,7 +73,7 @@ class DeviceModalCreate extends Component {
         const formattedTypes = types.map( (type, i) => {
           return { text: type, value: type}
         });
-        this.setState({ deviceTypes: formattedTypes });
+        if(this._isMounted) this.setState({ deviceTypes: formattedTypes });
       })
       .catch( err => console.log(err) );
   };
@@ -85,7 +86,7 @@ class DeviceModalCreate extends Component {
       .then( res =>  res.json() )
       .then( oldThings => {
         this.oldThings = oldThings;
-        this.setState({ oldThings });
+        if(this._isMounted) this.setState({ oldThings });
       })
       .catch( err => console.log(err) );
   };
@@ -253,19 +254,25 @@ class DeviceModalCreate extends Component {
 
       // Close and send data to parent
       const { showModalCreateDevice, oldConnections } = this.state;
-      this.setState({ showModalCreateDevice: false });
+      if(this._isMounted) this.setState({ showModalCreateDevice: false });
       this.props.callbackFromParent(showModalCreateDevice, oldConnections);
-      this.setState( prevState => ({
-        config: {
-          ...prevState.config,
-          sendToApp: false,
-        },
-      }));
+      if(this._isMounted) {
+        this.setState( prevState => ({
+          config: {
+            ...prevState.config,
+            sendToApp: false,
+          },
+        }));
+      }
     } catch(err) {
       console.log(err);
     }
   };
   // -- End of creating device --
+
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
 
   componentWillReceiveProps(nextProps) {
     if( nextProps !== this.props ) {
@@ -287,7 +294,7 @@ class DeviceModalCreate extends Component {
   };
 
   closeError = () => {
-    this.setState({ showModalError: false, errorText: '' });
+    if(this._isMounted) this.setState({ showModalError: false, errorText: '' });
   };
 
   handleChangeConnectionName = e => {
@@ -296,16 +303,18 @@ class DeviceModalCreate extends Component {
       return item.name === `zsse/${str}`;
     });
     if(arr.length !== 0 || !this.regexpName.test(str)) {
-      this.setState({ isConnectionNameDisabled: true });
+      if(this._isMounted) this.setState({ isConnectionNameDisabled: true });
     } else {
-      this.setState( prevState => ({
-        newThing: {
-          ...prevState.newThing,
-          name: str,
-        },
-        connectionName: str,
-        isConnectionNameDisabled: false,
-      }));
+      if(this._isMounted) {
+        this.setState( prevState => ({
+          newThing: {
+            ...prevState.newThing,
+            name: str,
+          },
+          connectionName: str,
+          isConnectionNameDisabled: false,
+        }));
+      }
     };
   };
 
@@ -315,59 +324,69 @@ class DeviceModalCreate extends Component {
       return item.metadata.mac === str;
     });
     if(arr.length !== 0 || !this.regexpMac.test(str)) {
-      this.setState({ isThingMacDisabled: true });
+      if(this._isMounted) this.setState({ isThingMacDisabled: true });
     } else {
-      this.setState( prevState => ({
-        newThing: {
-          ...prevState.newThing,
-          metadata: {
-            ...prevState.newThing.metadata,
-            mac: str,
+      if(this._isMounted) {
+        this.setState( prevState => ({
+          newThing: {
+            ...prevState.newThing,
+            metadata: {
+              ...prevState.newThing.metadata,
+              mac: str,
+            },
           },
-        },
-        isThingMacDisabled: false,
-      }));
+          isThingMacDisabled: false,
+        }));
+      }
     }
   };
 
   handleChangeCycle = e => {
     let str = e.target.value;
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        cycle: str,
-      },
-      isEnabled: prevState.config.cycle.length <= 4 && /^\d+$/.test(prevState.config.cycle)
-    }));
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          cycle: str,
+        },
+        isEnabled: prevState.config.cycle.length <= 4 && /^\d+$/.test(prevState.config.cycle)
+      }));
+    }
   };
 
 
   handleChangeSendToApp = (e, { checked }) => {
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        sendToApp: checked,
-      },
-    }));
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          sendToApp: checked,
+        },
+      }));
+    }
     this.getConnections();
   };
 
   handleChangeDeviceType = (e, { value }) => {
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        device_type: value,
-      },
-    }));
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          device_type: value,
+        },
+      }));
+    }
   };
 
   handleChangeApp = (e, { value }) => {
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        app: value,
-      },
-    }));
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          app: value,
+        },
+      }));
+    }
   };
 
   // shouldComponentUpdate(nextProps, nextState) {
@@ -375,6 +394,7 @@ class DeviceModalCreate extends Component {
   // };
 
   componentDidMount() {
+    this._isMounted = true;
     this.getThings();
     this.getConnections();
     this.getDeviceTypes();

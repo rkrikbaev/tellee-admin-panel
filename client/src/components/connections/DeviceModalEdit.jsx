@@ -9,6 +9,8 @@ import {
 } from 'semantic-ui-react';
 
 class DeviceModalEdit extends Component {
+  _isMounted = false;
+
   constructor(props) {
     super(props);
 
@@ -18,8 +20,8 @@ class DeviceModalEdit extends Component {
       deviceTypes: [],
       apps: [],
       config: {},
-      selectedDeviceType: [],
-      selectedApp: [],
+      selectedDeviceType: '',
+      selectedApp: '',
       oldConnections: [],
       isConnectionNameDisabled: false,
       handleSendToApp: undefined,
@@ -41,7 +43,9 @@ class DeviceModalEdit extends Component {
         let selectedApp = config.content.app;
         let selectedDeviceType = config.content.device_type;
         let handleSendToApp = config.content.sendToApp;
-        this.setState({ selectedApp, selectedDeviceType, config, handleSendToApp });
+        if(this._isMounted) {
+          this.setState({ selectedApp, selectedDeviceType, config, handleSendToApp });
+        }
       })
       .catch( err => console.log(err) );
   };
@@ -56,7 +60,7 @@ class DeviceModalEdit extends Component {
         const currentThing = oldThings.filter( item => {
           return item.id === this.props.connection.mainflux_id;
         });
-        this.setState({currentThing: currentThing[0]});
+        if(this._isMounted) this.setState({currentThing: currentThing[0]});
       })
       .catch( err => console.log(err) );
   };
@@ -75,7 +79,7 @@ class DeviceModalEdit extends Component {
       const apps = connections.map( item => {
         return { value: item.external_id, text: item.name.split(".")[0] }
       })
-      this.setState({ apps, oldConnections });
+      if(this._isMounted) this.setState({ apps, oldConnections });
     })
     .catch( err => console.log(err) );
   };
@@ -87,7 +91,7 @@ class DeviceModalEdit extends Component {
         const formattedTypes = types.map( (type, i) => {
           return { text: type, value: type}
         });
-        this.setState({ deviceTypes: formattedTypes });
+        if(this._isMounted) this.setState({ deviceTypes: formattedTypes });
       })
       .catch( err => console.log(err) );
   };
@@ -129,27 +133,26 @@ class DeviceModalEdit extends Component {
     return globalChannel[0];
   }
 
-  componentWillReceiveProps(nextProps) {
-    if(nextProps.connection !== this.props.connection){
-      this.getConfigById(nextProps.connection.external_id);
-      this.getThings().then( () => {
-        this.forceUpdate();
-      });
-    };
-    this.getConnections();
-  };
-
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps === this.props || nextState !== this.state;
+    return !(nextProps === this.props && nextState === this.state);
   };
 
   componentDidMount() {
+    this._isMounted = true;
+    this.getConfigById(this.props.connection.external_id);
+      this.getThings().then( () => {
+        if(this._isMounted) this.forceUpdate();
+      });
     this.getDeviceTypes();
     this.getConnections();
   };
 
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
   close = () => {
-    this.setState({ showModalEditDevice: false });
+    if(this._isMounted) this.setState({ showModalEditDevice: false });
     this.props.callbackFromParent(this.state.showModalEditDevice);
   };
 
@@ -400,66 +403,74 @@ class DeviceModalEdit extends Component {
       return item.name === `zsse/${currentValue}`;
     });
     if(arr.length !== 0) {
-      this.setState({ isConnectionNameDisabled: true });
+      if(this._isMounted) this.setState({ isConnectionNameDisabled: true });
     } else {
-      this.setState( prevState => ({
-        config: {
-          ...prevState.config,
-          content: {
-            ...prevState.config.content,
-            name: currentValue,
+      if(this._isMounted) {
+        this.setState( prevState => ({
+          config: {
+            ...prevState.config,
+            content: {
+              ...prevState.config.content,
+              name: currentValue,
+            },
           },
-        },
-        isConnectionNameDisabled: false,
-      }));
+          isConnectionNameDisabled: false,
+        }));
+      }
     };
   };
 
   handleChangeCycle = e => {
     const currentValue = e.target.value;
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        content: {
-          ...prevState.config.content,
-          cycle: currentValue,
-        }
-      },
-      isEnabled: prevState.config.content.cycle.length <= 4 && /^\d+$/.test(prevState.config.content.cycle)
-    }));
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          content: {
+            ...prevState.config.content,
+            cycle: currentValue,
+          }
+        },
+        isEnabled: prevState.config.content.cycle.length <= 4 && /^\d+$/.test(prevState.config.content.cycle)
+      }));
+    }
   };
 
   handleChangeDeviceType = (e, { value }) => {
     const currentValue = value;
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        content: {
-          ...prevState.config.content,
-          device_type: currentValue,
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          content: {
+            ...prevState.config.content,
+            device_type: currentValue,
+          },
         },
-      },
-      selectedDeviceType: value,
-    }));
+        selectedDeviceType: value,
+      }));
+    }
   };
 
   handleChangeSendToApp = (e, { checked }) => {
-    this.setState({ handleSendToApp : checked });
+    if(this._isMounted) this.setState({ handleSendToApp : checked });
     this.getConnections();
   };
 
   handleChangeApp = (e, { value }) => {
     const currentValue = value;
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        content: {
-          ...prevState.config.content,
-          app: currentValue,
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          content: {
+            ...prevState.config.content,
+            app: currentValue,
+          },
         },
-      },
-      selectedApp: value,
-    }));
+        selectedApp: value,
+      }));
+    }
   };
 
   render() {
