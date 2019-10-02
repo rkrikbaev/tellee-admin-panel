@@ -3,4 +3,4 @@ node_modules
 structure.json
 output.log
 env.txt
-data
+mainflux_db_volume

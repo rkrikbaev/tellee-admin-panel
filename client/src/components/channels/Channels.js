@@ -25,6 +25,7 @@ class Channels extends Component {
   }
 
   getToken = async () => {
+    console.log(`${process.env.REACT_APP_EXPRESS_HOST}/api/users/login`)
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/users/login`, {
       method: 'POST',
       headers: {

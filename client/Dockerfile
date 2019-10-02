@@ -6,14 +6,20 @@ WORKDIR /client
 
 COPY . /client/
 
-ENV REACT_APP_EXPRESS_HOST=http://localhost:5000
-ENV REACT_APP_MAINFLUX_USER=zeinetsse10@email.com
-ENV REACT_APP_CHANNEL_NAME=global_channel
-ENV FLASK_URL=134.209.240.215:8100
+ARG REACT_APP_EXPRESS_HOST=http://localhost:5000
+ARG REACT_APP_MAINFLUX_USER=zeinetsse@email.com
+ARG REACT_APP_CHANNEL_NAME=global_channel
+ARG FLASK_URL=134.209.240.215:8100
 
-RUN npm install &&\
-    npm run build
+ENV REACT_APP_EXPRESS_HOST $REACT_APP_EXPRESS_HOST
+ENV REACT_APP_MAINFLUX_USER $REACT_APP_MAINFLUX_USER
+ENV REACT_APP_CHANNEL_NAME $REACT_APP_CHANNEL_NAME
+ENV FLASK_URL $FLASK_URL
+
+RUN npm install && npm run build
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 EXPOSE 8000
 
-CMD sh ./docker-entrypoint.sh && npm run production
+CMD npm run production

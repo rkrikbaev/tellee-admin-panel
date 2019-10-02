@@ -20,6 +20,7 @@ import ConnectionRouter from './api/connection/connectionRouter';
 const app = express();
 const originsWhitelist = [
   'http://localhost',
+  // 'http://134.209.240.215',
 ];
 
 const logger = pino({ level: process.env.LOG_LEVEL || 'info' });

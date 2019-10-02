@@ -1,4 +1,3 @@
-import faker from 'faker';
 import React, { Component } from 'react';
 import {
   Header,
