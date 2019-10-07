@@ -21,7 +21,7 @@ const deviceSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  date: new Date("<YYYY-mm-ddTHH:MM>"),
+  // date: new Date("<YYYY-mm-ddTHH:MM>"),
 });
 
 deviceSchema.plugin(timestamp);

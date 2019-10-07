@@ -16,6 +16,7 @@ import ChannelRouter from './api/channel/channelRouter';
 import BootstrapRouter from './api/bootstrap/bootstrapRouter';
 import OtherRouter from './api/other/otherRouter';
 import ConnectionRouter from './api/connection/connectionRouter';
+import DeviceRouter from './api/device/deviceRouter';
 
 const app = express();
 const originsWhitelist = [
@@ -62,6 +63,7 @@ app.use( session({
 app.use('/api/users', UserRouter);
 app.use('/api/other', OtherRouter);
 app.use('/api/things', ThingRouter);
+app.use('/api/device', DeviceRouter);
 app.use('/api/channels', ChannelRouter);
 app.use('/api/bootstrap', BootstrapRouter);
 app.use('/api/connection', ConnectionRouter);

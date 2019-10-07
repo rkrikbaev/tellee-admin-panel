@@ -25,6 +25,12 @@ class DeviceModalEdit extends Component {
       oldConnections: [],
       isConnectionNameDisabled: false,
       handleSendToApp: undefined,
+      editDevice: {
+        id: '',
+        title: '',
+        subtitle: '',
+        severity: '',
+      },
     };
   };
 
@@ -131,6 +137,17 @@ class DeviceModalEdit extends Component {
       return item.name === `zsse/${channelName}`;
     });
     return globalChannel[0];
+  };
+
+  getDeviceInfoFromDB = async id => {
+    const device = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/${id}`, {
+      mode: 'cors',
+      credentials: 'include'
+    })
+    // .then( res => res.json())
+    .then( resp => console.log(resp.body))
+    .catch(e => console.log(e));
+    console.log(device);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -139,6 +156,7 @@ class DeviceModalEdit extends Component {
 
   componentDidMount() {
     this._isMounted = true;
+    this.getDeviceInfoFromDB(this.props.connection.external_id);
     this.getConfigById(this.props.connection.external_id);
       this.getThings().then( () => {
         if(this._isMounted) this.forceUpdate();

@@ -61,7 +61,7 @@ class ConnectionModalRemove extends Component {
       mode: 'cors',
       credentials : 'include',
     });
-    const { sendToApp, app } = connection.content;
+    const { sendToApp, app, type } = connection.content;
     if(sendToApp) {
       await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`,{
         mode: 'cors',
@@ -87,16 +87,17 @@ class ConnectionModalRemove extends Component {
           });
         });
     }
-
-    let arr = await this.getChannel(connection.name);
-    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/remove/${arr.id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      mode: 'cors',
-      credentials : 'include',
-    });
+    if (type === 'app') {
+      let arr = await this.getChannel(connection.name);
+      fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/remove/${arr.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        mode: 'cors',
+        credentials : 'include',
+      });
+    }
 
     if(this._isMounted) this.setState({ showModalRemove: false });
     this.props.callbackFromParent(this.state.showModalRemove, connection.mainflux_id);
