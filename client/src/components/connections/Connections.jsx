@@ -6,10 +6,10 @@ import {
   Icon,
   Popup,
 } from 'semantic-ui-react';
-import AppModalCreate from './AppModalCreate';
-import AppModalEdit from './AppModalEdit';
-import DeviceModalCreate from './DeviceModalCreate';
-import DeviceModalEdit from './DeviceModalEdit';
+import AppModalCreate from '../applications/AppModalCreate';
+import AppModalEdit from '../applications/AppModalEdit';
+import DeviceModalCreate from '../devices/DeviceModalCreate';
+import DeviceModalEdit from '../devices/DeviceModalEdit';
 import ConnectionModalRemove from './ConnectionModalRemove';
 import ErrorModal from '../errorModal';
 

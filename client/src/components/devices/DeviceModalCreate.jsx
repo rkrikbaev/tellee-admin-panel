@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Connections.scss';
+import '../connections/Connections.scss';
 import {
   Button,
   Form,
