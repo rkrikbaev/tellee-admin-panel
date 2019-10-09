@@ -66,7 +66,7 @@ BootstrapRouter.route('/create/device').post( async (req, res, next) => {
     }),
   };
 
-  const { mac, id, channel, name, cycle, sendToApp, device_type, app, } = req.body;
+  const { mac, id, channel, name, cycle, sendToApp, sendToDB, device_type, app, } = req.body;
   const pref_name = `zsse/${name}`;
   let newConnection = {};
 
@@ -79,7 +79,7 @@ BootstrapRouter.route('/create/device').post( async (req, res, next) => {
       channels: typeof channel === "string"
         ? [channel]
         : channel,
-      content: {name: pref_name, cycle, sendToApp, mac, device_type, type: "device"},
+      content: {name: pref_name, cycle, sendToApp, sendToDB, mac, device_type, type: "device"},
       state: 1
     };
   } else {
@@ -91,7 +91,7 @@ BootstrapRouter.route('/create/device').post( async (req, res, next) => {
       channels: typeof channel === "string"
         ? [channel]
         : channel,
-      content: {name: pref_name, cycle, mac, sendToApp, type: "device", device_type, app},
+      content: {name: pref_name, cycle, mac, sendToApp, sendToDB, type: "device", device_type, app},
       state: 1
     };
   };
@@ -285,14 +285,14 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
     }
     // -- IF EDITTING CONFIG IS DEVICE -- //
     else if(req.body.obj.type === "device") {
-      const { type, id, mac, sendToApp, name, cycle, device_type, app } = req.body.obj;
+      const { type, id, mac, sendToApp, sendToDB, name, cycle, device_type, app } = req.body.obj;
       if(app !== undefined) {
         editedConfig = {
           external_id: mac,
           external_key: md5(mac.toLowerCase()),
           thing_id: id,
           name,
-          content: {name, cycle, mac, type, sendToApp, device_type, app},
+          content: {name, cycle, mac, type, sendToApp, sendToDB, device_type, app},
         };
       } else {
         editedConfig = {
@@ -300,7 +300,7 @@ BootstrapRouter.route('/edit/info/:id').put( async (req, res, next) => {
           external_key: md5(mac.toLowerCase()),
           thing_id: id,
           name,
-          content: {name, cycle, mac, type, device_type, sendToApp},
+          content: {name, cycle, mac, type, device_type, sendToApp, sendToDB},
         };
       };
     };

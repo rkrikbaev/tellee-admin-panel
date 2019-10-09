@@ -21,7 +21,6 @@ import DeviceRouter from './api/device/deviceRouter';
 const app = express();
 const originsWhitelist = [
   'http://localhost',
-  // 'http://134.209.240.215',
 ];
 
 const logger = pino({ level: process.env.LOG_LEVEL || 'info' });
@@ -42,7 +41,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use( (req, res, next) => {
-  res.header("Access-Control-Allow-Origin", process.env.UI_URL);
+  let allowedOrigins = [process.env.UI_URL, 'http://0.0.0.0:8080'];
+  if (allowedOrigins.includes(req.headers.origin)) {
+    res.header("Access-Control-Allow-Origin", req.headers.origin);
+  }
+  // res.header("Access-Control-Allow-Origin", );
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   res.header("Access-Control-Allow-Credentials", true);

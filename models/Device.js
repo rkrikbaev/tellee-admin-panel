@@ -21,7 +21,28 @@ const deviceSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  // date: new Date("<YYYY-mm-ddTHH:MM>"),
+  alerttext: {
+    type: String,
+    required: false,
+  },
+  alertvalue: {
+    type: String,
+    required: false,
+    trim: true,
+  },
+  assettext: {
+    type: String,
+    required: false,
+  },
+  assetvalue: {
+    type: String,
+    required: false,
+    trim: true,
+  },
+  messagetext: {
+    type: String,
+    required: false,
+  },
 });
 
 deviceSchema.plugin(timestamp);

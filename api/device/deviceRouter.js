@@ -14,13 +14,28 @@ DeviceRouter.route('/create').post( async (req, res, next) => {
     throw new Error("Expects content-type 'application/json'");
   }
 
-  const { id, title, subtitle, severity } = req.body;
+  const {
+    id,
+    title,
+    subtitle,
+    severity,
+    alerttext,
+    alertvalue,
+    assettext,
+    assetvalue,
+    messagetext,
+  } = req.body;
 
   const device = new Device({
     id,
     title,
     subtitle,
-    severity
+    severity,
+    alerttext,
+    alertvalue,
+    assettext,
+    assetvalue,
+    messagetext,
   });
 
   try {
@@ -49,9 +64,12 @@ DeviceRouter.route('/').get( async (req, res, next) => {
 DeviceRouter.route('/:id').get( async (req, res, next) => {
 
   try {
-    const device = await Device.findOne({ id : req.params.id });
-
-    res.send(device);
+    await Device.findOne({ id : req.params.id },
+      (err, device) => {
+        if(err) return res.status(500).send(err);
+        if(!device) return res.sendStatus(404);
+        return res.status(200).send(device);
+      });
     next();
   } catch(err) {
     return next(err);
@@ -74,7 +92,12 @@ DeviceRouter.route('/update/:id').put( (req, res, next) => {
     Device.findOneAndUpdate({ id : req.params.id }, {
       title,
       subtitle,
-      severity
+      severity,
+      alerttext,
+      alertvalue,
+      assettext,
+      assetvalue,
+      messagetext,
     }, (err, device) => {
       if(err) return res.status(500).send(err);
       if(!device) return res.sendStatus(404);

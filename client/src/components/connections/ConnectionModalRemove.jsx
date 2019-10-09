@@ -61,6 +61,14 @@ class ConnectionModalRemove extends Component {
       mode: 'cors',
       credentials : 'include',
     });
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/remove/${connection.mainflux_id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      mode: 'cors',
+      credentials : 'include',
+    });
     const { sendToApp, app, type } = connection.content;
     if(sendToApp) {
       await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`,{
