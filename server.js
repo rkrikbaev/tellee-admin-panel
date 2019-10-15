@@ -28,11 +28,14 @@ const logger = pino({ level: process.env.LOG_LEVEL || 'info' });
 const expressLogger = expressPino({ logger });
 
 const corsOptions = {
-  origin: (origin, callback) => {
-    var isWhitelisted = originsWhitelist.indexOf(origin) !== -1;
-    callback(null, isWhitelisted);
-  }
-};
+  origin: (origin, callback)=>{
+    if (originsWhitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },credentials: true
+}
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
@@ -42,15 +45,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use( (req, res, next) => {
-<<<<<<< HEAD
-  res.header("Access-Control-Allow-Origin", 'http://134.209.240.215:8000');
-=======
-  let allowedOrigins = [process.env.UI_URL, 'http://0.0.0.0:8080'];
+  let allowedOrigins = [process.env.UI_URL, 'http://0.0.0.0:8080', 'http://134.209.240.215'];
   if (allowedOrigins.includes(req.headers.origin)) {
+    console.log(req.headers.origin)
     res.header("Access-Control-Allow-Origin", req.headers.origin);
   }
   // res.header("Access-Control-Allow-Origin", );
->>>>>>> 8302d69245adb95fa968ddc065d4ade4b6e656f3
+
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   res.header("Access-Control-Allow-Credentials", true);
