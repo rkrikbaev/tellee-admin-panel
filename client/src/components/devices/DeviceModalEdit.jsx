@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Connections.scss';
+import '../connections/Connections.scss';
 import {
   Button,
   Modal,
@@ -9,6 +9,8 @@ import {
 } from 'semantic-ui-react';
 
 class DeviceModalEdit extends Component {
+  _isMounted = false;
+
   constructor(props) {
     super(props);
 
@@ -18,11 +20,25 @@ class DeviceModalEdit extends Component {
       deviceTypes: [],
       apps: [],
       config: {},
-      selectedDeviceType: [],
-      selectedApp: [],
+      selectedDeviceType: '',
+      selectedApp: '',
       oldConnections: [],
       isConnectionNameDisabled: false,
       handleSendToApp: undefined,
+      handleSendToDB: undefined,
+      editDevice: {
+        id: '',
+        title: '',
+        subtitle: '',
+        severity: '',
+        alerttext: '',
+        alertvalue: '',
+        assettext: '',
+        assetvalue: '',
+        messagetext: '',
+        latitude: '',
+        longitude: '',
+      },
     };
   };
 
@@ -41,7 +57,16 @@ class DeviceModalEdit extends Component {
         let selectedApp = config.content.app;
         let selectedDeviceType = config.content.device_type;
         let handleSendToApp = config.content.sendToApp;
-        this.setState({ selectedApp, selectedDeviceType, config, handleSendToApp });
+        let handleSendToDB = config.content.sendToDB;
+        if(this._isMounted) {
+          this.setState({
+            selectedApp,
+            selectedDeviceType,
+            config,
+            handleSendToApp,
+            handleSendToDB,
+          });
+        }
       })
       .catch( err => console.log(err) );
   };
@@ -56,7 +81,7 @@ class DeviceModalEdit extends Component {
         const currentThing = oldThings.filter( item => {
           return item.id === this.props.connection.mainflux_id;
         });
-        this.setState({currentThing: currentThing[0]});
+        if(this._isMounted) this.setState({currentThing: currentThing[0]});
       })
       .catch( err => console.log(err) );
   };
@@ -75,7 +100,7 @@ class DeviceModalEdit extends Component {
       const apps = connections.map( item => {
         return { value: item.external_id, text: item.name.split(".")[0] }
       })
-      this.setState({ apps, oldConnections });
+      if(this._isMounted) this.setState({ apps, oldConnections });
     })
     .catch( err => console.log(err) );
   };
@@ -87,7 +112,7 @@ class DeviceModalEdit extends Component {
         const formattedTypes = types.map( (type, i) => {
           return { text: type, value: type}
         });
-        this.setState({ deviceTypes: formattedTypes });
+        if(this._isMounted) this.setState({ deviceTypes: formattedTypes });
       })
       .catch( err => console.log(err) );
   };
@@ -127,35 +152,73 @@ class DeviceModalEdit extends Component {
       return item.name === `zsse/${channelName}`;
     });
     return globalChannel[0];
-  }
+  };
 
-  componentWillReceiveProps(nextProps) {
-    if(nextProps.connection !== this.props.connection){
-      this.getConfigById(nextProps.connection.external_id);
-      this.getThings().then( () => {
-        this.forceUpdate();
-      });
-    };
-    this.getConnections();
+  getDeviceInfoFromDB = async device_id => {
+    const device = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/${device_id}`, {
+      mode: 'cors',
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .catch(e => console.log(e));
+    const {
+      id,
+      title,
+      subtitle,
+      severity,
+      alerttext,
+      alertvalue,
+      assettext,
+      assetvalue,
+      messagetext,
+      longitude,
+      latitude,
+    } = device;
+    this.setState( prevState => ({
+      editDevice: {
+        ...prevState.editDevice,
+        id,
+        title,
+        subtitle,
+        severity,
+        alerttext,
+        alertvalue,
+        assettext,
+        assetvalue,
+        messagetext,
+        longitude,
+        latitude,
+      }
+    }));
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps === this.props || nextState !== this.state;
+    return !(nextProps === this.props && nextState === this.state);
   };
 
   componentDidMount() {
+    this._isMounted = true;
+    this.getDeviceInfoFromDB(this.props.connection.mainflux_id);
+    this.getConfigById(this.props.connection.external_id);
+      this.getThings().then( () => {
+        if(this._isMounted) this.forceUpdate();
+      });
     this.getDeviceTypes();
     this.getConnections();
   };
 
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
   close = () => {
-    this.setState({ showModalEditDevice: false });
+    if(this._isMounted) this.setState({ showModalEditDevice: false });
     this.props.callbackFromParent(this.state.showModalEditDevice);
   };
 
   editDevice = async () => {
-    const { config, oldConnections, handleSendToApp } = this.state;
-    const { name, cycle, device_type, app, sendToApp, mac } = this.state.config.content;
+    const { config, oldConnections, handleSendToApp, handleSendToDB } = this.state;
+    const { name, cycle, device_type, app, sendToApp, sendToDB, mac } = this.state.config.content;
     let obj = {};
 
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things/${config.mainflux_id}`, {
@@ -188,6 +251,7 @@ class DeviceModalEdit extends Component {
         mac,
         channel: channel.id,
         sendToApp: handleSendToApp,
+        sendToDB: handleSendToDB,
         name,
         cycle,
         device_type,
@@ -201,6 +265,7 @@ class DeviceModalEdit extends Component {
         mac,
         channel: channel.id,
         sendToApp: handleSendToApp,
+        sendToDB: handleSendToDB,
         name,
         device_type,
         cycle,
@@ -226,6 +291,88 @@ class DeviceModalEdit extends Component {
       credentials : 'include',
       body: JSON.stringify({ obj })
     });
+
+    if( sendToDB === true && handleSendToDB === false ) {
+      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/remove/${this.state.editDevice.id}`, {
+        method: 'DELETE',
+        mode: 'cors',
+        credentials: 'include',
+      })
+      .catch( err => console.log(err));
+    } else if ( sendToDB === false && handleSendToDB === true ) {
+      const {
+        title,
+        subtitle,
+        severity,
+        alerttext,
+        alertvalue,
+        assettext,
+        assetvalue,
+        messagetext,
+        longitude,
+        latitude,
+      } = this.state.newDevice;
+        let newDevice = {
+          id: config.mainflux_id,
+          title,
+          subtitle,
+          severity,
+          alerttext,
+          alertvalue,
+          assettext,
+          assetvalue,
+          messagetext,
+          longitude,
+          latitude,
+        }
+
+        await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          mode: 'cors',
+          credentials: 'include',
+          body: JSON.stringify(newDevice),
+        });
+    } else if( sendToDB === true && handleSendToDB === true ) {
+      const {
+        id,
+        title,
+        subtitle,
+        severity,
+        alerttext,
+        alertvalue,
+        assettext,
+        assetvalue,
+        messagetext,
+        longitude,
+        latitude,
+      } = this.state.editDevice;
+        let editDevice = {
+          id,
+          title,
+          subtitle,
+          severity,
+          alerttext,
+          alertvalue,
+          assettext,
+          assetvalue,
+          messagetext,
+          longitude,
+          latitude,
+        }
+
+        await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/update/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          mode: 'cors',
+          credentials: 'include',
+          body: JSON.stringify(editDevice),
+        });
+    }
 
     // -- IF DEVICE CONNECTED TO APP BUT IT SHOULD BE DISCONNECTED -- //
     if( sendToApp === true && handleSendToApp === false ) {
@@ -400,66 +547,86 @@ class DeviceModalEdit extends Component {
       return item.name === `zsse/${currentValue}`;
     });
     if(arr.length !== 0) {
-      this.setState({ isConnectionNameDisabled: true });
+      if(this._isMounted) this.setState({ isConnectionNameDisabled: true });
     } else {
-      this.setState( prevState => ({
-        config: {
-          ...prevState.config,
-          content: {
-            ...prevState.config.content,
-            name: currentValue,
+      if(this._isMounted) {
+        this.setState( prevState => ({
+          config: {
+            ...prevState.config,
+            content: {
+              ...prevState.config.content,
+              name: currentValue,
+            },
           },
-        },
-        isConnectionNameDisabled: false,
-      }));
+          isConnectionNameDisabled: false,
+        }));
+      }
     };
   };
 
   handleChangeCycle = e => {
     const currentValue = e.target.value;
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        content: {
-          ...prevState.config.content,
-          cycle: currentValue,
-        }
-      },
-      isEnabled: prevState.config.content.cycle.length <= 4 && /^\d+$/.test(prevState.config.content.cycle)
-    }));
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          content: {
+            ...prevState.config.content,
+            cycle: currentValue,
+          }
+        },
+        isEnabled: prevState.config.content.cycle.length <= 4 && /^\d+$/.test(prevState.config.content.cycle)
+      }));
+    }
   };
 
   handleChangeDeviceType = (e, { value }) => {
     const currentValue = value;
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        content: {
-          ...prevState.config.content,
-          device_type: currentValue,
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          content: {
+            ...prevState.config.content,
+            device_type: currentValue,
+          },
         },
-      },
-      selectedDeviceType: value,
-    }));
+        selectedDeviceType: value,
+      }));
+    }
   };
 
   handleChangeSendToApp = (e, { checked }) => {
-    this.setState({ handleSendToApp : checked });
+    if(this._isMounted) this.setState({ handleSendToApp : checked });
     this.getConnections();
+  };
+
+  handleChangeSendToDB = (e, { checked }) => {
+    if(this._isMounted) this.setState({ handleSendToDB : checked });
   };
 
   handleChangeApp = (e, { value }) => {
     const currentValue = value;
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        content: {
-          ...prevState.config.content,
-          app: currentValue,
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          content: {
+            ...prevState.config.content,
+            app: currentValue,
+          },
         },
-      },
-      selectedApp: value,
-    }));
+        selectedApp: value,
+      }));
+    }
+  };
+
+  handleChangeEditDevice = e => {
+    if(this._isMounted) {
+      var editDevice = {...this.state.editDevice}
+      editDevice[Object.keys(e)[0]] = e[Object.keys(e)[0]];
+      this.setState({editDevice});
+    }
   };
 
   render() {
@@ -473,7 +640,21 @@ class DeviceModalEdit extends Component {
       selectedApp,
       isConnectionNameDisabled,
       handleSendToApp,
+      handleSendToDB,
+      editDevice,
     } = this.state;
+    const {
+      title,
+      subtitle,
+      severity,
+      alerttext,
+      alertvalue,
+      assettext,
+      assetvalue,
+      messagetext,
+      longitude,
+      latitude,
+    } = editDevice;
 
     return (
       <Modal
@@ -539,6 +720,11 @@ class DeviceModalEdit extends Component {
                 onChange={this.handleChangeSendToApp}
                 checked={handleSendToApp}
               />
+              <Checkbox
+                label={handleSendToDB ? 'This device have additional info' : 'Click checkbox for additional info'}
+                onChange={this.handleChangeSendToDB}
+                checked={handleSendToDB}
+              />
             </Form.Field>
             <Form.Field className={handleSendToApp ? '' : 'hide'}>
               <label>Apps</label>
@@ -549,6 +735,96 @@ class DeviceModalEdit extends Component {
                 options={apps}
                 onChange={this.handleChangeApp}
                 value={selectedApp}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Title</label>
+              <input
+                placeholder='Device title'
+                onChange={e => this.handleChangeEditDevice({title: e.target.value})}
+                value={title !== undefined ? title : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Subtitle</label>
+              <input
+                placeholder='Device subtitle'
+                onChange={e => this.handleChangeEditDevice({subtitle: e.target.value})}
+                value={subtitle !== undefined ? subtitle : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Severity</label>
+              <input
+                placeholder='Device severity'
+                onChange={e => this.handleChangeEditDevice({severity: e.target.value})}
+                value={severity !== undefined ? severity : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Latitude</label>
+              <input
+                placeholder='Device latitude'
+                onChange={e => this.handleChangeEditDevice({latitude: e.target.value})}
+                value={latitude !== undefined ? latitude : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Longitude</label>
+              <input
+                placeholder='Device longitude'
+                onChange={e => this.handleChangeEditDevice({longitude: e.target.value})}
+                value={longitude !== undefined ? longitude : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Alert text</label>
+              <input
+                placeholder='Alert text'
+                onChange={e => this.handleChangeEditDevice({alerttext: e.target.value})}
+                value={alerttext !== undefined ? alerttext : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Alert value</label>
+              <input
+                placeholder='Alert value'
+                onChange={e => this.handleChangeEditDevice({alertvalue: e.target.value})}
+                value={alertvalue !== undefined ? alertvalue : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Asset text</label>
+              <input
+                placeholder='Asset text'
+                onChange={e => this.handleChangeEditDevice({assettext: e.target.value})}
+                value={assettext !== undefined ? assettext : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Asset value</label>
+              <input
+                placeholder='Asset value'
+                onChange={e => this.handleChangeEditDevice({assetvalue: e.target.value})}
+                value={assetvalue !== undefined ? assetvalue : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Message text</label>
+              <input
+                placeholder='Message text'
+                onChange={e => this.handleChangeEditDevice({messagetext: e.target.value})}
+                value={messagetext !== undefined ? messagetext : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
           </Form>

@@ -7,13 +7,12 @@ import {
 } from 'semantic-ui-react';
 import ChannelModalCreate from './ChannelModalCreate';
 import ChannelModalRemove from './ChannelModalRemove';
-import ChannelModalEdit from './ChannelModalEdit';
+// import ChannelModalEdit from './ChannelModalEdit';
 
 class Channels extends Component {
 
   constructor() {
     super();
-
     this.state = {
       channels: [],
       edittingChannel: {},
@@ -59,9 +58,9 @@ class Channels extends Component {
     };
   };
 
-  editModalCallback = showModalEdit => {
-    this.setState({ showModalEdit });
-  };
+  // editModalCallback = showModalEdit => {
+  //   this.setState({ showModalEdit });
+  // };
 
   createChannelModalCallback = async showModalCreate => {
     this.setState({ showModalCreate });
@@ -77,11 +76,11 @@ class Channels extends Component {
 
     const {
       channels,
-      showModalEdit,
+      // showModalEdit,
       showModalCreate,
       showModalRemove,
       removingChannel,
-      edittingChannel,
+      // edittingChannel,
     } = this.state;
 
     return (
@@ -120,14 +119,14 @@ class Channels extends Component {
                       content="Remove"
                       onClick={() => this.setState({ showModalRemove: true, removingChannel: item })}
                     />
-                    <Button
+                    {/* <Button
                       color="yellow"
                       floated='right'
                       icon='edit outline'
                       labelPosition='right'
                       content="Edit"
                       onClick={() => this.setState({ showModalEdit: true, edittingChannel: item })}
-                    />
+                    /> */}
                   </Item.Extra>
                 </Item.Content>
 
@@ -135,20 +134,36 @@ class Channels extends Component {
             )
           }
         </Item.Group>
-        <ChannelModalRemove
-          showModalRemove={showModalRemove}
-          channel={removingChannel}
-          callbackFromParent={this.removeModalCallback}
-        />
-        <ChannelModalEdit
-          showModalEdit={showModalEdit}
-          channel={edittingChannel}
-          callbackFromParent={this.editModalCallback}
-        />
-        <ChannelModalCreate
-          showModalCreate={showModalCreate}
-          callbackFromParent={this.createChannelModalCallback}
-        />
+
+        {
+          this.state.showModalRemove
+          ? <ChannelModalRemove
+              showModalRemove={showModalRemove}
+              channel={removingChannel}
+              callbackFromParent={this.removeModalCallback}
+            />
+          : null
+        }
+
+        {/* {
+          this.state.showModalEdit
+          ? <ChannelModalEdit
+              showModalEdit={showModalEdit}
+              channel={edittingChannel}
+              callbackFromParent={this.editModalCallback}
+            />
+          : null
+        } */}
+
+        {
+          this.state.showModalCreate
+          ? <ChannelModalCreate
+              showModalCreate={showModalCreate}
+              callbackFromParent={this.createChannelModalCallback}
+            />
+          : null
+        }
+
       </div>
     );
   }

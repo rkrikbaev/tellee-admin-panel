@@ -6,14 +6,15 @@ import {
   Icon,
   Popup,
 } from 'semantic-ui-react';
-import AppModalCreate from './AppModalCreate';
-import AppModalEdit from './AppModalEdit';
-import DeviceModalCreate from './DeviceModalCreate';
-import DeviceModalEdit from './DeviceModalEdit';
+import AppModalCreate from '../applications/AppModalCreate';
+import AppModalEdit from '../applications/AppModalEdit';
+import DeviceModalCreate from '../devices/DeviceModalCreate';
+import DeviceModalEdit from '../devices/DeviceModalEdit';
 import ConnectionModalRemove from './ConnectionModalRemove';
 import ErrorModal from '../errorModal';
 
 class Connections extends Component {
+  _isMounted = false;
 
   constructor() {
     super();
@@ -60,14 +61,19 @@ class Connections extends Component {
           item.content = JSON.parse(item.content);
           return item;
         });
-        this.setState({connections: parsedConnections})
+        if(this._isMounted) this.setState({connections: parsedConnections})
       })
       .catch( err => console.log(err) );
   };
 
   componentDidMount() {
+    this._isMounted = true;
     this.getToken();
     this.getConnections();
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -80,7 +86,7 @@ class Connections extends Component {
     showModalCreateApp,
     oldConnections,
   ) => {
-    this.setState({ showModalCreateApp, connections: oldConnections})
+    if(this._isMounted) this.setState({ showModalCreateApp, connections: oldConnections})
     this.getConnections();
   };
 
@@ -88,12 +94,12 @@ class Connections extends Component {
     showModalCreateDevice,
     oldConnections,
   ) => {
-    this.setState({ showModalCreateDevice, connections: oldConnections})
+    if(this._isMounted) this.setState({ showModalCreateDevice, connections: oldConnections})
     this.getConnections();
   };
 
   removeModalCallback = (showModalRemove, id) => {
-    this.setState({ showModalRemove });
+    if(this._isMounted) this.setState({ showModalRemove });
     if(id) {
       // FIXME:
       const connections = this.state.connections
@@ -103,26 +109,28 @@ class Connections extends Component {
         let connectedApp = connections.filter( i => i.external_id === app );
         const edittedApp = connectedApp[0].content.devices.filter(i => i.device_id !== id );
         connections[connections.indexOf(connectedApp[0])].content.devices = edittedApp;
-        this.setState({ connections });
+        if(this._isMounted) this.setState({ connections });
       };
-      this.setState({
-        connections: this.state.connections.filter( i => i.mainflux_id !== id )
-      });
+      if(this._isMounted) {
+        this.setState({
+          connections: this.state.connections.filter( i => i.mainflux_id !== id )
+        });
+      }
     };
   };
 
   editAppModalCallback = showModalEditApp => {
-    this.setState({ showModalEditApp });
+    if(this._isMounted) this.setState({ showModalEditApp });
     this.getConnections();
   };
 
   editDeviceModalCallback = showModalEditDevice => {
-    this.setState({ showModalEditDevice });
+    if(this._isMounted) this.setState({ showModalEditDevice });
     this.getConnections();
   };
 
   errorModalCallback = showModalError => {
-    this.setState({ showModalError });
+    if(this._isMounted) this.setState({ showModalError });
   };
 
   render() {
@@ -215,39 +223,63 @@ class Connections extends Component {
           }
         </Item.Group>
 
-        <AppModalCreate
-          showModalCreateApp={showModalCreateApp}
-          callbackFromParent={this.createAppModalCallback}
-        />
+        {
+          this.state.showModalCreateApp
+          ? <AppModalCreate
+            showModalCreateApp={showModalCreateApp}
+            callbackFromParent={this.createAppModalCallback}
+          />
+          : null
+        }
 
-        <DeviceModalCreate
-          showModalCreateDevice={showModalCreateDevice}
-          callbackFromParent={this.createDeviceModalCallback}
-        />
+        {
+          this.state.showModalCreateDevice
+          ? <DeviceModalCreate
+            showModalCreateDevice={showModalCreateDevice}
+            callbackFromParent={this.createDeviceModalCallback}
+          />
+          : null
+        }
 
-        <ConnectionModalRemove
-          showModalRemove={showModalRemove}
-          connection={removingConnection}
-          callbackFromParent={this.removeModalCallback}
-        />
+        {
+          this.state.showModalRemove
+          ? <ConnectionModalRemove
+            showModalRemove={showModalRemove}
+            connection={removingConnection}
+            callbackFromParent={this.removeModalCallback}
+          />
+          : null
+        }
 
-        <ErrorModal
-          showModalError={showModalError}
-          errorText={errorText}
-          callbackFromParent={this.errorModalCallback}
-        />
+        {
+          this.state.showModalError
+          ? <ErrorModal
+              showModalError={showModalError}
+              errorText={errorText}
+              callbackFromParent={this.errorModalCallback}
+            />
+          : null
+        }
 
-        <AppModalEdit
-          showModalEditApp={showModalEditApp}
-          connection={edittingApp}
-          callbackFromParent={this.editAppModalCallback}
-        />
+        {
+          this.state.showModalEditApp
+          ? <AppModalEdit
+              showModalEditApp={showModalEditApp}
+              connection={edittingApp}
+              callbackFromParent={this.editAppModalCallback}
+            />
+          : null
+        }
 
-        <DeviceModalEdit
-          showModalEditDevice={showModalEditDevice}
-          connection={edittingDevice}
-          callbackFromParent={this.editDeviceModalCallback}
-        />
+        {
+          this.state.showModalEditDevice
+          ? <DeviceModalEdit
+              showModalEditDevice={showModalEditDevice}
+              connection={edittingDevice}
+              callbackFromParent={this.editDeviceModalCallback}
+            />
+          : null
+        }
 
       </div>
     );

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Connections.scss';
+import '../connections/Connections.scss';
 import {
   Button,
   Form,
@@ -9,6 +9,7 @@ import {
 } from 'semantic-ui-react';
 
 class DeviceModalCreate extends Component {
+  _isMounted = false;
 
   constructor(props) {
     super(props);
@@ -35,8 +36,22 @@ class DeviceModalCreate extends Component {
         name: '',
         cycle: '',
         sendToApp: false,
+        sendToDB: false,
         device_type: undefined,
         app: undefined,
+      },
+      newDevice: {
+        id: '',
+        title: '',
+        subtitle: '',
+        severity: '',
+        alertext: '',
+        alertvalue: '',
+        assettext: '',
+        assetvalue: '',
+        messagetext: '',
+        longitude: '',
+        latitude: '',
       },
     };
 
@@ -60,7 +75,7 @@ class DeviceModalCreate extends Component {
       const apps = connections.map( item => {
         return { key: item.external_id, text: item.name, value: item.external_id}
       })
-      this.setState({ apps });
+      if(this._isMounted) this.setState({ apps });
     })
     .catch( err => console.log(err) );
   };
@@ -72,7 +87,7 @@ class DeviceModalCreate extends Component {
         const formattedTypes = types.map( (type, i) => {
           return { text: type, value: type}
         });
-        this.setState({ deviceTypes: formattedTypes });
+        if(this._isMounted) this.setState({ deviceTypes: formattedTypes });
       })
       .catch( err => console.log(err) );
   };
@@ -85,7 +100,7 @@ class DeviceModalCreate extends Component {
       .then( res =>  res.json() )
       .then( oldThings => {
         this.oldThings = oldThings;
-        this.setState({ oldThings });
+        if(this._isMounted) this.setState({ oldThings });
       })
       .catch( err => console.log(err) );
   };
@@ -149,6 +164,7 @@ class DeviceModalCreate extends Component {
     const {
       cycle,
       sendToApp,
+      sendToDB,
       device_type,
       app
     } = config;
@@ -167,7 +183,7 @@ class DeviceModalCreate extends Component {
 
     let obj = {},
         channel = {};
-    if(sendToApp) {
+    if (sendToApp) {
       channel = await this.getChannel(app);
       obj = {
         mac: newThing.metadata.mac,
@@ -176,6 +192,7 @@ class DeviceModalCreate extends Component {
         name: connectionName,
         cycle,
         sendToApp,
+        sendToDB,
         device_type,
         app
       };
@@ -189,6 +206,7 @@ class DeviceModalCreate extends Component {
         cycle,
         device_type,
         sendToApp,
+        sendToDB,
       };
     };
 
@@ -249,29 +267,79 @@ class DeviceModalCreate extends Component {
             credentials : 'include',
           });
       };
+      if (sendToDB) {
+        const {
+          title,
+          subtitle,
+          severity,
+          alerttext,
+          alertvalue,
+          assettext,
+          assetvalue,
+          messagetext,
+          longitude,
+          latitude,
+        } = this.state.newDevice;
+        let newDevice = {
+          id: createdThing[0].id,
+          title,
+          subtitle,
+          severity,
+          alerttext,
+          alertvalue,
+          assettext,
+          assetvalue,
+          messagetext,
+          longitude,
+          latitude,
+        }
+
+        await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          mode: 'cors',
+          credentials: 'include',
+          body: JSON.stringify(newDevice),
+        });
+      }
       await this.getConnections();
 
       // Close and send data to parent
       const { showModalCreateDevice, oldConnections } = this.state;
-      this.setState({ showModalCreateDevice: false });
+      if(this._isMounted) this.setState({ showModalCreateDevice: false });
       this.props.callbackFromParent(showModalCreateDevice, oldConnections);
-      this.setState( prevState => ({
-        config: {
-          ...prevState.config,
-          sendToApp: false,
-        },
-      }));
+      if(this._isMounted) {
+        this.setState( prevState => ({
+          config: {
+            ...prevState.config,
+            sendToApp: false,
+          },
+        }));
+      }
     } catch(err) {
       console.log(err);
     }
   };
   // -- End of creating device --
 
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
   componentWillReceiveProps(nextProps) {
     if( nextProps !== this.props ) {
       this.getConnections();
       this.getThings();
     };
+  };
+
+  componentDidMount() {
+    this._isMounted = true;
+    this.getThings();
+    this.getConnections();
+    this.getDeviceTypes();
   };
 
   close = async () => {
@@ -287,7 +355,7 @@ class DeviceModalCreate extends Component {
   };
 
   closeError = () => {
-    this.setState({ showModalError: false, errorText: '' });
+    if(this._isMounted) this.setState({ showModalError: false, errorText: '' });
   };
 
   handleChangeConnectionName = e => {
@@ -296,16 +364,18 @@ class DeviceModalCreate extends Component {
       return item.name === `zsse/${str}`;
     });
     if(arr.length !== 0 || !this.regexpName.test(str)) {
-      this.setState({ isConnectionNameDisabled: true });
+      if(this._isMounted) this.setState({ isConnectionNameDisabled: true });
     } else {
-      this.setState( prevState => ({
-        newThing: {
-          ...prevState.newThing,
-          name: str,
-        },
-        connectionName: str,
-        isConnectionNameDisabled: false,
-      }));
+      if(this._isMounted) {
+        this.setState( prevState => ({
+          newThing: {
+            ...prevState.newThing,
+            name: str,
+          },
+          connectionName: str,
+          isConnectionNameDisabled: false,
+        }));
+      }
     };
   };
 
@@ -315,69 +385,96 @@ class DeviceModalCreate extends Component {
       return item.metadata.mac === str;
     });
     if(arr.length !== 0 || !this.regexpMac.test(str)) {
-      this.setState({ isThingMacDisabled: true });
+      if(this._isMounted) this.setState({ isThingMacDisabled: true });
     } else {
-      this.setState( prevState => ({
-        newThing: {
-          ...prevState.newThing,
-          metadata: {
-            ...prevState.newThing.metadata,
-            mac: str,
+      if(this._isMounted) {
+        this.setState( prevState => ({
+          newThing: {
+            ...prevState.newThing,
+            metadata: {
+              ...prevState.newThing.metadata,
+              mac: str,
+            },
           },
+          isThingMacDisabled: false,
+        }));
+      };
+    };
+  };
+
+  // TODO:
+  // handleChangeConfig = e => {
+  //   if(this._isMounted) {
+  //     var config = {...this.state.config};
+  //     config[Object.keys(e)[0]] = e[Object.keys(e)[0]];
+  //     this.setState({config});
+  //   }
+  // };
+
+  handleChangeCycle = e => {
+    let str = e.target.value;
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          cycle: str,
         },
-        isThingMacDisabled: false,
+        isEnabled: prevState.config.cycle.length <= 4 && /^\d+$/.test(prevState.config.cycle)
       }));
     }
   };
 
-  handleChangeCycle = e => {
-    let str = e.target.value;
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        cycle: str,
-      },
-      isEnabled: prevState.config.cycle.length <= 4 && /^\d+$/.test(prevState.config.cycle)
-    }));
+  handleChangeSendToApp = (e, { checked }) => {
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          sendToApp: checked,
+        },
+      }));
+    }
+    this.getConnections();
   };
 
-
-  handleChangeSendToApp = (e, { checked }) => {
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        sendToApp: checked,
-      },
-    }));
-    this.getConnections();
+  handleChangeSendToDB = (e, { checked }) => {
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          sendToDB: checked,
+        },
+      }));
+    }
   };
 
   handleChangeDeviceType = (e, { value }) => {
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        device_type: value,
-      },
-    }));
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          device_type: value,
+        },
+      }));
+    }
   };
 
   handleChangeApp = (e, { value }) => {
-    this.setState( prevState => ({
-      config: {
-        ...prevState.config,
-        app: value,
-      },
-    }));
+    if(this._isMounted) {
+      this.setState( prevState => ({
+        config: {
+          ...prevState.config,
+          app: value,
+        },
+      }));
+    }
   };
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   return nextProps === this.props || nextState !== this.state;
-  // };
-
-  componentDidMount() {
-    this.getThings();
-    this.getConnections();
-    this.getDeviceTypes();
+  handleChangeNewDevice = e => {
+    if(this._isMounted) {
+      var newDevice = {...this.state.newDevice}
+      newDevice[Object.keys(e)[0]] = e[Object.keys(e)[0]];
+      this.setState({newDevice});
+    }
   };
 
   render() {
@@ -403,7 +500,7 @@ class DeviceModalCreate extends Component {
         <Modal.Content>
           <Form>
             <Form.Field>
-              <label> Name </label>
+              <label>Name</label>
               <input
                 placeholder='name'
                 onChange={e => this.handleChangeConnectionName(e)}
@@ -411,7 +508,7 @@ class DeviceModalCreate extends Component {
               />
             </Form.Field>
             <Form.Field>
-              <label> Mac </label>
+              <label>Mac</label>
               <input
                 placeholder='mac'
                 onChange={e => this.handleChangeThingMac(e)}
@@ -419,7 +516,7 @@ class DeviceModalCreate extends Component {
               />
             </Form.Field>
             <Form.Field>
-              <label> Device type </label>
+              <label>Device type</label>
               <Dropdown
                 placeholder='type'
                 fluid
@@ -429,7 +526,7 @@ class DeviceModalCreate extends Component {
               />
             </Form.Field>
             <Form.Field>
-              <label> Cycle </label>
+              <label>Cycle</label>
               <input
                 placeholder='cycle'
                 className={
@@ -443,6 +540,10 @@ class DeviceModalCreate extends Component {
                 label={config.sendToApp ? 'This device will be sent to App' : 'Click checkbox for send this config to App'}
                 onChange={this.handleChangeSendToApp}
               />
+              <Checkbox
+                label={config.sendToDB ? 'This device have additional info' : 'Click checkbox for additional info'}
+                onChange={this.handleChangeSendToDB}
+              />
             </Form.Field>
             <Form.Field className={config.sendToApp ? '' : 'hide'}>
               <label>Apps</label>
@@ -452,6 +553,86 @@ class DeviceModalCreate extends Component {
                 selection
                 options={apps}
                 onChange={this.handleChangeApp}
+              />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Title</label>
+              <input
+                placeholder='Device title'
+                onChange={e => this.handleChangeNewDevice({title: e.target.value})}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Subtitle</label>
+              <input
+                placeholder='Device subtitle'
+                onChange={e => this.handleChangeNewDevice({subtitle: e.target.value})}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Severity</label>
+              <input
+                placeholder='Device severity'
+                onChange={e => this.handleChangeNewDevice({severity: e.target.value})}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Latitude</label>
+              <input
+                placeholder='Device latitude'
+                onChange={e => this.handleChangeNewDevice({latitude: e.target.value})}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Longitude</label>
+              <input
+                placeholder='Device longitude'
+                onChange={e => this.handleChangeNewDevice({longitude: e.target.value})}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Alert text</label>
+              <input
+                placeholder='Alert text'
+                onChange={e => this.handleChangeNewDevice({alerttext: e.target.value})}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Alert value</label>
+              <input
+                placeholder='Alert value'
+                onChange={e => this.handleChangeNewDevice({alertvalue: e.target.value})}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Asset text</label>
+              <input
+                placeholder='Asset text'
+                onChange={e => this.handleChangeNewDevice({assettext: e.target.value})}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Asset value</label>
+              <input
+                placeholder='Asset value'
+                onChange={e => this.handleChangeNewDevice({assetvalue: e.target.value})}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Message text</label>
+              <input
+                placeholder='Message text'
+                onChange={e => this.handleChangeNewDevice({messagetext: e.target.value})}
+                // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
           </Form>

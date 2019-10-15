@@ -16,6 +16,7 @@ import ChannelRouter from './api/channel/channelRouter';
 import BootstrapRouter from './api/bootstrap/bootstrapRouter';
 import OtherRouter from './api/other/otherRouter';
 import ConnectionRouter from './api/connection/connectionRouter';
+import DeviceRouter from './api/device/deviceRouter';
 
 const app = express();
 const originsWhitelist = [
@@ -41,7 +42,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use( (req, res, next) => {
+<<<<<<< HEAD
   res.header("Access-Control-Allow-Origin", 'http://134.209.240.215:8000');
+=======
+  let allowedOrigins = [process.env.UI_URL, 'http://0.0.0.0:8080'];
+  if (allowedOrigins.includes(req.headers.origin)) {
+    res.header("Access-Control-Allow-Origin", req.headers.origin);
+  }
+  // res.header("Access-Control-Allow-Origin", );
+>>>>>>> 8302d69245adb95fa968ddc065d4ade4b6e656f3
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   res.header("Access-Control-Allow-Credentials", true);
@@ -62,6 +71,7 @@ app.use( session({
 app.use('/api/users', UserRouter);
 app.use('/api/other', OtherRouter);
 app.use('/api/things', ThingRouter);
+app.use('/api/device', DeviceRouter);
 app.use('/api/channels', ChannelRouter);
 app.use('/api/bootstrap', BootstrapRouter);
 app.use('/api/connection', ConnectionRouter);

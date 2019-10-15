@@ -1,6 +1,6 @@
 {
   "name": "mainflux_admin",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "private": true,
   "dependencies": {
     "@babel/parser": "^7.4.5",
@@ -36,12 +36,12 @@
       "last 1 safari version"
     ]
   },
+  "homepage": ".",
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.5",
-    "faker": "^4.1.0",
     "node-sass": "^4.12.0"
   }
 }

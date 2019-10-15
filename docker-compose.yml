@@ -1,58 +1,68 @@
-version: "2"
-
-services:
-  mainflux-interface:
-    container_name: mainflux_interface
-    restart: on-failure
-    build:
-      context: ./client/
-      dockerfile: ./Dockerfile
-    ports:
-      - "8000:8000"
-    links:
-      - mainflux-api
-    networks:
-      - mainflux-base-net
-
-  mainflux-api:
-    container_name: mainflux_api
-    restart: on-failure
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./mainflux_api:/mainflux_api
-    depends_on:
-      - mainflux-db
-    links:
-      - mainflux-db
-    networks:
-      - mainflux-base-net
-    environment:
-      WAIT_HOSTS: mongodb:27017
-      DATABASE_URL: mongodb://mainflux-db:27017/mainflux_admin
-      # Write down relevant bootstrap and mainflux urls
-      MAINFLUX_URL: 134.209.240.215
-      BOOTSTRAP_URL: 134.209.240.215:8200
-      UI_URL: http://localhost:8000
-
-  mainflux-db:
-    container_name: mainflux_db
-    image: mongo
-    restart: always
-    volumes:
-      - ./data:/data/db
-    command: mongod
-    networks:
-      - mainflux-base-net
+version: "3"
 
 networks:
   mainflux-base-net:
     driver: bridge
 
-# volumes:
-#   mongo_data:
+volumes:
+  mainflux_db_volume:
 
+services:
+  mainflux_interface:
+    container_name: mainflux_interface
+    restart: on-failure
+    build:
+      context: ./client/
+      dockerfile: ./Dockerfile
+      args:
+        - REACT_APP_EXPRESS_HOST=http://localhost:5000
+        - REACT_APP_MAINFLUX_USER=zeinetsse3@email.com
+        - REACT_APP_CHANNEL_NAME=global_channel
+        - FLASK_URL=134.209.240.215:8100
+    ports:
+      - 8000:8000
+    networks:
+      - mainflux-base-net
+    links:
+      - mainflux_server
+    environment:
+      REACT_APP_EXPRESS_HOST: http://localhost:5000
+      REACT_APP_MAINFLUX_USER: zeinetsse4@email.com
+      REACT_APP_CHANNEL_NAME: global_channel
+      FLASK_URL: 134.209.240.215:8100
 
+  mainflux_server:
+    container_name: mainflux_server
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        - MAINFLUX_URL=http://localhost
+        - BOOTSTRAP_URL=http://localhost:8200
+        - UI_URL=http://localhost:8000
+        - DATABASE_URL=mongodb://mainflux_db:27017/mainflux_admin
+    ports:
+      - 5000:5000
+    depends_on:
+      - mainflux_db
+    links:
+      - mainflux_db
+    networks:
+      - mainflux-base-net
+    environment:
+      WAIT_HOSTS: mainflux_db:27017
+      DATABASE_URL: mongodb://mainflux_db:27017/mainflux_admin
+      MAINFLUX_URL: http://localhost
+      BOOTSTRAP_URL: http://localhost:8200
+      UI_URL: http://localhost:8000
+
+  mainflux_db:
+    container_name: mainflux_db
+    image: mongo
+    restart: always
+    volumes:
+      - ./mainflux_db_volume:/data/db
+    command: mongod
+    networks:
+      - mainflux-base-net

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Connections.scss';
+import '../connections/Connections.scss';
 import {
   Button,
   Modal,
@@ -7,6 +7,7 @@ import {
 } from 'semantic-ui-react';
 
 class AppModalCreate extends Component {
+  _isMounted = false;
 
   constructor(props) {
     super(props);
@@ -30,6 +31,7 @@ class AppModalCreate extends Component {
       },
       connectionName: '',
     };
+
     this.regexpName = /^\w+$/;
     this.regexpMac = /^[0-9a-z]{1,2}([.:-])(?:[0-9a-z]{1,2}\1){4}[0-9a-z]{2}$/gmi;
   };
@@ -41,7 +43,9 @@ class AppModalCreate extends Component {
     })
       .then( res =>  res.json() )
       .then( oldThings => {
-        this.setState({oldThings});
+        if(this._isMounted) {
+          this.setState({oldThings});
+        }
       })
       .catch( err => console.log(err) );
   };
@@ -53,7 +57,9 @@ class AppModalCreate extends Component {
     })
     .then( res =>  res.json() )
     .then( oldConnections => {
-      this.setState({oldConnections});
+      if(this._isMounted) {
+        this.setState({oldConnections});
+      }
       })
       .catch( err => console.log(err) );
   };
@@ -149,7 +155,9 @@ class AppModalCreate extends Component {
 
       // Close and send data to parent
       const { showModalCreateApp, oldConnections } = this.state;
-      this.setState({ showModalCreateApp: false });
+      if(this._isMounted) {
+        this.setState({ showModalCreateApp: false });
+      }
       this.props.callbackFromParent(showModalCreateApp, oldConnections)
     } catch(err) {
       console.log(err);
@@ -158,14 +166,23 @@ class AppModalCreate extends Component {
 
   close = async () => {
     const { showModalCreateApp, oldConnections } = this.state;
-    this.setState({ showModalCreateApp: false });
-    this.props.callbackFromParent(showModalCreateApp, oldConnections)
+    if(this._isMounted) this.setState({ showModalCreateApp: false });
+    this.props.callbackFromParent(showModalCreateApp, oldConnections);
   };
 
   componentDidMount() {
+    this._isMounted = true;
     this.getThings();
     this.getConnections();
   };
+
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !(this.props === nextProps && this.state === nextState);
+  }
 
   handleChangeConnectionName = e => {
     let str = e.target.value;
@@ -173,20 +190,22 @@ class AppModalCreate extends Component {
       return item.name === str;
     });
     if(arr.length !== 0 || !this.regexpName.test(str)) {
-      this.setState({ isConnectionNameEnabled: true });
+      if(this._isMounted) this.setState({ isConnectionNameEnabled: true });
     } else {
-      this.setState( prevState => ({
-        newThing: {
-          ...prevState.newThing,
-          name: str,
-        },
-        channel: {
-          ...prevState.channel,
-          name: str,
-        },
-        connectionName: str,
-        isConnectionNameEnabled: false,
-      }));
+      if(this._isMounted) {
+        this.setState( prevState => ({
+          newThing: {
+            ...prevState.newThing,
+            name: str,
+          },
+          channel: {
+            ...prevState.channel,
+            name: str,
+          },
+          connectionName: str,
+          isConnectionNameEnabled: false,
+        }));
+      }
     };
   };
 
@@ -196,18 +215,20 @@ class AppModalCreate extends Component {
       return item.metadata.mac === str;
     });
     if(arr.length !== 0 || !this.regexpMac.test(str)) {
-      this.setState({ isThingMacEnabled: true });
+      if(this._isMounted) this.setState({ isThingMacEnabled: true });
     } else {
-      this.setState( prevState => ({
-        newThing: {
-          ...prevState.newThing,
-          metadata: {
-            ...prevState.newThing.metadata,
-            mac: str,
+      if(this._isMounted) {
+        this.setState( prevState => ({
+          newThing: {
+            ...prevState.newThing,
+            metadata: {
+              ...prevState.newThing.metadata,
+              mac: str,
+            },
           },
-        },
-        isThingMacEnabled: false,
-      }));
+          isThingMacEnabled: false,
+        }));
+      }
     }
   };
 

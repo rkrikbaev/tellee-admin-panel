@@ -8,6 +8,7 @@ import {
 } from 'semantic-ui-react';
 
 class ConnectionModalRemove extends Component {
+  _isMounted = false;
 
   constructor(props) {
     super(props);
@@ -16,6 +17,14 @@ class ConnectionModalRemove extends Component {
       showModalRemove: false,
       isRemoveable: true,
     }
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   getChannel = async app => {
@@ -52,7 +61,15 @@ class ConnectionModalRemove extends Component {
       mode: 'cors',
       credentials : 'include',
     });
-    const { sendToApp, app } = connection.content;
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/remove/${connection.mainflux_id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      mode: 'cors',
+      credentials : 'include',
+    });
+    const { sendToApp, app, type } = connection.content;
     if(sendToApp) {
       await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`,{
         mode: 'cors',
@@ -78,35 +95,38 @@ class ConnectionModalRemove extends Component {
           });
         });
     }
+    if (type === 'app') {
+      let arr = await this.getChannel(connection.name);
+      fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/remove/${arr.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        mode: 'cors',
+        credentials : 'include',
+      });
+    }
 
-    let arr = await this.getChannel(connection.name);
-    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/remove/${arr.id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      mode: 'cors',
-      credentials : 'include',
-    });
-
-    this.setState({ showModalRemove: false });
+    if(this._isMounted) this.setState({ showModalRemove: false });
     this.props.callbackFromParent(this.state.showModalRemove, connection.mainflux_id);
   }
 
   componentWillReceiveProps(nextProps) {
     const { content } = nextProps.connection;
     if( content !== undefined && content.type === 'app' && content.devices.length !== 0) {
-      this.setState({ isRemoveable: false });
+      if(this._isMounted) this.setState({ isRemoveable: false });
     } else {
-      this.setState({ isRemoveable: true });
+      if(this._isMounted) this.setState({ isRemoveable: true });
     };
   };
 
 
   close = () => {
-    this.setState({ showModalRemove: false, isRemoveable: true }, () => {
-      this.props.callbackFromParent(this.state.showModalRemove);
-    });
+    if(this._isMounted) {
+      this.setState({ showModalRemove: false, isRemoveable: true }, () => {
+        this.props.callbackFromParent(this.state.showModalRemove);
+      });
+    }
   }
 
   render() {

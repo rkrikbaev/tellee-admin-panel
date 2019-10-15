@@ -96,13 +96,6 @@ ThingRouter.route('/create').post( async (req, res, next) => {
 // -- Remove Thing by it's Id --
 ThingRouter.route('/remove/:id').delete( async (req, res, next) => {
 
-  // Chech for JSON
-  // if(!req.is('application/json')) {
-  //   console.log(true)
-  //   next();
-  //   throw new Error("Expects content-type 'application/json'");
-  // }
-
   const token = req.cookies.auth;
   const config = {
     headers: {

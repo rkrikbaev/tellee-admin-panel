@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Connections.scss';
+import '../connections/Connections.scss';
 import {
   Button,
   Form,
@@ -8,6 +8,7 @@ import {
 } from 'semantic-ui-react';
 
 class AppModalEdit extends Component {
+  _isMounted = false;
 
   constructor(props) {
     super(props);
@@ -38,11 +39,12 @@ class AppModalEdit extends Component {
         for (let i = 0; i < config.mainflux_channels.length; i++) {
           selectedChannels.push(config.mainflux_channels[i].id);
         };
-
-        this.setState({
-          selectedChannels,
-          config
-        });
+        if(this._isMounted) {
+          this.setState({
+            selectedChannels,
+            config
+          });
+        }
       })
       .catch( err => console.log(err) );
   };
@@ -61,7 +63,7 @@ class AppModalEdit extends Component {
         const chan = channels.map( (item, i) => {
           return {value: item.id, text: item.name}
         });
-        this.setState({ channels: chan });
+        if(this._isMounted) this.setState({ channels: chan });
       })
       .catch( err => console.log(err) );
   };
@@ -86,48 +88,58 @@ class AppModalEdit extends Component {
       credentials : 'include',
       body: JSON.stringify({ obj })
     });
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/edit/${obj.channels[0].id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      mode: 'cors',
+      credentials : 'include',
+      body: JSON.stringify({name: obj.name, metadata: {}})
+    });
 
     this.close();
   };
 
-  componentWillReceiveProps(nextProps) {
-    if(nextProps.connection !== this.props.connection){
-      this.getConfigById(nextProps.connection.external_id);
-    };
-  };
-
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps !== this.props ||
-    nextState !== this.state;
+    return !(nextProps === this.props &&
+    nextState === this.state);
   };
 
   componentDidMount() {
+    this._isMounted = true;
+    this.getConfigById(this.props.connection.external_id)
     this.getChannels();
   }
 
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
   close = () => {
-    this.setState({ showModalEditApp: false });
+    if(this._isMounted) this.setState({ showModalEditApp: false });
     this.props.callbackFromParent(this.state.showModalEditApp);
   };
 
   handleChangeName = e => {
     const obj = this.state.config;
     obj.content.name = e.target.value;
-    this.setState({ config: obj });
+    if(this._isMounted) this.setState({ config: obj });
   };
 
   handleChangeChannel = (e, { value }) => {
     let obj = this.state.config;
     obj.mainflux_channels = value;
-    this.setState({ config: obj });
+    if(this._isMounted) this.setState({ config: obj });
   };
 
   render() {
     const { showModalEditApp } = this.props;
     const { config, channels, selectedChannels } = this.state;
+
     return (
       <Modal closeIcon dimmer="blurring" open={showModalEditApp} onClose={this.close}>
-        <Modal.Header>EDIT CONNECTION</Modal.Header>
+        <Modal.Header>EDIT APPLICATION</Modal.Header>
         <Modal.Content>
           <Form>
 
