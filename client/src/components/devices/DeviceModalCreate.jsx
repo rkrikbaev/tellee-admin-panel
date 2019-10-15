@@ -36,9 +36,9 @@ class DeviceModalCreate extends Component {
         name: '',
         cycle: '',
         sendToApp: false,
+        sendToDB: false,
         device_type: undefined,
         app: undefined,
-        sendToDB: false,
       },
       newDevice: {
         id: '',
@@ -50,6 +50,8 @@ class DeviceModalCreate extends Component {
         assettext: '',
         assetvalue: '',
         messagetext: '',
+        longitude: '',
+        latitude: '',
       },
     };
 
@@ -275,6 +277,8 @@ class DeviceModalCreate extends Component {
           assettext,
           assetvalue,
           messagetext,
+          longitude,
+          latitude,
         } = this.state.newDevice;
         let newDevice = {
           id: createdThing[0].id,
@@ -286,6 +290,8 @@ class DeviceModalCreate extends Component {
           assettext,
           assetvalue,
           messagetext,
+          longitude,
+          latitude,
         }
 
         await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/create`, {
@@ -392,9 +398,18 @@ class DeviceModalCreate extends Component {
           },
           isThingMacDisabled: false,
         }));
-      }
-    }
+      };
+    };
   };
+
+  // TODO:
+  // handleChangeConfig = e => {
+  //   if(this._isMounted) {
+  //     var config = {...this.state.config};
+  //     config[Object.keys(e)[0]] = e[Object.keys(e)[0]];
+  //     this.setState({config});
+  //   }
+  // };
 
   handleChangeCycle = e => {
     let str = e.target.value;
@@ -408,7 +423,6 @@ class DeviceModalCreate extends Component {
       }));
     }
   };
-
 
   handleChangeSendToApp = (e, { checked }) => {
     if(this._isMounted) {
@@ -562,6 +576,22 @@ class DeviceModalCreate extends Component {
               <input
                 placeholder='Device severity'
                 onChange={e => this.handleChangeNewDevice({severity: e.target.value})}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Latitude</label>
+              <input
+                placeholder='Device latitude'
+                onChange={e => this.handleChangeNewDevice({latitude: e.target.value})}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Longitude</label>
+              <input
+                placeholder='Device longitude'
+                onChange={e => this.handleChangeNewDevice({longitude: e.target.value})}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>

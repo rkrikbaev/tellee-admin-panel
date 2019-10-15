@@ -21,6 +21,16 @@ const deviceSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  latitude: {
+    type: String,
+    required: false,
+    trim: true,
+  },
+  longitude: {
+    type: String,
+    required: false,
+    trim: true,
+  },
   alerttext: {
     type: String,
     required: false,

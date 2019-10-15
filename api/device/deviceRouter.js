@@ -24,6 +24,8 @@ DeviceRouter.route('/create').post( async (req, res, next) => {
     assettext,
     assetvalue,
     messagetext,
+    longitude,
+    latitude,
   } = req.body;
 
   const device = new Device({
@@ -36,6 +38,8 @@ DeviceRouter.route('/create').post( async (req, res, next) => {
     assettext,
     assetvalue,
     messagetext,
+    longitude,
+    latitude,
   });
 
   try {
@@ -70,7 +74,6 @@ DeviceRouter.route('/:id').get( async (req, res, next) => {
         if(!device) return res.sendStatus(404);
         return res.status(200).send(device);
       });
-    next();
   } catch(err) {
     return next(err);
   };
@@ -86,7 +89,18 @@ DeviceRouter.route('/update/:id').put( (req, res, next) => {
     throw new Error("Expects content-type 'application/json'");
   }
 
-  const { title, subtitle, severity } = req.body;
+  const {
+    title,
+    subtitle,
+    severity,
+    alerttext,
+    alertvalue,
+    assettext,
+    assetvalue,
+    messagetext,
+    longitude,
+    latitude,
+  } = req.body;
 
   try {
     Device.findOneAndUpdate({ id : req.params.id }, {
@@ -98,10 +112,12 @@ DeviceRouter.route('/update/:id').put( (req, res, next) => {
       assettext,
       assetvalue,
       messagetext,
+      longitude,
+      latitude,
     }, (err, device) => {
-      if(err) return res.status(500).send(err);
-      if(!device) return res.sendStatus(404);
-      return res.sendStatus(200);
+      if(err && !device) return res.status(500).send(err);
+      if(!err && !device) return res.sendStatus(404);
+      return res.status(200).send(device);
     });
   } catch(err) {
     return next(err);

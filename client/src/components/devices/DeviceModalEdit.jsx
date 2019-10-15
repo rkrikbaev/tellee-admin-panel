@@ -36,6 +36,8 @@ class DeviceModalEdit extends Component {
         assettext: '',
         assetvalue: '',
         messagetext: '',
+        latitude: '',
+        longitude: '',
       },
     };
   };
@@ -169,6 +171,8 @@ class DeviceModalEdit extends Component {
       assettext,
       assetvalue,
       messagetext,
+      longitude,
+      latitude,
     } = device;
     this.setState( prevState => ({
       editDevice: {
@@ -182,6 +186,8 @@ class DeviceModalEdit extends Component {
         assettext,
         assetvalue,
         messagetext,
+        longitude,
+        latitude,
       }
     }));
   };
@@ -303,6 +309,8 @@ class DeviceModalEdit extends Component {
         assettext,
         assetvalue,
         messagetext,
+        longitude,
+        latitude,
       } = this.state.newDevice;
         let newDevice = {
           id: config.mainflux_id,
@@ -314,6 +322,8 @@ class DeviceModalEdit extends Component {
           assettext,
           assetvalue,
           messagetext,
+          longitude,
+          latitude,
         }
 
         await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/create`, {
@@ -336,6 +346,8 @@ class DeviceModalEdit extends Component {
         assettext,
         assetvalue,
         messagetext,
+        longitude,
+        latitude,
       } = this.state.editDevice;
         let editDevice = {
           id,
@@ -347,6 +359,8 @@ class DeviceModalEdit extends Component {
           assettext,
           assetvalue,
           messagetext,
+          longitude,
+          latitude,
         }
 
         await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/update/${id}`, {
@@ -638,6 +652,8 @@ class DeviceModalEdit extends Component {
       assettext,
       assetvalue,
       messagetext,
+      longitude,
+      latitude,
     } = editDevice;
 
     return (
@@ -745,6 +761,24 @@ class DeviceModalEdit extends Component {
                 placeholder='Device severity'
                 onChange={e => this.handleChangeEditDevice({severity: e.target.value})}
                 value={severity !== undefined ? severity : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Latitude</label>
+              <input
+                placeholder='Device latitude'
+                onChange={e => this.handleChangeEditDevice({latitude: e.target.value})}
+                value={latitude !== undefined ? latitude : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Longitude</label>
+              <input
+                placeholder='Device longitude'
+                onChange={e => this.handleChangeEditDevice({longitude: e.target.value})}
+                value={longitude !== undefined ? longitude : ''}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
