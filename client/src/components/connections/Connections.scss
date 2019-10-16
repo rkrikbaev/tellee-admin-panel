@@ -22,5 +22,10 @@
     padding: 10px;
     border-radius: 5px;
   }
+}
 
+#devices {
+  .field.checkbox .ui.checkbox {
+    padding-right: 1rem;
+  }
 }

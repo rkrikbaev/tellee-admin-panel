@@ -5,6 +5,7 @@ import {
   Button,
   Icon,
   Popup,
+  Loader,
 } from 'semantic-ui-react';
 import AppModalCreate from '../applications/AppModalCreate';
 import AppModalEdit from '../applications/AppModalEdit';
@@ -30,6 +31,7 @@ class Connections extends Component {
       edittingDevice: {},
       removingConnection: {},
       errorText: '',
+      loader: true,
     };
   }
 
@@ -61,7 +63,7 @@ class Connections extends Component {
           item.content = JSON.parse(item.content);
           return item;
         });
-        if(this._isMounted) this.setState({connections: parsedConnections})
+        if(this._isMounted) this.setState({connections: parsedConnections, loader: false})
       })
       .catch( err => console.log(err) );
   };
@@ -146,6 +148,7 @@ class Connections extends Component {
       edittingDevice,
       removingConnection,
       errorText,
+      loader,
     } = this.state;
 
     return (
@@ -174,9 +177,12 @@ class Connections extends Component {
         <hr />
         <Item.Group relaxed>
           {
+            <Loader active={loader} content='Loading' />
+          }
+          {
             connections.length === 0
             ? <p>
-                Unfortunately we did not find your connections.
+                Unfortunately we did not find your connections. It will be great to create some.
                 <span role="img" aria-label="Sad">🙁</span>
               </p>
             : connections.map( item =>
@@ -280,7 +286,6 @@ class Connections extends Component {
             />
           : null
         }
-
       </div>
     );
   }

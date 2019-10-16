@@ -4,6 +4,7 @@ import {
   Item,
   Button,
   Icon,
+  Loader,
 } from 'semantic-ui-react';
 import ChannelModalCreate from './ChannelModalCreate';
 import ChannelModalRemove from './ChannelModalRemove';
@@ -20,6 +21,7 @@ class Channels extends Component {
       showModalRemove: false,
       showModalEdit: false,
       showModalCreate: false,
+      loader: true,
     };
   }
 
@@ -46,7 +48,7 @@ class Channels extends Component {
       credentials : 'include',
     })
       .then( res =>  res.json())
-      .then( channels => this.setState({channels}) )
+      .then( channels => this.setState({channels, loader: false}) )
       .catch( err => console.log(err) );
   };
 
@@ -81,6 +83,7 @@ class Channels extends Component {
       showModalRemove,
       removingChannel,
       // edittingChannel,
+      loader,
     } = this.state;
 
     return (
@@ -98,6 +101,9 @@ class Channels extends Component {
         </div>
         <hr />
         <Item.Group relaxed>
+          {
+            <Loader active={loader} content='Loading' />
+          }
           {
             channels.length === 0
             ? <p>

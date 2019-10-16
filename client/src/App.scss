@@ -81,6 +81,32 @@ hr {
   background-color: #ffffff;
   box-shadow: 5px 5px 10px #d4d4d5;
   padding: 30px;
+  .ui.cards .home_card {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 4rem;
+    img {
+      background: transparent;
+    }
+    .home_card__item {
+      display: flex;
+      align-items: center;
+      margin: 0;
+      width: 100px;
+      height: 3rem;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #6435c9;
+      flex-direction: column;
+    }
+    .home_card__label {
+      font-size: 0.7rem;
+      font-weight: 400;
+    }
+  }
 }
 
 // -- GLOBAL STYLES --

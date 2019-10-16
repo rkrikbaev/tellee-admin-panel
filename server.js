@@ -20,21 +20,28 @@ import DeviceRouter from './api/device/deviceRouter';
 
 const app = express();
 const originsWhitelist = [
-  'http://localhost',
+  'http://0.0.0.0:8080',
   'http://134.209.240.215',
+  'http://mainflux.zeinetsse.com',
+  process.env.UI_URL
 ];
 
 const logger = pino({ level: process.env.LOG_LEVEL || 'info' });
 const expressLogger = expressPino({ logger });
 
+// const corsOptions = {
+//   origin: (origin, callback) => {
+//     if (originsWhitelist.indexOf(origin) !== -1) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Not allowed by CORS'))
+//     }
+//   },credentials: true
+// }
+
 const corsOptions = {
-  origin: (origin, callback)=>{
-    if (originsWhitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  },credentials: true
+  origin: true,
+  credentials: true
 }
 
 app.use(cors(corsOptions));
@@ -45,9 +52,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use( (req, res, next) => {
-  let allowedOrigins = [process.env.UI_URL, 'http://0.0.0.0:8080', 'http://134.209.240.215'];
+  let allowedOrigins = [process.env.UI_URL, 'http://0.0.0.0:8080', 'http://134.209.240.215', 'http://mainflux.zeinetsse.com'];
   if (allowedOrigins.includes(req.headers.origin)) {
-    console.log(req.headers.origin)
     res.header("Access-Control-Allow-Origin", req.headers.origin);
   }
   // res.header("Access-Control-Allow-Origin", );
