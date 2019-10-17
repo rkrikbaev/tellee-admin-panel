@@ -52,7 +52,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use( (req, res, next) => {
-  let allowedOrigins = [process.env.UI_URL, 'http://0.0.0.0:8080', 'http://134.209.240.215', 'http://mainflux.zeinetsse.com'];
+  let allowedOrigins = [
+    process.env.UI_URL,
+    'http://0.0.0.0:8080',
+    'http://134.209.240.215',
+    'http://mainflux.zeinetsse.com'
+];
   if (allowedOrigins.includes(req.headers.origin)) {
     res.header("Access-Control-Allow-Origin", req.headers.origin);
   }

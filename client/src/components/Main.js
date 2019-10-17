@@ -7,86 +7,127 @@ import turbine from '../static/icons/turbine.svg'
 import pump from '../static/icons/pump.svg'
 import generator from '../static/icons/generator.svg'
 
-const data = [
-  {
-    icon: 'turbine',
-    name: 'Turbine:01',
-    status: 'Run',
-    ram: 30,
-    memory: '7976/6459',
-  },
-  {
-    icon: 'pump',
-    name: 'Pump:01',
-    status: 'Stop',
-    ram: 28,
-    memory: '8176/2459',
-  },
-  {
-    icon: 'generator',
-    name: 'Generator:01',
-    status: 'Run',
-    ram: 42,
-    memory: '2976/459',
-  },
-  {
-    icon: 'turbine',
-    name: 'Turbine:02',
-    status: 'Crush',
-    ram: 11,
-    memory: '9976/6419',
-  },
-]
+
+const statusTypes = ['connected', 'not connected'];
+const statusColorTypes = [];
 
 class Main extends Component {
+  _isMounted = false;
 
-  render() {
+  constructor(props) {
+    super(props);
 
-    const statusArray = []
+    this.state = {
+      devices: [],
+    }
 
-    data.forEach(item => {
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
+    this.getToken();
+    this.getDevicesFromMainflux();
+  }
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
+  getToken = async () => {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/users/login`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      mode: 'cors',
+      credentials : 'include',
+      body: JSON.stringify({email: `${process.env.REACT_APP_MAINFLUX_USER}`})
+    });
+  };
+
+  getDevicesFromMainflux = async () => {
+    const dataFromBootstrap = [];
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap`, {
+      mode: 'cors',
+      credentials : 'include',
+    })
+      .then( res =>  res.json() )
+      .then( devices => {
+        devices.forEach(item => {
+          dataFromBootstrap.push(item);
+        })
+      })
+      .catch( err => console.log(err) );
+
+    this.parseDataFromBootstrap(dataFromBootstrap);
+  }
+
+  parseDataFromBootstrap = devices => {
+    const _data = devices
+      .filter(item => {
+        item.content = JSON.parse(item.content);
+        return item.content.type === 'device';
+      })
+      .map(item => {
+        return {
+          icon: item.content.device_type,
+          name: item.name,
+          status: statusTypes[Math.floor(Math.random() * statusTypes.length)],
+          ram: Math.floor(Math.random() * 100) + 1,
+          memory: `7976/${Math.floor(Math.random() * 7976) + 1}`,
+        }
+    });
+    this.customizeDataForRender(_data);
+  }
+
+  customizeDataForRender = devices => {
+    devices.forEach(item => {
       switch(item.icon) {
         case 'turbine':
           item.icon = turbine;
           break;
-        case 'pump':
+        case 'e-meter_v2':
           item.icon = pump;
           break;
-        case 'generator':
+        case 'e-meter_v1':
           item.icon = generator;
           break;
         default:
           break;
       }
-    })
+    });
 
-    data.forEach(item => {
+    devices.forEach(item => {
       switch(item.status) {
-        case 'Run':
-          statusArray.push('green');
+        case 'connected':
+          statusColorTypes.push('green');
           break;
-        case 'Stop':
-          statusArray.push('yellow');
-          break;
-        case 'Crush':
-          statusArray.push('red');
+        case 'not connected':
+          statusColorTypes.push('yellow');
           break;
         default:
           break;
       }
-    })
+    });
+
+    if(this._isMounted) this.setState({ devices });
+  }
+
+  render() {
+
+    const { devices } = this.state;
 
     return (
       <div className="main_wrapper">
         <h1>Home</h1>
         <hr />
         {
-          data.length !== 0
+          devices.length !== 0
           ?
           <Card.Group>
             {
-              data.map((item, index) =>
-                <Card fluid color={statusArray[index]} key={index} className="home_card">
+              devices.map((item, index) =>
+                <Card fluid color={statusColorTypes[index]} key={index} className="home_card">
                   <img
                     src={item.icon}
                     alt={`${item.name}`}
