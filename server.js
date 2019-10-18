@@ -1,6 +1,4 @@
 import express from 'express';
-// import Keycloak from 'keycloak-connect';
-import session from 'express-session';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -23,6 +21,7 @@ const originsWhitelist = [
   'http://0.0.0.0:8080',
   'http://134.209.240.215',
   'http://mainflux.zeinetsse.com',
+  'http://key.zeinetsse.com',
   process.env.UI_URL
 ];
 
@@ -56,28 +55,20 @@ app.use( (req, res, next) => {
     process.env.UI_URL,
     'http://0.0.0.0:8080',
     'http://134.209.240.215',
-    'http://mainflux.zeinetsse.com'
+    'http://mainflux.zeinetsse.com',
+    'http://key.zeinetsse.com',
 ];
   if (allowedOrigins.includes(req.headers.origin)) {
     res.header("Access-Control-Allow-Origin", req.headers.origin);
+  } else {
+    res.header("Access-Control-Allow-Origin", '*');
   }
-  // res.header("Access-Control-Allow-Origin", );
 
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   res.header("Access-Control-Allow-Credentials", true);
   next();
 });
-
-const memoryStore = new session.MemoryStore();
-
-// Session
-app.use( session({
-  secret: 'thisShouldBeLongAndSecret',
-  resave: false,
-  saveUninitialized: true,
-  store: memoryStore
-}));
 
 // Routes
 app.use('/api/users', UserRouter);

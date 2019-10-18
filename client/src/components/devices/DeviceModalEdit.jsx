@@ -8,6 +8,13 @@ import {
   Checkbox,
 } from 'semantic-ui-react';
 
+const alertMessagesText = {
+  "title": "Turbine",
+  "subtitle": "LM2500",
+  "assettext": "MTU",
+  "assetvalue": "operation",
+}
+
 class DeviceModalEdit extends Component {
   _isMounted = false;
 
@@ -28,16 +35,16 @@ class DeviceModalEdit extends Component {
       handleSendToDB: undefined,
       editDevice: {
         id: '',
-        title: '',
-        subtitle: '',
+        title: alertMessagesText.title,
+        subtitle: alertMessagesText.subtitle,
+        latitude: '',
+        longitude: '',
+        assettext: alertMessagesText.assettext,
+        assetvalue: alertMessagesText.assetvalue,
         severity: '',
         alerttext: '',
         alertvalue: '',
-        assettext: '',
-        assetvalue: '',
         messagetext: '',
-        latitude: '',
-        longitude: '',
       },
     };
   };
@@ -198,13 +205,16 @@ class DeviceModalEdit extends Component {
 
   componentDidMount() {
     this._isMounted = true;
-    this.getDeviceInfoFromDB(this.props.connection.mainflux_id);
-    this.getConfigById(this.props.connection.external_id);
+    const { external_id, name, content } = this.props.connection
+    this.getConfigById(external_id);
       this.getThings().then( () => {
         if(this._isMounted) this.forceUpdate();
       });
     this.getDeviceTypes();
     this.getConnections();
+    if (content.sendToDB) {
+      this.getDeviceInfoFromDB(name.split('/')[1]);
+    }
   };
 
   componentWillUnmount() {
@@ -293,7 +303,7 @@ class DeviceModalEdit extends Component {
     });
 
     if( sendToDB === true && handleSendToDB === false ) {
-      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/remove/${this.state.editDevice.id}`, {
+      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/remove/${this.state.editDevice.id.split('/')[1]}`, {
         method: 'DELETE',
         mode: 'cors',
         credentials: 'include',
@@ -311,30 +321,30 @@ class DeviceModalEdit extends Component {
         messagetext,
         longitude,
         latitude,
-      } = this.state.newDevice;
-        let newDevice = {
-          id: config.mainflux_id,
-          title,
-          subtitle,
-          severity,
-          alerttext,
-          alertvalue,
-          assettext,
-          assetvalue,
-          messagetext,
-          longitude,
-          latitude,
-        }
+      } = this.state.editDevice;
+      let newDevice = {
+        id: this.state.config.content.name.split('/')[1],
+        title,
+        subtitle,
+        severity,
+        alerttext,
+        alertvalue,
+        assettext,
+        assetvalue,
+        messagetext,
+        longitude,
+        latitude,
+      }
 
-        await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/create`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          mode: 'cors',
-          credentials: 'include',
-          body: JSON.stringify(newDevice),
-        });
+      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        mode: 'cors',
+        credentials: 'include',
+        body: JSON.stringify(newDevice),
+      });
     } else if( sendToDB === true && handleSendToDB === true ) {
       const {
         id,
@@ -349,29 +359,29 @@ class DeviceModalEdit extends Component {
         longitude,
         latitude,
       } = this.state.editDevice;
-        let editDevice = {
-          id,
-          title,
-          subtitle,
-          severity,
-          alerttext,
-          alertvalue,
-          assettext,
-          assetvalue,
-          messagetext,
-          longitude,
-          latitude,
-        }
+      let editDevice = {
+        id: this.state.config.content.name.split('/')[1],
+        title,
+        subtitle,
+        severity,
+        alerttext,
+        alertvalue,
+        assettext,
+        assetvalue,
+        messagetext,
+        longitude,
+        latitude,
+      }
 
-        await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/update/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          mode: 'cors',
-          credentials: 'include',
-          body: JSON.stringify(editDevice),
-        });
+      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/update/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        mode: 'cors',
+        credentials: 'include',
+        body: JSON.stringify(editDevice),
+      });
     }
 
     // -- IF DEVICE CONNECTED TO APP BUT IT SHOULD BE DISCONNECTED -- //
@@ -646,12 +656,12 @@ class DeviceModalEdit extends Component {
     const {
       title,
       subtitle,
-      severity,
-      alerttext,
-      alertvalue,
+      // severity,
+      // alerttext,
+      // alertvalue,
       assettext,
       assetvalue,
-      messagetext,
+      // messagetext,
       longitude,
       latitude,
     } = editDevice;
@@ -756,15 +766,6 @@ class DeviceModalEdit extends Component {
               />
             </Form.Field>
             <Form.Field className={handleSendToDB ? '' : 'hide'}>
-              <label>Severity</label>
-              <input
-                placeholder='Device severity'
-                onChange={e => this.handleChangeEditDevice({severity: e.target.value})}
-                value={severity !== undefined ? severity : ''}
-                // className={isThingMacDisabled ? 'show_error' : ''}
-              />
-            </Form.Field>
-            <Form.Field className={handleSendToDB ? '' : 'hide'}>
               <label>Latitude</label>
               <input
                 placeholder='Device latitude'
@@ -779,6 +780,33 @@ class DeviceModalEdit extends Component {
                 placeholder='Device longitude'
                 onChange={e => this.handleChangeEditDevice({longitude: e.target.value})}
                 value={longitude !== undefined ? longitude : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Asset text</label>
+              <input
+                placeholder='Asset text'
+                onChange={e => this.handleChangeEditDevice({assettext: e.target.value})}
+                value={assettext !== undefined ? assettext : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Asset value</label>
+              <input
+                placeholder='Asset value'
+                onChange={e => this.handleChangeEditDevice({assetvalue: e.target.value})}
+                value={assetvalue !== undefined ? assetvalue : ''}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            {/* <Form.Field className={handleSendToDB ? '' : 'hide'}>
+              <label>Severity</label>
+              <input
+                placeholder='Device severity'
+                onChange={e => this.handleChangeEditDevice({severity: e.target.value})}
+                value={severity !== undefined ? severity : ''}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
@@ -801,24 +829,6 @@ class DeviceModalEdit extends Component {
               />
             </Form.Field>
             <Form.Field className={handleSendToDB ? '' : 'hide'}>
-              <label>Asset text</label>
-              <input
-                placeholder='Asset text'
-                onChange={e => this.handleChangeEditDevice({assettext: e.target.value})}
-                value={assettext !== undefined ? assettext : ''}
-                // className={isThingMacDisabled ? 'show_error' : ''}
-              />
-            </Form.Field>
-            <Form.Field className={handleSendToDB ? '' : 'hide'}>
-              <label>Asset value</label>
-              <input
-                placeholder='Asset value'
-                onChange={e => this.handleChangeEditDevice({assetvalue: e.target.value})}
-                value={assetvalue !== undefined ? assetvalue : ''}
-                // className={isThingMacDisabled ? 'show_error' : ''}
-              />
-            </Form.Field>
-            <Form.Field className={handleSendToDB ? '' : 'hide'}>
               <label>Message text</label>
               <input
                 placeholder='Message text'
@@ -826,7 +836,7 @@ class DeviceModalEdit extends Component {
                 value={messagetext !== undefined ? messagetext : ''}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
-            </Form.Field>
+            </Form.Field> */}
           </Form>
         </Modal.Content>
         <Modal.Actions>

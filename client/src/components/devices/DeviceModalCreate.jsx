@@ -8,6 +8,13 @@ import {
   Checkbox,
 } from 'semantic-ui-react';
 
+const alertMessagesText = {
+  "title": "Turbine",
+  "subtitle": "LM2500",
+  "assettext": "MTU",
+  "assetvalue": "operation",
+}
+
 class DeviceModalCreate extends Component {
   _isMounted = false;
 
@@ -42,16 +49,16 @@ class DeviceModalCreate extends Component {
       },
       newDevice: {
         id: '',
-        title: '',
-        subtitle: '',
+        title: alertMessagesText.title,
+        subtitle: alertMessagesText.subtitle,
+        assettext: alertMessagesText.assettext,
+        assetvalue: alertMessagesText.assetvalue,
+        longitude: '',
+        latitude: '',
         severity: '',
         alertext: '',
         alertvalue: '',
-        assettext: '',
-        assetvalue: '',
         messagetext: '',
-        longitude: '',
-        latitude: '',
       },
     };
 
@@ -281,7 +288,7 @@ class DeviceModalCreate extends Component {
           latitude,
         } = this.state.newDevice;
         let newDevice = {
-          id: createdThing[0].id,
+          id: newThing.name,
           title,
           subtitle,
           severity,
@@ -486,6 +493,7 @@ class DeviceModalCreate extends Component {
       deviceTypes,
       apps,
       config,
+      newDevice,
     } = this.state;
 
     return (
@@ -560,6 +568,7 @@ class DeviceModalCreate extends Component {
               <input
                 placeholder='Device title'
                 onChange={e => this.handleChangeNewDevice({title: e.target.value})}
+                value={newDevice.title}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
@@ -568,14 +577,7 @@ class DeviceModalCreate extends Component {
               <input
                 placeholder='Device subtitle'
                 onChange={e => this.handleChangeNewDevice({subtitle: e.target.value})}
-                // className={isThingMacDisabled ? 'show_error' : ''}
-              />
-            </Form.Field>
-            <Form.Field className={config.sendToDB ? '' : 'hide'}>
-              <label>Severity</label>
-              <input
-                placeholder='Device severity'
-                onChange={e => this.handleChangeNewDevice({severity: e.target.value})}
+                value={newDevice.subtitle}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
@@ -585,13 +587,39 @@ class DeviceModalCreate extends Component {
                 placeholder='Device latitude'
                 onChange={e => this.handleChangeNewDevice({latitude: e.target.value})}
                 // className={isThingMacDisabled ? 'show_error' : ''}
-              />
+                />
             </Form.Field>
             <Form.Field className={config.sendToDB ? '' : 'hide'}>
               <label>Longitude</label>
               <input
                 placeholder='Device longitude'
                 onChange={e => this.handleChangeNewDevice({longitude: e.target.value})}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+                />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Asset text</label>
+              <input
+                placeholder='Asset text'
+                onChange={e => this.handleChangeNewDevice({assettext: e.target.value})}
+                value={newDevice.assettext}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Asset value</label>
+              <input
+                placeholder='Asset value'
+                onChange={e => this.handleChangeNewDevice({assetvalue: e.target.value})}
+                value={newDevice.assetvalue}
+                // className={isThingMacDisabled ? 'show_error' : ''}
+              />
+            </Form.Field>
+            {/* <Form.Field className={config.sendToDB ? '' : 'hide'}>
+              <label>Severity</label>
+              <input
+                placeholder='Device severity'
+                onChange={e => this.handleChangeNewDevice({severity: e.target.value})}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
@@ -612,29 +640,13 @@ class DeviceModalCreate extends Component {
               />
             </Form.Field>
             <Form.Field className={config.sendToDB ? '' : 'hide'}>
-              <label>Asset text</label>
-              <input
-                placeholder='Asset text'
-                onChange={e => this.handleChangeNewDevice({assettext: e.target.value})}
-                // className={isThingMacDisabled ? 'show_error' : ''}
-              />
-            </Form.Field>
-            <Form.Field className={config.sendToDB ? '' : 'hide'}>
-              <label>Asset value</label>
-              <input
-                placeholder='Asset value'
-                onChange={e => this.handleChangeNewDevice({assetvalue: e.target.value})}
-                // className={isThingMacDisabled ? 'show_error' : ''}
-              />
-            </Form.Field>
-            <Form.Field className={config.sendToDB ? '' : 'hide'}>
               <label>Message text</label>
               <input
                 placeholder='Message text'
                 onChange={e => this.handleChangeNewDevice({messagetext: e.target.value})}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
-            </Form.Field>
+            </Form.Field> */}
           </Form>
         </Modal.Content>
 

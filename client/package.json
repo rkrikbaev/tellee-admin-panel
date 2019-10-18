@@ -6,6 +6,7 @@
     "@babel/parser": "^7.4.5",
     "@blueprintjs/core": "^3.15.1",
     "env-cmd": "^9.0.3",
+    "keycloak-js": "^7.0.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.1",

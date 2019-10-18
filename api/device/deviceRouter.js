@@ -90,6 +90,7 @@ DeviceRouter.route('/update/:id').put( (req, res, next) => {
   }
 
   const {
+    id,
     title,
     subtitle,
     severity,
@@ -104,6 +105,7 @@ DeviceRouter.route('/update/:id').put( (req, res, next) => {
 
   try {
     Device.findOneAndUpdate({ id : req.params.id }, {
+      id,
       title,
       subtitle,
       severity,
