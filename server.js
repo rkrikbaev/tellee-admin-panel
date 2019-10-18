@@ -22,6 +22,7 @@ const originsWhitelist = [
   'http://134.209.240.215',
   'http://mainflux.zeinetsse.com',
   'http://key.zeinetsse.com',
+  'http://flash.zeinetsse.com',
   process.env.UI_URL
 ];
 
@@ -57,6 +58,7 @@ app.use( (req, res, next) => {
     'http://134.209.240.215',
     'http://mainflux.zeinetsse.com',
     'http://key.zeinetsse.com',
+    'http://flash.zeinetsse.com',
 ];
   if (allowedOrigins.includes(req.headers.origin)) {
     res.header("Access-Control-Allow-Origin", req.headers.origin);
