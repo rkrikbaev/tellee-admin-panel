@@ -1,11 +1,11 @@
-import React, { Component } from 'react'
-import { Card } from 'semantic-ui-react'
+import React, { Component } from 'react';
+import { Card } from 'semantic-ui-react';
 
-import 'semantic-ui-css/semantic.min.css'
+import 'semantic-ui-css/semantic.min.css';
 
-import turbine from '../static/icons/turbine.svg'
-import pump from '../static/icons/pump.svg'
-import generator from '../static/icons/generator.svg'
+import turbine from '../static/icons/turbine.svg';
+import pump from '../static/icons/pump.svg';
+import generator from '../static/icons/generator.svg';
 
 
 const statusTypes = ['connected', 'not connected'];
@@ -19,8 +19,7 @@ class Main extends Component {
 
     this.state = {
       devices: [],
-    }
-
+    };
   }
 
   componentDidMount() {
@@ -28,6 +27,7 @@ class Main extends Component {
     this.getToken();
     this.getDevicesFromMainflux();
   }
+
   componentWillUnmount() {
     this._isMounted = false;
   }
@@ -36,53 +36,47 @@ class Main extends Component {
     fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/users/login`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       mode: 'cors',
-      credentials : 'include',
-      body: JSON.stringify({email: `${process.env.REACT_APP_MAINFLUX_USER}`})
+      credentials: 'include',
+      body: JSON.stringify({ email: `${process.env.REACT_APP_MAINFLUX_USER}` }),
     });
   };
 
   getDevicesFromMainflux = async () => {
-    const dataFromBootstrap = [];
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap`, {
       mode: 'cors',
-      credentials : 'include',
+      credentials: 'include',
     })
-      .then( res =>  res.json() )
-      .then( devices => {
-        devices.forEach(item => {
-          dataFromBootstrap.push(item);
-        })
+      .then(res => res.json())
+      .then(devices => {
+        this.parseDataFromBootstrap(devices);
       })
-      .catch( err => console.log(err) );
-
-    this.parseDataFromBootstrap(dataFromBootstrap);
+      .catch((err) => console.log(err));
   }
 
   parseDataFromBootstrap = devices => {
-    const _data = devices
-      .filter(item => {
+    const data = devices
+      .filter((item) => {
         item.content = JSON.parse(item.content);
         return item.content.type === 'device';
       })
-      .map(item => {
-        return {
-          icon: item.content.device_type,
-          name: item.name,
-          status: statusTypes[Math.floor(Math.random() * statusTypes.length)],
-          ram: Math.floor(Math.random() * 100) + 1,
-          memory: `7976/${Math.floor(Math.random() * 7976) + 1}`,
-        }
-    });
-    this.customizeDataForRender(_data);
+      .map(item => ({
+        id: item.mainflux_id,
+        icon: item.content.device_type,
+        name: item.name,
+        status: statusTypes[Math.floor(Math.random() * statusTypes.length)],
+        ram: Math.floor(Math.random() * 100) + 1,
+        memory: `7976/${Math.floor(Math.random() * 7976) + 1}`,
+      }));
+    this.customizeDataForRender(data);
   }
 
-  customizeDataForRender = devices => {
-    devices.forEach(item => {
-      switch(item.icon) {
+  customizeDataForRender = (devices) => {
+    devices.forEach((item) => {
+      switch (item.icon) {
         case 'turbine':
           item.icon = turbine;
           break;
@@ -97,8 +91,8 @@ class Main extends Component {
       }
     });
 
-    devices.forEach(item => {
-      switch(item.status) {
+    devices.forEach((item) => {
+      switch (item.status) {
         case 'connected':
           statusColorTypes.push('green');
           break;
@@ -110,11 +104,10 @@ class Main extends Component {
       }
     });
 
-    if(this._isMounted) this.setState({ devices });
+    if (this._isMounted) this.setState({ devices });
   }
 
   render() {
-
     const { devices } = this.state;
 
     return (
@@ -123,41 +116,43 @@ class Main extends Component {
         <hr />
         {
           devices.length !== 0
-          ?
-          <Card.Group>
-            {
-              devices.map((item, index) =>
-                <Card fluid color={statusColorTypes[index]} key={index} className="home_card">
-                  <img
-                    src={item.icon}
-                    alt={`${item.name}`}
-                    className="home_card__item"
-                  />
-                  <p className="home_card__item">
-                    <label className="home_card__label">name:</label>
-                    {item.name.toUpperCase()}
-                  </p>
-                  <p className="home_card__item">
-                    <label className="home_card__label">status:</label>
-                    {item.status.toUpperCase()}
-                  </p>
-                  <p className="home_card__item">
-                    <label className="home_card__label">CPU:</label>
-                    {item.ram}%
-                  </p>
-                  <p className="home_card__item">
-                    <label className="home_card__label">memory:</label>
-                    {item.memory}kB
-                  </p>
-                </Card>
-              )
+            ? (
+              <Card.Group>
+                {
+                  devices.map((item, i) => (
+                    <Card fluid color={statusColorTypes[i]} key={item.id} className="home_card">
+                      <img
+                        src={item.icon}
+                        alt={`${item.name}`}
+                        className="home_card__item"
+                      />
+                      <p className="home_card__item">
+                        <label className="home_card__label" htmlFor="name">name:</label>
+                        {item.name.toUpperCase()}
+                      </p>
+                      <p className="home_card__item">
+                        <label className="home_card__label" htmlFor="status">status:</label>
+                        {item.status.toUpperCase()}
+                      </p>
+                      <p className="home_card__item">
+                        <label className="home_card__label" htmlFor="cpu">CPU:</label>
+                        {item.ram}%
+                      </p>
+                      <p className="home_card__item">
+                        <label className="home_card__label" htmlFor="memory">memory:</label>
+                        {item.memory}kB
+                      </p>
+                    </Card>
+                  ))
             }
-          </Card.Group>
-          :
-          <p>
+              </Card.Group>
+            )
+            : (
+              <p>
             Here you can put everything your heart desires.
-            <span role="img" aria-label="Hooray">🙂</span>
-          </p>
+                <span role="img" aria-label="Hooray">🙂</span>
+              </p>
+            )
         }
       </div>
     );

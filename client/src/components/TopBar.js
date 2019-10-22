@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
   Header,
   Segment,
@@ -9,7 +9,9 @@ import {
 
 const trigger = (
   <span>
-    <Image avatar src='http://zsse.zeinetsse.com/favicon.ico' /> User Admin
+    <Image avatar src="http://zsse.zeinetsse.com/favicon.ico" />
+    {' '}
+    User Admin
   </span>
 );
 
@@ -19,29 +21,23 @@ const options = [
   { key: 'sign-out', text: 'Sign Out', icon: 'sign out' },
 ];
 
-class TopBar extends Component {
-
-  render() {
-
-    return (
-      <div id='TopBar'>
-        <Segment clearing id='top_menu'>
-          <Header className='topbar_left' floated='left'>
-            <img className="top_logo" alt="Tellee_logo" src="/Tellee_logo.svg" />
-          </Header>
-          <Header className='topbar_right' floated='right'>
-            <Dropdown
-              className='top_dropdown'
-              trigger={trigger}
-              options={options}
-              pointing='top left'
-              icon={null}
-            />
-          </Header>
-        </Segment>
-      </div>
-    );
-  }
+export default function TopBar() {
+  return (
+    <div id="TopBar">
+      <Segment clearing id="top_menu">
+        <Header className="topbar_left" floated="left">
+          <img className="top_logo" alt="Tellee_logo" src="/Tellee_logo.svg" />
+        </Header>
+        <Header className="topbar_right" floated="right">
+          <Dropdown
+            className="top_dropdown"
+            trigger={trigger}
+            options={options}
+            pointing="top left"
+            icon={null}
+          />
+        </Header>
+      </Segment>
+    </div>
+  );
 }
-
-export default TopBar;
