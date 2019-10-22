@@ -22,7 +22,8 @@
     "eject": "react-scripts eject",
     "production": "serve -s build -l 8000",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "format": "prettier --write \"**/*.+(js|jsx|json|css|md)\""
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -45,10 +46,12 @@
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
     "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-prettier": "^6.4.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^1.7.0",
-    "node-sass": "^4.12.0"
+    "node-sass": "^4.12.0",
+    "prettier": "^1.18.2"
   }
 }

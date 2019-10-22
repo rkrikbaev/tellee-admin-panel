@@ -1,22 +1,24 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import './index.css'
 // import Keycloak from 'keycloak-js';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import App from './App'
+import * as serviceWorker from './serviceWorker'
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('root'))
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+serviceWorker.unregister()
 
-// // keycloak init options
+// keycloak init options
 // const initOptions = {
-//   url: 'http://key.zeinetsse.com/auth', realm: 'zeinetsse', clientId: 'mainflux_admin', onLoad: 'login-required',
+//   url: 'http://key.zeinetsse.com/auth',
+//   realm: 'zeinetsse',
+//   clientId: 'mainflux_admin',
+//   onLoad: 'login-required',
 // };
-
 
 // const keycloak = Keycloak(initOptions);
 
@@ -39,7 +41,9 @@ serviceWorker.unregister();
 //         console.debug(`Token refreshed${refreshed}`);
 //       } else {
 //         console.warn(`Token not refreshed, valid for ${
-//           Math.round(keycloak.tokenParsed.exp + keycloak.timeSkew - new Date().getTime() / 1000)} seconds`);
+// Math.round(
+//   keycloak.tokenParsed.exp + keycloak.timeSkew - new Date().getTime() / 1000)}
+//   seconds`);
 //       }
 //     }).error(() => {
 //       console.error('Failed to refresh token');

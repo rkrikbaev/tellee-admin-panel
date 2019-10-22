@@ -1,27 +1,27 @@
-import React, { Component } from 'react';
-import './Channels.scss';
-import {
-  Item,
-  Button,
-  Icon,
-  Loader,
-} from 'semantic-ui-react';
-import ChannelModalCreate from './ChannelModalCreate';
-import ChannelModalRemove from './ChannelModalRemove';
+import React, { Component } from 'react'
+import './Channels.scss'
+import { Item, Button, Icon, Loader } from 'semantic-ui-react'
+import ChannelModalCreate from './ChannelModalCreate'
+import ChannelModalRemove from './ChannelModalRemove'
 // import ChannelModalEdit from './ChannelModalEdit';
 
 class Channels extends Component {
   constructor() {
-    super();
+    super()
     this.state = {
       channels: [],
-      edittingChannel: {},
+      // edittingChannel: {},
       removingChannel: {},
       showModalRemove: false,
-      showModalEdit: false,
+      // showModalEdit: false,
       showModalCreate: false,
       loader: true,
-    };
+    }
+  }
+
+  async componentDidMount() {
+    await this.getToken()
+    this.getChannels()
   }
 
   getToken = async () => {
@@ -34,8 +34,8 @@ class Channels extends Component {
       mode: 'cors',
       credentials: 'include',
       body: JSON.stringify({ email: `${process.env.REACT_APP_MAINFLUX_USER}` }),
-    });
-  };
+    })
+  }
 
   getChannels = async () => {
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
@@ -48,28 +48,25 @@ class Channels extends Component {
     })
       .then((res) => res.json())
       .then((channels) => this.setState({ channels, loader: false }))
-      .catch((err) => console.log(err));
-  };
+      .catch((err) => err)
+  }
 
-  removeModalCallback = (showModalRemove, id) => {
-    this.setState({ showModalRemove });
-    if (id) {
-      this.setState({ channels: this.state.channels.filter((i) => i.id !== id) });
+  removeModalCallback = (showModalRemove, removeItemId) => {
+    this.setState({ showModalRemove })
+    if (removeItemId) {
+      this.setState((prevState) => ({
+        channels: prevState.channels.filter((item) => item.id !== removeItemId),
+      }))
     }
-  };
+  }
 
   // editModalCallback = showModalEdit => {
   //   this.setState({ showModalEdit });
   // };
 
   createChannelModalCallback = async (showModalCreate) => {
-    this.setState({ showModalCreate });
-    await this.getChannels();
-  };
-
-  async componentDidMount() {
-    await this.getToken();
-    this.getChannels();
+    this.setState({ showModalCreate })
+    await this.getChannels()
   }
 
   render() {
@@ -81,7 +78,7 @@ class Channels extends Component {
       removingChannel,
       // edittingChannel,
       loader,
-    } = this.state;
+    } = this.state
 
     return (
       <div id="channels" className="main_wrapper">
@@ -98,33 +95,35 @@ class Channels extends Component {
         </div>
         <hr />
         <Item.Group relaxed>
-          {
-            <Loader active={loader} content="Loading" />
-          }
-          {
-            channels.length === 0
-              ? (
-                <p>
-                Unfortunately we did not find your channels.
-                  <span role="img" aria-label="Sad">🙁</span>
-                </p>
-              )
-              : channels.map((item) => (
-                <Item key={item.id}>
-
-                  <Item.Content verticalAlign="middle">
-                    <Item.Header>{item.name}</Item.Header>
-                    <Item.Description>{item.id}</Item.Description>
-                    <Item.Extra>
-                      <Button
-                        color="red"
-                        floated="right"
-                        icon="trash alternate outline"
-                        labelPosition="right"
-                        content="Remove"
-                        onClick={() => this.setState({ showModalRemove: true, removingChannel: item })}
-                      />
-                      {/* <Button
+          {<Loader active={loader} content="Loading" />}
+          {channels.length === 0 ? (
+            <p>
+              Unfortunately we did not find your channels.
+              <span role="img" aria-label="Sad">
+                🙁
+              </span>
+            </p>
+          ) : (
+            channels.map((item) => (
+              <Item key={item.id}>
+                <Item.Content verticalAlign="middle">
+                  <Item.Header>{item.name}</Item.Header>
+                  <Item.Description>{item.id}</Item.Description>
+                  <Item.Extra>
+                    <Button
+                      color="red"
+                      floated="right"
+                      icon="trash alternate outline"
+                      labelPosition="right"
+                      content="Remove"
+                      onClick={() =>
+                        this.setState({
+                          showModalRemove: true,
+                          removingChannel: item,
+                        })
+                      }
+                    />
+                    {/* <Button
                       color="yellow"
                       floated='right'
                       icon='edit outline'
@@ -132,28 +131,23 @@ class Channels extends Component {
                       content="Edit"
                       onClick={() => this.setState({ showModalEdit: true, edittingChannel: item })}
                     /> */}
-                    </Item.Extra>
-                  </Item.Content>
-
-                </Item>
-              ))
-          }
+                  </Item.Extra>
+                </Item.Content>
+              </Item>
+            ))
+          )}
         </Item.Group>
 
-        {
-          this.state.showModalRemove
-            ? (
-              <ChannelModalRemove
-                showModalRemove={showModalRemove}
-                channel={removingChannel}
-                callbackFromParent={this.removeModalCallback}
-              />
-            )
-            : null
-        }
+        {showModalRemove ? (
+          <ChannelModalRemove
+            showModalRemove={showModalRemove}
+            channel={removingChannel}
+            callbackFromParent={this.removeModalCallback}
+          />
+        ) : null}
 
         {/* {
-          this.state.showModalEdit
+          showModalEdit
           ? <ChannelModalEdit
               showModalEdit={showModalEdit}
               channel={edittingChannel}
@@ -162,20 +156,15 @@ class Channels extends Component {
           : null
         } */}
 
-        {
-          this.state.showModalCreate
-            ? (
-              <ChannelModalCreate
-                showModalCreate={showModalCreate}
-                callbackFromParent={this.createChannelModalCallback}
-              />
-            )
-            : null
-        }
-
+        {showModalCreate ? (
+          <ChannelModalCreate
+            showModalCreate={showModalCreate}
+            callbackFromParent={this.createChannelModalCallback}
+          />
+        ) : null}
       </div>
-    );
+    )
   }
 }
 
-export default Channels;
+export default Channels

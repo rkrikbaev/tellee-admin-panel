@@ -1,17 +1,12 @@
-import React, { Component } from 'react';
-import './Connections.scss';
-import {
-  Button,
-  Header,
-  Modal,
-  Icon
-} from 'semantic-ui-react';
+import React, { Component } from 'react'
+import './Connections.scss'
+import { Button, Header, Modal, Icon } from 'semantic-ui-react'
 
 class ConnectionModalRemove extends Component {
-  _isMounted = false;
+  _isMounted = false
 
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
       showModalRemove: false,
@@ -20,141 +15,163 @@ class ConnectionModalRemove extends Component {
   }
 
   componentDidMount() {
-    this._isMounted = true;
+    this._isMounted = true
   }
 
   componentWillUnmount() {
-    this._isMounted = false;
+    this._isMounted = false
   }
 
-  getChannel = async app => {
+  getChannel = async (app) => {
     let arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
       mode: 'cors',
-      credentials: 'include'
+      credentials: 'include',
     })
-    .then( res => res.json())
-    .then( oldChannels => {
-      return oldChannels;
-    })
-    .catch( err => console.log(err));
+      .then((res) => res.json())
+      .then((oldChannels) => {
+        return oldChannels
+      })
+      .catch((err) => console.log(err))
 
-    var channel = arr.filter( item => {
-      return item.name === app;
-    });
-    return channel[0];
+    var channel = arr.filter((item) => {
+      return item.name === app
+    })
+    return channel[0]
   }
 
-  removeConnection = async connection => {
-    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things/remove/${connection.mainflux_id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      mode: 'cors',
-      credentials : 'include',
-    });
-    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/remove/${connection.mainflux_id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      mode: 'cors',
-      credentials : 'include',
-    });
-    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/device/remove/${connection.mainflux_id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      mode: 'cors',
-      credentials : 'include',
-    });
-    const { sendToApp, app, type } = connection.content;
-    if(sendToApp) {
-      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`,{
+  removeConnection = async (connection) => {
+    fetch(
+      `${process.env.REACT_APP_EXPRESS_HOST}/api/things/remove/${connection.mainflux_id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         mode: 'cors',
-        credentials : 'include',
+        credentials: 'include',
+      }
+    )
+    fetch(
+      `${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/remove/${connection.mainflux_id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        mode: 'cors',
+        credentials: 'include',
+      }
+    )
+    fetch(
+      `${process.env.REACT_APP_EXPRESS_HOST}/api/device/remove/${connection.mainflux_id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        mode: 'cors',
+        credentials: 'include',
+      }
+    )
+    const { sendToApp, app, type } = connection.content
+    if (sendToApp) {
+      await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`, {
+        mode: 'cors',
+        credentials: 'include',
       })
-        .then( response => response.json())
-        .then( response => {
-          response.content = JSON.parse(response.content);
-          const { content } = response;
+        .then((response) => response.json())
+        .then((response) => {
+          response.content = JSON.parse(response.content)
+          const { content } = response
 
-          content.devices = content.devices.filter( item => {
-            return item.device_id !== connection.mainflux_id;
-          });
+          content.devices = content.devices.filter((item) => {
+            return item.device_id !== connection.mainflux_id
+          })
 
-          fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            mode: 'cors',
-            credentials : 'include',
-            body: JSON.stringify({ response })
-          });
-        });
+          fetch(
+            `${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`,
+            {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              mode: 'cors',
+              credentials: 'include',
+              body: JSON.stringify({ response }),
+            }
+          )
+        })
     }
     if (type === 'app') {
-      let arr = await this.getChannel(connection.name);
+      let arr = await this.getChannel(connection.name)
       fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/remove/${arr.id}`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         mode: 'cors',
-        credentials : 'include',
-      });
+        credentials: 'include',
+      })
     }
 
-    if(this._isMounted) this.setState({ showModalRemove: false });
-    this.props.callbackFromParent(this.state.showModalRemove, connection.mainflux_id);
+    if (this._isMounted) this.setState({ showModalRemove: false })
+    this.props.callbackFromParent(this.state.showModalRemove, connection.mainflux_id)
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { content } = nextProps.connection;
-    if( content !== undefined && content.type === 'app' && content.devices.length !== 0) {
-      if(this._isMounted) this.setState({ isRemoveable: false });
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    const { content } = nextProps.connection
+    if (
+      content !== undefined &&
+      content.type === 'app' &&
+      content.devices.length !== 0
+    ) {
+      if (this._isMounted) this.setState({ isRemoveable: false })
     } else {
-      if(this._isMounted) this.setState({ isRemoveable: true });
-    };
-  };
-
+      if (this._isMounted) this.setState({ isRemoveable: true })
+    }
+  }
 
   close = () => {
-    if(this._isMounted) {
+    if (this._isMounted) {
       this.setState({ showModalRemove: false, isRemoveable: true }, () => {
-        this.props.callbackFromParent(this.state.showModalRemove);
-      });
+        this.props.callbackFromParent(this.state.showModalRemove)
+      })
     }
   }
 
   render() {
-    const { showModalRemove, connection } = this.props;
-    const { isRemoveable } = this.state;
+    const { showModalRemove, connection } = this.props
+    const { isRemoveable } = this.state
     return (
-      <Modal basic size='small' open={showModalRemove}>
-        <Header icon='archive' content={isRemoveable ? 'REMOVE CONNECTION?': 'CAN NOT REMOVE CONNECTION'} />
+      <Modal basic size="small" open={showModalRemove}>
+        <Header
+          icon="archive"
+          content={isRemoveable ? 'REMOVE CONNECTION?' : 'CAN NOT REMOVE CONNECTION'}
+        />
         <Modal.Content>
           <p>
-            {
-              isRemoveable
+            {isRemoveable
               ? `Do you want to remove connection: ${connection.name}`
-              : `CONNECTION '${connection.name}' HAVE CONNECTED DEVICES. FIRST REMOVE CONNECTED DEVICES.`
-            }
+              : `CONNECTION '${connection.name}' HAVE CONNECTED DEVICES. FIRST REMOVE CONNECTED DEVICES.`}
           </p>
         </Modal.Content>
         <Modal.Actions>
-          <Button basic color='green' inverted onClick={this.close}>
-            <Icon name='remove' /> No
+          <Button basic color="green" inverted onClick={this.close}>
+            <Icon name="remove" /> No
           </Button>
-          <Button color='red' inverted onClick={() => {isRemoveable ? this.removeConnection(connection) : this.close()} }>
-            <Icon name='checkmark' /> Yes
+          <Button
+            color="red"
+            inverted
+            onClick={() => {
+              isRemoveable ? this.removeConnection(connection) : this.close()
+            }}
+          >
+            <Icon name="checkmark" /> Yes
           </Button>
         </Modal.Actions>
       </Modal>
-    );
+    )
   }
 }
 
-export default ConnectionModalRemove;
+export default ConnectionModalRemove

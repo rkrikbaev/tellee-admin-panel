@@ -1,15 +1,12 @@
-import React, { Component } from 'react';
-import './Things.scss';
-import {
-  Button,
-  Item,
-} from 'semantic-ui-react';
-import ThingModalRemove from './ThingModalRemove';
-import ThingModalEdit from './ThingModalEdit';
+import React, { Component } from 'react'
+import './Things.scss'
+import { Button, Item } from 'semantic-ui-react'
+import ThingModalRemove from './ThingModalRemove'
+import ThingModalEdit from './ThingModalEdit'
 
 class Things extends Component {
   constructor() {
-    super();
+    super()
 
     this.state = {
       things: [],
@@ -17,7 +14,12 @@ class Things extends Component {
       showModalRemove: false,
       removingThing: {},
       edittingThing: {},
-    };
+    }
+  }
+
+  componentDidMount() {
+    this.getToken()
+    this.getThings()
   }
 
   getToken = async () => {
@@ -30,8 +32,8 @@ class Things extends Component {
       mode: 'cors',
       credentials: 'include',
       body: JSON.stringify({ email: `${process.env.REACT_APP_MAINFLUX_USER}` }),
-    });
-  };
+    })
+  }
 
   getThings = async () => {
     fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
@@ -39,43 +41,39 @@ class Things extends Component {
       credentials: 'include',
     })
       .then((res) => res.json())
-      .then((things) => this.setState({ things }, () => {
-        console.log('fetched');
-      }))
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+      .then((things) => this.setState({ things }))
+      .catch((err) => err)
+  }
 
-  removeModalCallback = (showModalRemove, id) => {
-    this.setState({ showModalRemove });
-    if (id) {
-      this.setState({ things: this.state.things.filter((i) => i.id !== id) });
+  removeModalCallback = (showModalRemove, removeItemId) => {
+    this.setState({ showModalRemove })
+    if (removeItemId) {
+      this.setState((prevstate) => ({
+        things: prevstate.things.filter((item) => item.id !== removeItemId),
+      }))
     }
-  };
+  }
 
   editModalCallback = (showModalEdit) => {
-    this.setState({ showModalEdit });
-  };
-
-  componentDidMount() {
-    this.getToken();
-    this.getThings();
+    this.setState({ showModalEdit })
   }
 
   render() {
     const {
-      showModalEdit, showModalRemove, removingThing, edittingThing,
-    } = this.state;
+      things,
+      showModalEdit,
+      showModalRemove,
+      removingThing,
+      edittingThing,
+    } = this.state
 
     return (
       <div id="things">
         <h1>Things</h1>
         <hr />
         <Item.Group relaxed>
-          {this.state.things.map((thing) => (
+          {things.map((thing) => (
             <Item key={thing.id}>
-
               <Item.Content verticalAlign="middle">
                 <Item.Header>{thing.name}</Item.Header>
                 <Item.Description>{thing.id}</Item.Description>
@@ -86,7 +84,9 @@ class Things extends Component {
                     icon="trash alternate outline"
                     labelPosition="right"
                     content="Remove"
-                    onClick={() => this.setState({ showModalRemove: true, removingThing: thing })}
+                    onClick={() =>
+                      this.setState({ showModalRemove: true, removingThing: thing })
+                    }
                   />
                   <Button
                     color="yellow"
@@ -94,11 +94,12 @@ class Things extends Component {
                     icon="edit outline"
                     labelPosition="right"
                     content="Edit"
-                    onClick={() => this.setState({ showModalEdit: true, edittingThing: thing })}
+                    onClick={() =>
+                      this.setState({ showModalEdit: true, edittingThing: thing })
+                    }
                   />
                 </Item.Extra>
               </Item.Content>
-
             </Item>
           ))}
         </Item.Group>
@@ -113,8 +114,8 @@ class Things extends Component {
           callbackFromParent={this.editModalCallback}
         />
       </div>
-    );
+    )
   }
 }
 
-export default Things;
+export default Things

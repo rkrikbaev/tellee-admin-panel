@@ -1,25 +1,17 @@
-import React from 'react';
-import {
-  Header,
-  Segment,
-  Dropdown,
-  Image,
-} from 'semantic-ui-react';
-
+import React from 'react'
+import { Header, Segment, Dropdown, Image } from 'semantic-ui-react'
 
 const trigger = (
   <span>
-    <Image avatar src="http://zsse.zeinetsse.com/favicon.ico" />
-    {' '}
-    User Admin
+    <Image avatar src="http://zsse.zeinetsse.com/favicon.ico" /> User Admin
   </span>
-);
+)
 
 const options = [
   { key: 'user', text: 'Account', icon: 'user' },
   { key: 'settings', text: 'Settings', icon: 'settings' },
   { key: 'sign-out', text: 'Sign Out', icon: 'sign out' },
-];
+]
 
 export default function TopBar() {
   return (
@@ -39,5 +31,5 @@ export default function TopBar() {
         </Header>
       </Segment>
     </div>
-  );
+  )
 }
