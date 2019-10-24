@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import './Channels.scss'
-import { Item, Button, Icon, Loader } from 'semantic-ui-react'
+import {
+  Item, Button, Icon, Loader,
+} from 'semantic-ui-react'
 import ChannelModalCreate from './ChannelModalCreate'
 import ChannelModalRemove from './ChannelModalRemove'
 // import ChannelModalEdit from './ChannelModalEdit';
@@ -116,12 +118,10 @@ class Channels extends Component {
                       icon="trash alternate outline"
                       labelPosition="right"
                       content="Remove"
-                      onClick={() =>
-                        this.setState({
-                          showModalRemove: true,
-                          removingChannel: item,
-                        })
-                      }
+                      onClick={() => this.setState({
+                        showModalRemove: true,
+                        removingChannel: item,
+                      })}
                     />
                     {/* <Button
                       color="yellow"

@@ -1,9 +1,13 @@
 import React from 'react'
-import { Header, Segment, Dropdown, Image } from 'semantic-ui-react'
+import {
+  Header, Segment, Dropdown, Image,
+} from 'semantic-ui-react'
 
 const trigger = (
   <span>
-    <Image avatar src="http://zsse.zeinetsse.com/favicon.ico" /> User Admin
+    <Image avatar src="http://zsse.zeinetsse.com/favicon.ico" />
+    {' '}
+User Admin
   </span>
 )
 

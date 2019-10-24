@@ -84,9 +84,7 @@ class Things extends Component {
                     icon="trash alternate outline"
                     labelPosition="right"
                     content="Remove"
-                    onClick={() =>
-                      this.setState({ showModalRemove: true, removingThing: thing })
-                    }
+                    onClick={() => this.setState({ showModalRemove: true, removingThing: thing })}
                   />
                   <Button
                     color="yellow"
@@ -94,9 +92,7 @@ class Things extends Component {
                     icon="edit outline"
                     labelPosition="right"
                     content="Edit"
-                    onClick={() =>
-                      this.setState({ showModalEdit: true, edittingThing: thing })
-                    }
+                    onClick={() => this.setState({ showModalEdit: true, edittingThing: thing })}
                   />
                 </Item.Extra>
               </Item.Content>

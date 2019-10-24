@@ -19,13 +19,16 @@ module.exports = {
   plugins: ['react'],
   parser: 'babel-eslint',
   rules: {
+    'semi': [2, 'never'],
+    'no-param-reassign': [2, { props: false }],
+    'no-underscore-dangle': ['error', { allow: ['_isMounted'] }],
+    'import/no-named-as-default': 0,
     'react/jsx-filename-extension': [
       1,
       {
         extensions: ['.js', '.jsx'],
       },
     ],
-    'import/no-named-as-default': 0,
     'jsx-a11y/label-has-associated-control': [
       'error',
       {
@@ -42,6 +45,5 @@ module.exports = {
         },
       },
     ],
-    semi: [2, 'never'],
   },
 }

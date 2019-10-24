@@ -10,7 +10,7 @@ import generator from '../static/icons/generator.svg'
 const statusTypes = ['connected', 'not connected']
 const statusColorTypes = []
 
-class Main extends Component {
+export default class Home extends Component {
   _isMounted = false
 
   constructor(props) {
@@ -21,9 +21,9 @@ class Main extends Component {
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this._isMounted = true
-    this.getToken()
+    await this.getToken()
     this.getDevicesFromMainflux()
   }
 
@@ -32,7 +32,7 @@ class Main extends Component {
   }
 
   getToken = async () => {
-    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/users/login`, {
+    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/users/login`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -44,8 +44,8 @@ class Main extends Component {
     })
   }
 
-  getDevicesFromMainflux = async () => {
-    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap`, {
+  getDevicesFromMainflux = () => {
+    fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap`, {
       mode: 'cors',
       credentials: 'include',
     })
@@ -143,7 +143,8 @@ class Main extends Component {
                   <label className="home_card__label" htmlFor="cpu">
                     CPU:
                   </label>
-                  {item.ram}%
+                  {item.ram}
+%
                 </p>
                 <p className="home_card__item">
                   <label className="home_card__label" htmlFor="memory">
@@ -167,5 +168,3 @@ class Main extends Component {
     )
   }
 }
-
-export default Main

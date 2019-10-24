@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "client-install": "cd client && npm install",
-    "git ": "cd client && npm run build",
+    "client-build": "cd client && npm run build",
     "start": "LOG_LEVEL=debug node -r esm server.js > output.log | ./node_modules/.bin/pino-pretty",
     "server": "LOG_LEVEL=debug nodemon -r esm server.js > output.log | ./node_modules/.bin/pino-pretty",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -20,7 +20,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "cd client && npm run lint && npm run format"
+      "pre-commit": "cd client && npm run lint:fix && npm run format"
     }
   },
   "author": "Galymzhan Almabek",
