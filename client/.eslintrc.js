@@ -19,7 +19,7 @@ module.exports = {
   plugins: ['react'],
   parser: 'babel-eslint',
   rules: {
-    'semi': [2, 'never'],
+    semi: [2, 'never'],
     'no-param-reassign': [2, { props: false }],
     'no-underscore-dangle': ['error', { allow: ['_isMounted'] }],
     'import/no-named-as-default': 0,

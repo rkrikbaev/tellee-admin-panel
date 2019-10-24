@@ -27,13 +27,23 @@ export default class App extends Component {
             <Menu id="sidebar_menu" secondary vertical>
               <ul>
                 <li>
-                  <NavLink to="/" activeClassName="active_item" isActive={this.checkActive}>Home</NavLink>
+                  <NavLink
+                    to="/"
+                    activeClassName="active_item"
+                    isActive={this.checkActive}
+                  >
+                    Home
+                  </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/channels" activeClassName="active_item">Channels</NavLink>
+                  <NavLink to="/channels" activeClassName="active_item">
+                    Channels
+                  </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/connections" activeClassName="active_item">Connections</NavLink>
+                  <NavLink to="/connections" activeClassName="active_item">
+                    Connections
+                  </NavLink>
                 </li>
               </ul>
             </Menu>
