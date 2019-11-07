@@ -1,18 +1,21 @@
 {
   "files": {
-    "main.css": "/static/css/main.1f31a7d8.chunk.css",
-    "main.js": "/static/js/main.09f19e62.chunk.js",
-    "main.js.map": "/static/js/main.09f19e62.chunk.js.map",
-    "runtime~main.js": "/static/js/runtime~main.a8a9905a.js",
-    "runtime~main.js.map": "/static/js/runtime~main.a8a9905a.js.map",
-    "static/css/2.621b5bde.chunk.css": "/static/css/2.621b5bde.chunk.css",
-    "static/js/2.7191b347.chunk.js": "/static/js/2.7191b347.chunk.js",
-    "static/js/2.7191b347.chunk.js.map": "/static/js/2.7191b347.chunk.js.map",
-    "index.html": "/index.html",
-    "precache-manifest.cd86b17261ab586dd7197f93cd73bdb1.js": "/precache-manifest.cd86b17261ab586dd7197f93cd73bdb1.js",
-    "service-worker.js": "/service-worker.js",
-    "static/css/2.621b5bde.chunk.css.map": "/static/css/2.621b5bde.chunk.css.map",
-    "static/css/main.1f31a7d8.chunk.css.map": "/static/css/main.1f31a7d8.chunk.css.map",
-    "static/media/semantic.min.css": "/static/media/outline-icons.ef60a4f6.woff"
+    "main.css": "./static/css/main.127c687c.chunk.css",
+    "main.js": "./static/js/main.f86af04a.chunk.js",
+    "main.js.map": "./static/js/main.f86af04a.chunk.js.map",
+    "runtime~main.js": "./static/js/runtime~main.d653cc00.js",
+    "runtime~main.js.map": "./static/js/runtime~main.d653cc00.js.map",
+    "static/css/2.62cea1d2.chunk.css": "./static/css/2.62cea1d2.chunk.css",
+    "static/js/2.b0b466da.chunk.js": "./static/js/2.b0b466da.chunk.js",
+    "static/js/2.b0b466da.chunk.js.map": "./static/js/2.b0b466da.chunk.js.map",
+    "index.html": "./index.html",
+    "precache-manifest.f62f18627b30cc2a70ef204f73c160e8.js": "./precache-manifest.f62f18627b30cc2a70ef204f73c160e8.js",
+    "service-worker.js": "./service-worker.js",
+    "static/css/2.62cea1d2.chunk.css.map": "./static/css/2.62cea1d2.chunk.css.map",
+    "static/css/main.127c687c.chunk.css.map": "./static/css/main.127c687c.chunk.css.map",
+    "static/media/semantic.min.css": "./static/media/outline-icons.ef60a4f6.woff",
+    "static/media/generator.svg": "./static/media/generator.7a7e96ae.svg",
+    "static/media/pump.svg": "./static/media/pump.1df4e95b.svg",
+    "static/media/turbine.svg": "./static/media/turbine.06474a16.svg"
   }
 }

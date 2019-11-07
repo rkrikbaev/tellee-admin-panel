@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "client-install": "cd client && npm install",
-    "git ": "cd client && npm run build",
+    "client-build": "cd client && npm run build",
     "start": "LOG_LEVEL=debug node -r esm server.js > output.log | ./node_modules/.bin/pino-pretty",
     "server": "LOG_LEVEL=debug nodemon -r esm server.js > output.log | ./node_modules/.bin/pino-pretty",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -17,6 +17,11 @@
   "repository": {
     "type": "git",
     "url": "ssh://git@git.zeinetsse.com:10022/hero9/mainflux_admin.git"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "cd client && yarn run lint:fix"
+    }
   },
   "author": "Galymzhan Almabek",
   "license": "MIT",
@@ -40,6 +45,7 @@
   "devDependencies": {
     "concurrently": "^4.1.0",
     "esm": "^3.2.25",
+    "husky": "^3.0.9",
     "nodemon": "^1.19.1",
     "pino-pretty": "^3.2.0"
   }

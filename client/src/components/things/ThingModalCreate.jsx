@@ -1,21 +1,16 @@
-import React, { Component } from 'react';
-import './Things.scss';
-import {
-  Button,
-  Form,
-  Modal
-} from 'semantic-ui-react';
+import React, { Component } from 'react'
+import './Things.scss'
+import { Button, Form, Modal } from 'semantic-ui-react'
 
 class ThingModalCreate extends Component {
-
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
       showModalCreate: false,
       name: '',
       metadata: {
-        mac : '',
+        mac: '',
       },
     }
   }
@@ -24,33 +19,33 @@ class ThingModalCreate extends Component {
     fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things/create`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       mode: 'cors',
-      credentials : 'include',
-      body: JSON.stringify({name, metadata})
-    });
-    this.close();
-  };
+      credentials: 'include',
+      body: JSON.stringify({ name, metadata }),
+    })
+    this.close()
+  }
 
-  show = () => this.setState({ showModalCreate: true });
+  show = () => this.setState({ showModalCreate: true })
   close = () => {
-    this.setState({ showModalCreate: false });
-    this.props.callbackFromParent(this.state.showModalCreate);
-  };
+    this.setState({ showModalCreate: false })
+    this.props.callbackFromParent(this.state.showModalCreate)
+  }
 
   handleChangeName = (e) => {
-    this.setState({ name: e.target.value });
-  };
+    this.setState({ name: e.target.value })
+  }
 
   handleChangeMac = (e) => {
-    let obj = { mac: e.target.value };
-    this.setState({ metadata: obj });
-  };
+    let obj = { mac: e.target.value }
+    this.setState({ metadata: obj })
+  }
 
   render() {
-    const { showModalCreate } = this.props;
-    const { name, metadata } = this.state;
+    const { showModalCreate } = this.props
+    const { name, metadata } = this.state
 
     return (
       <Modal closeIcon dimmer="blurring" open={showModalCreate} onClose={this.close}>
@@ -59,29 +54,37 @@ class ThingModalCreate extends Component {
           <Form>
             <Form.Field>
               <label>Name</label>
-              <input placeholder='name' value={name} onChange={e => this.handleChangeName(e)} />
+              <input
+                placeholder="name"
+                value={name}
+                onChange={(e) => this.handleChangeName(e)}
+              />
             </Form.Field>
             <Form.Field>
               <label>Mac</label>
-              <input placeholder='mac address' value={metadata.mac} onChange={e => this.handleChangeMac(e)} />
+              <input
+                placeholder="mac address"
+                value={metadata.mac}
+                onChange={(e) => this.handleChangeMac(e)}
+              />
             </Form.Field>
           </Form>
-          </Modal.Content>
-          <Modal.Actions>
-            <Button color='black' onClick={this.close}>
-              No
-            </Button>
-            <Button
-              positive
-              icon='edit outline'
-              labelPosition='right'
-              content="Yes"
-              onClick={() => this.createThing(name, metadata)}
-            />
-          </Modal.Actions>
-        </Modal>
-    );
+        </Modal.Content>
+        <Modal.Actions>
+          <Button color="black" onClick={this.close}>
+            No
+          </Button>
+          <Button
+            positive
+            icon="edit outline"
+            labelPosition="right"
+            content="Yes"
+            onClick={() => this.createThing(name, metadata)}
+          />
+        </Modal.Actions>
+      </Modal>
+    )
   }
 }
 
-export default ThingModalCreate;
+export default ThingModalCreate

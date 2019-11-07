@@ -2,5 +2,5 @@ node_modules
 .idea
 structure.json
 output.log
-env.txt
+*.txt
 mainflux_db_volume

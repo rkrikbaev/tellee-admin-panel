@@ -6,7 +6,11 @@ const connectDb = () => {
 };
 
 mongoose.Promise = global.Promise;
-var db = mongoose.connection;
+
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+
+const db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
