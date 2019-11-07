@@ -1,6 +1,16 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import '../connections/Connections.scss'
-import { Button, Form, Modal, Dropdown } from 'semantic-ui-react'
+import {
+  Button,
+  Form,
+  Modal,
+  Dropdown,
+} from 'semantic-ui-react'
+
+const Console = {
+  log: (text) => console.log(text),
+}
 
 class AppModalEdit extends Component {
   _isMounted = false
@@ -14,6 +24,21 @@ class AppModalEdit extends Component {
       selectedChannels: [],
       showModalEditApp: false,
     }
+  }
+
+  componentDidMount() {
+    const { connection } = this.props
+    this._isMounted = true
+    this.getConfigById(connection.external_id)
+    this.getChannels()
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !(nextProps === this.props && nextState === this.state)
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   getConfigById = async (id) => {
@@ -31,7 +56,7 @@ class AppModalEdit extends Component {
 
         config.content = JSON.parse(config.content)
 
-        for (let i = 0; i < config.mainflux_channels.length; i++) {
+        for (let i = 0; i < config.mainflux_channels.length; i += 1) {
           selectedChannels.push(config.mainflux_channels[i].id)
         }
         if (this._isMounted) {
@@ -41,7 +66,7 @@ class AppModalEdit extends Component {
           })
         }
       })
-      .catch((err) => console.log(err))
+      .catch((err) => Console.log(err))
   }
 
   getChannels = async () => {
@@ -55,17 +80,15 @@ class AppModalEdit extends Component {
     })
       .then((res) => res.json())
       .then((channels) => {
-        const chan = channels.map((item, i) => {
-          return { value: item.id, text: item.name }
-        })
+        const chan = channels.map((item) => ({ value: item.id, text: item.name }))
         if (this._isMounted) this.setState({ channels: chan })
       })
-      .catch((err) => console.log(err))
+      .catch((err) => Console.log(err))
   }
 
   editApp = async () => {
     const { config } = this.state
-    const { mac, name } = this.state.config.content
+    const { mac, name } = config.content
     const obj = {
       mac,
       id: config.mainflux_id,
@@ -84,7 +107,7 @@ class AppModalEdit extends Component {
         mode: 'cors',
         credentials: 'include',
         body: JSON.stringify({ obj }),
-      }
+      },
     )
     await fetch(
       `${process.env.REACT_APP_EXPRESS_HOST}/api/channels/edit/${obj.channels[0].id}`,
@@ -96,39 +119,29 @@ class AppModalEdit extends Component {
         mode: 'cors',
         credentials: 'include',
         body: JSON.stringify({ name: obj.name, metadata: {} }),
-      }
+      },
     )
 
     this.close()
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return !(nextProps === this.props && nextState === this.state)
-  }
-
-  componentDidMount() {
-    this._isMounted = true
-    this.getConfigById(this.props.connection.external_id)
-    this.getChannels()
-  }
-
-  componentWillUnmount() {
-    this._isMounted = false
-  }
-
   close = () => {
+    const { callbackFromParent } = this.props
+    const { showModalEditApp } = this.state
     if (this._isMounted) this.setState({ showModalEditApp: false })
-    this.props.callbackFromParent(this.state.showModalEditApp)
+    callbackFromParent(showModalEditApp)
   }
 
   handleChangeName = (e) => {
-    const obj = this.state.config
+    const { config } = this.state
+    const obj = config
     obj.content.name = e.target.value
     if (this._isMounted) this.setState({ config: obj })
   }
 
   handleChangeChannel = (e, { value }) => {
-    let obj = this.state.config
+    const { config } = this.state
+    const obj = config
     obj.mainflux_channels = value
     if (this._isMounted) this.setState({ config: obj })
   }
@@ -148,7 +161,7 @@ class AppModalEdit extends Component {
         <Modal.Content>
           <Form>
             <Form.Field>
-              <label>Thing ID</label>
+              <label htmlFor="mainflux_id">Thing ID</label>
               <input
                 placeholder="mainflux_id"
                 value={config.content !== undefined ? config.mainflux_id : ''}
@@ -157,7 +170,7 @@ class AppModalEdit extends Component {
             </Form.Field>
 
             <Form.Field>
-              <label>Thing Key</label>
+              <label htmlFor="mainflux_key">Thing Key</label>
               <input
                 placeholder="mainflux_key"
                 value={config.content !== undefined ? config.mainflux_key : ''}
@@ -166,7 +179,7 @@ class AppModalEdit extends Component {
             </Form.Field>
 
             <Form.Field>
-              <label>Name</label>
+              <label htmlFor="name">Name</label>
               <input
                 placeholder="name"
                 value={config.content !== undefined ? config.content.name : ''}
@@ -175,7 +188,7 @@ class AppModalEdit extends Component {
             </Form.Field>
 
             <Form.Field>
-              <label>Channels</label>
+              <label htmlFor="channels">Channels</label>
               <Dropdown
                 placeholder="channels"
                 multiple
@@ -206,3 +219,9 @@ class AppModalEdit extends Component {
 }
 
 export default AppModalEdit
+
+AppModalEdit.propTypes = {
+  connection: PropTypes.instanceOf(Object).isRequired,
+  callbackFromParent: PropTypes.func.isRequired,
+  showModalEditApp: PropTypes.bool.isRequired,
+}

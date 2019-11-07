@@ -1,12 +1,23 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import '../connections/Connections.scss'
-import { Button, Modal, Form, Dropdown, Checkbox } from 'semantic-ui-react'
+import {
+  Button,
+  Modal,
+  Form,
+  Dropdown,
+  Checkbox,
+} from 'semantic-ui-react'
 
 const alertMessagesText = {
   title: 'Turbine',
   subtitle: 'LM2500',
   assettext: 'MTU',
   assetvalue: 'operation',
+}
+
+const Console = {
+  log: (text) => console.log(text),
 }
 
 class DeviceModalEdit extends Component {
@@ -43,6 +54,29 @@ class DeviceModalEdit extends Component {
     }
   }
 
+  componentDidMount() {
+    this._isMounted = true
+    const { connection } = this.props
+    const { externalId, name, content } = connection
+    this.getConfigById(externalId)
+    this.getThings().then(() => {
+      if (this._isMounted) this.forceUpdate()
+    })
+    this.getDeviceTypes()
+    this.getConnections()
+    if (content.sendToDB) {
+      this.getDeviceInfoFromDB(name.split('/')[1])
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !(nextProps === this.props && nextState === this.state)
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
+  }
+
   getConfigById = async (id) => {
     fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${id}`, {
       method: 'GET',
@@ -55,10 +89,10 @@ class DeviceModalEdit extends Component {
       .then((res) => res.json())
       .then((config) => {
         config.content = JSON.parse(config.content)
-        let selectedApp = config.content.app
-        let selectedDeviceType = config.content.device_type
-        let handleSendToApp = config.content.sendToApp
-        let handleSendToDB = config.content.sendToDB
+        const selectedApp = config.content.app
+        const selectedDeviceType = config.content.device_type
+        const handleSendToApp = config.content.sendToApp
+        const handleSendToDB = config.content.sendToDB
         if (this._isMounted) {
           this.setState({
             selectedApp,
@@ -69,23 +103,24 @@ class DeviceModalEdit extends Component {
           })
         }
       })
-      .catch((err) => console.log(err))
+      .catch((err) => Console.log(err))
   }
 
-  getThings = async () => {
-    await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
-      mode: 'cors',
-      credentials: 'include',
-    })
-      .then((res) => res.json())
-      .then((oldThings) => {
-        const currentThing = oldThings.filter((item) => {
-          return item.id === this.props.connection.mainflux_id
-        })
-        if (this._isMounted) this.setState({ currentThing: currentThing[0] })
-      })
-      .catch((err) => console.log(err))
-  }
+  // getThings = async () => {
+  //   const { connection } = this.props
+  //   await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
+  //     mode: 'cors',
+  //     credentials: 'include',
+  //   })
+  //     .then((res) => res.json())
+  //     .then((oldThings) => {
+  //       const currentThing = oldThings.filter((item) => item.id === connection.mainflux_id)
+  //       if (this._isMounted) {
+  //         this.setState({ currentThing: currentThing[0] })
+  //       }
+  //     })
+  //     .catch((err) => Console.log(err))
+  // }
 
   getConnections = async () => {
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap`, {
@@ -98,73 +133,59 @@ class DeviceModalEdit extends Component {
           item.content = JSON.parse(item.content)
           return item.content.type === 'app'
         })
-        const apps = connections.map((item) => {
-          return { value: item.external_id, text: item.name.split('.')[0] }
-        })
+        const apps = connections.map((item) => ({ value: item.external_id, text: item.name.split('.')[0] }))
         if (this._isMounted) this.setState({ apps, oldConnections })
       })
-      .catch((err) => console.log(err))
+      .catch((err) => Console.log(err))
   }
 
   getDeviceTypes = async () => {
     fetch('http://134.209.240.215:8300/devices')
       .then((res) => res.json())
       .then((types) => {
-        const formattedTypes = types.map((type, i) => {
-          return { text: type, value: type }
-        })
+        const formattedTypes = types.map((type) => ({ text: type, value: type }))
         if (this._isMounted) this.setState({ deviceTypes: formattedTypes })
       })
-      .catch((err) => console.log(err))
+      .catch((err) => Console.log(err))
   }
 
   getChannel = async (appMac) => {
     const { oldConnections } = this.state
-    let app = oldConnections.filter((item) => {
-      return item.external_id === appMac
-    })
-    let arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
+    const app = oldConnections.filter((item) => item.external_id === appMac)
+    const arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
       mode: 'cors',
       credentials: 'include',
     })
       .then((res) => res.json())
-      .then((oldChannels) => {
-        return oldChannels
-      })
-      .catch((err) => console.log(err))
+      .then((oldChannels) => oldChannels)
+      .catch((err) => Console.log(err))
 
-    var channel = arr.filter((item) => {
-      return item.name === app[0].name
-    })
+    const channel = arr.filter((item) => item.name === app[0].name)
     return channel[0]
   }
 
   getGlobalChannel = async (channelName) => {
-    let arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
+    const arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
       mode: 'cors',
       credentials: 'include',
     })
       .then((res) => res.json())
-      .then((oldChannels) => {
-        return oldChannels
-      })
-      .catch((err) => console.log(err))
-    const globalChannel = arr.filter((item) => {
-      return item.name === `zsse/${channelName}`
-    })
+      .then((oldChannels) => oldChannels)
+      .catch((err) => Console.log(err))
+    const globalChannel = arr.filter((item) => item.name === `zsse/${channelName}`)
     return globalChannel[0]
   }
 
-  getDeviceInfoFromDB = async (device_id) => {
+  getDeviceInfoFromDB = async (deviceId) => {
     const device = await fetch(
-      `${process.env.REACT_APP_EXPRESS_HOST}/api/device/${device_id}`,
+      `${process.env.REACT_APP_EXPRESS_HOST}/api/device/${deviceId}`,
       {
         mode: 'cors',
         credentials: 'include',
-      }
+      },
     )
       .then((res) => res.json())
-      .catch((e) => console.log(e))
+      .catch((e) => Console.log(e))
     const {
       id,
       title,
@@ -196,44 +217,30 @@ class DeviceModalEdit extends Component {
     }))
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return !(nextProps === this.props && nextState === this.state)
-  }
-
-  componentDidMount() {
-    this._isMounted = true
-    const { external_id, name, content } = this.props.connection
-    this.getConfigById(external_id)
-    this.getThings().then(() => {
-      if (this._isMounted) this.forceUpdate()
-    })
-    this.getDeviceTypes()
-    this.getConnections()
-    if (content.sendToDB) {
-      this.getDeviceInfoFromDB(name.split('/')[1])
-    }
-  }
-
-  componentWillUnmount() {
-    this._isMounted = false
-  }
-
   close = () => {
+    const { callbackFromParent } = this.props
+    const { showModalEditDevice } = this.state
     if (this._isMounted) this.setState({ showModalEditDevice: false })
-    this.props.callbackFromParent(this.state.showModalEditDevice)
+    callbackFromParent(showModalEditDevice)
   }
 
   editDevice = async () => {
-    const { config, oldConnections, handleSendToApp, handleSendToDB } = this.state
+    const {
+      config,
+      oldConnections,
+      handleSendToApp,
+      handleSendToDB,
+      editDevice,
+    } = this.state
     const {
       name,
       cycle,
-      device_type,
+      deviceType,
       app,
       sendToApp,
       sendToDB,
       mac,
-    } = this.state.config.content
+    } = config.content
     let obj = {}
 
     await fetch(
@@ -245,7 +252,7 @@ class DeviceModalEdit extends Component {
         },
         mode: 'cors',
         credentials: 'include',
-      }
+      },
     )
       .then((response) => response.json())
       .then(async (thing) => {
@@ -259,7 +266,7 @@ class DeviceModalEdit extends Component {
             mode: 'cors',
             credentials: 'include',
             body: JSON.stringify({ name, metadata: thing.metadata }),
-          }
+          },
         )
       })
 
@@ -275,7 +282,7 @@ class DeviceModalEdit extends Component {
         sendToDB: handleSendToDB,
         name,
         cycle,
-        device_type,
+        deviceType,
         app,
       }
     } else {
@@ -288,7 +295,7 @@ class DeviceModalEdit extends Component {
         sendToApp: handleSendToApp,
         sendToDB: handleSendToDB,
         name,
-        device_type,
+        deviceType,
         cycle,
       }
     }
@@ -304,7 +311,7 @@ class DeviceModalEdit extends Component {
         mode: 'cors',
         credentials: 'include',
         body: JSON.stringify({ obj }),
-      }
+      },
     )
     await fetch(
       `${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/channels/${config.mainflux_id}`,
@@ -316,20 +323,20 @@ class DeviceModalEdit extends Component {
         mode: 'cors',
         credentials: 'include',
         body: JSON.stringify({ obj }),
-      }
+      },
     )
 
     if (sendToDB === true && handleSendToDB === false) {
       await fetch(
         `${process.env.REACT_APP_EXPRESS_HOST}/api/device/remove/${
-          this.state.editDevice.id.split('/')[1]
+          editDevice.id.split('/')[1]
         }`,
         {
           method: 'DELETE',
           mode: 'cors',
           credentials: 'include',
-        }
-      ).catch((err) => console.log(err))
+        },
+      ).catch((err) => Console.log(err))
     } else if (sendToDB === false && handleSendToDB === true) {
       const {
         title,
@@ -342,9 +349,9 @@ class DeviceModalEdit extends Component {
         messagetext,
         longitude,
         latitude,
-      } = this.state.editDevice
-      let newDevice = {
-        id: this.state.config.content.name.split('/')[1],
+      } = editDevice
+      const newDevice = {
+        id: config.content.name.split('/')[1],
         title,
         subtitle,
         severity,
@@ -379,9 +386,9 @@ class DeviceModalEdit extends Component {
         messagetext,
         longitude,
         latitude,
-      } = this.state.editDevice
-      let editDevice = {
-        id: this.state.config.content.name.split('/')[1],
+      } = editDevice
+      const editedDevice = {
+        id: config.content.name.split('/')[1],
         title,
         subtitle,
         severity,
@@ -401,7 +408,7 @@ class DeviceModalEdit extends Component {
         },
         mode: 'cors',
         credentials: 'include',
-        body: JSON.stringify(editDevice),
+        body: JSON.stringify(editedDevice),
       })
     }
 
@@ -416,9 +423,7 @@ class DeviceModalEdit extends Component {
           response.content = JSON.parse(response.content)
           const { content } = response
 
-          content.devices = content.devices.filter((item) => {
-            return item.device_id !== config.mainflux_id
-          })
+          content.devices = content.devices.filter((item) => item.device_id !== config.mainflux_id)
 
           fetch(
             `${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`,
@@ -430,7 +435,7 @@ class DeviceModalEdit extends Component {
               mode: 'cors',
               credentials: 'include',
               body: JSON.stringify({ response }),
-            }
+            },
           )
         })
       await fetch(
@@ -442,13 +447,13 @@ class DeviceModalEdit extends Component {
           },
           mode: 'cors',
           credentials: 'include',
-        }
+        },
       )
       this.close()
       return
     }
     // -- IF DEVICE DOESN'T CONNECTED TO APP BUT IT SHOULD BE CONNECTED -- //
-    else if (sendToApp === false && handleSendToApp === true) {
+    if (sendToApp === false && handleSendToApp === true) {
       await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`, {
         mode: 'cors',
         credentials: 'include',
@@ -456,7 +461,7 @@ class DeviceModalEdit extends Component {
         .then((response) => response.json())
         .then((response) => {
           response.content = JSON.parse(response.content)
-          let { content } = response
+          const { content } = response
           content.devices.push({
             device_name: `zsse/${obj.name}`,
             device_id: config.mainflux_id,
@@ -473,7 +478,7 @@ class DeviceModalEdit extends Component {
               mode: 'cors',
               credentials: 'include',
               body: JSON.stringify({ response }),
-            }
+            },
           )
         })
       await fetch(
@@ -485,16 +490,14 @@ class DeviceModalEdit extends Component {
           },
           mode: 'cors',
           credentials: 'include',
-        }
+        },
       )
       await this.getConnections()
     }
 
     if (sendToApp) {
       // -- Get current Device config
-      const currentDevice = oldConnections.filter((item) => {
-        return item.mainflux_id === config.mainflux_id
-      })
+      const currentDevice = oldConnections.filter((item) => item.mainflux_id === config.mainflux_id)
 
       if (currentDevice[0].content.app !== obj.app) {
         await fetch(
@@ -502,15 +505,14 @@ class DeviceModalEdit extends Component {
           {
             mode: 'cors',
             credentials: 'include',
-          }
+          },
         )
           .then((response) => response.json())
           .then((response) => {
             response.content = JSON.parse(response.content)
             const { content } = response
-            content.devices = content.devices.filter((item) => {
-              return item.device_id !== currentDevice[0].mainflux_id
-            })
+            content.devices = content.devices
+              .filter((item) => item.device_id !== currentDevice[0].mainflux_id)
 
             fetch(
               `${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`,
@@ -522,7 +524,7 @@ class DeviceModalEdit extends Component {
                 mode: 'cors',
                 credentials: 'include',
                 body: JSON.stringify({ response }),
-              }
+              },
             )
             fetch(
               `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${channel.id}/things/${config.mainflux_id}`,
@@ -533,7 +535,7 @@ class DeviceModalEdit extends Component {
                 },
                 mode: 'cors',
                 credentials: 'include',
-              }
+              },
             )
           })
       }
@@ -546,15 +548,13 @@ class DeviceModalEdit extends Component {
         .then((response) => {
           response.content = JSON.parse(response.content)
           const { content } = response
-          const editThing = content.devices.filter((item) => {
-            return item.device_id === config.mainflux_id
-          })
+          const editThing = content.devices.filter((item) => item.device_id === config.mainflux_id)
           if (editThing.length === 0) {
             content.devices.push({
               device_name: name,
               device_id: config.mainflux_id,
               device_key: config.mainflux_key,
-              device_type,
+              deviceType,
             })
           } else {
             const editThingIndex = content.devices.indexOf(editThing[0])
@@ -562,7 +562,7 @@ class DeviceModalEdit extends Component {
               device_name: name,
               device_id: config.mainflux_id,
               device_key: config.mainflux_key,
-              device_type,
+              deviceType,
             }
           }
 
@@ -576,7 +576,7 @@ class DeviceModalEdit extends Component {
               mode: 'cors',
               credentials: 'include',
               body: JSON.stringify({ response }),
-            }
+            },
           )
           fetch(
             `${process.env.REACT_APP_EXPRESS_HOST}/api/connection/create/channels/${channel.id}/things/${config.mainflux_id}`,
@@ -587,7 +587,7 @@ class DeviceModalEdit extends Component {
               },
               mode: 'cors',
               credentials: 'include',
-            }
+            },
           )
         })
     }
@@ -596,25 +596,22 @@ class DeviceModalEdit extends Component {
   }
 
   handleChangeConnectionName = (e) => {
+    const { oldConnections } = this.state
     const currentValue = e.target.value
-    let arr = this.state.oldConnections.filter((item) => {
-      return item.name === `zsse/${currentValue}`
-    })
-    if (arr.length !== 0) {
-      if (this._isMounted) this.setState({ isConnectionNameDisabled: true })
-    } else {
-      if (this._isMounted) {
-        this.setState((prevState) => ({
-          config: {
-            ...prevState.config,
-            content: {
-              ...prevState.config.content,
-              name: currentValue,
-            },
+    const arr = oldConnections.filter((item) => item.name === `zsse/${currentValue}`)
+    if (arr.length !== 0 && this._isMounted) {
+      this.setState({ isConnectionNameDisabled: true })
+    } else if (arr.length === 0 && this._isMounted) {
+      this.setState((prevState) => ({
+        config: {
+          ...prevState.config,
+          content: {
+            ...prevState.config.content,
+            name: currentValue,
           },
-          isConnectionNameDisabled: false,
-        }))
-      }
+        },
+        isConnectionNameDisabled: false,
+      }))
     }
   }
 
@@ -630,8 +627,8 @@ class DeviceModalEdit extends Component {
           },
         },
         isEnabled:
-          prevState.config.content.cycle.length <= 4 &&
-          /^\d+$/.test(prevState.config.content.cycle),
+          prevState.config.content.cycle.length <= 4
+          && /^\d+$/.test(prevState.config.content.cycle),
       }))
     }
   }
@@ -678,10 +675,11 @@ class DeviceModalEdit extends Component {
   }
 
   handleChangeEditDevice = (e) => {
+    const { editDevice } = this.state
     if (this._isMounted) {
-      var editDevice = { ...this.state.editDevice }
-      editDevice[Object.keys(e)[0]] = e[Object.keys(e)[0]]
-      this.setState({ editDevice })
+      const editingDevice = { ...editDevice }
+      editingDevice[Object.keys(e)[0]] = e[Object.keys(e)[0]]
+      this.setState({ editDevice: editingDevice })
     }
   }
 
@@ -723,7 +721,7 @@ class DeviceModalEdit extends Component {
         <Modal.Content>
           <Form>
             <Form.Field>
-              <label>Thing ID</label>
+              <label htmlFor="mainflux_id">Thing ID</label>
               <input
                 placeholder="mainflux_id"
                 value={config.content !== undefined ? config.mainflux_id : ''}
@@ -732,7 +730,7 @@ class DeviceModalEdit extends Component {
             </Form.Field>
 
             <Form.Field>
-              <label>Thing Key</label>
+              <label htmlFor="mainflux_key">Thing Key</label>
               <input
                 placeholder="mainflux_key"
                 value={config.content !== undefined ? config.mainflux_key : ''}
@@ -740,7 +738,7 @@ class DeviceModalEdit extends Component {
               />
             </Form.Field>
             <Form.Field>
-              <label> Name </label>
+              <label htmlFor="name"> Name </label>
               <input
                 placeholder="name"
                 onChange={(e) => this.handleChangeConnectionName(e)}
@@ -749,7 +747,7 @@ class DeviceModalEdit extends Component {
               />
             </Form.Field>
             <Form.Field>
-              <label> Cycle </label>
+              <label htmlFor="cycle"> Cycle </label>
               <input
                 placeholder="cycle"
                 value={config.content !== undefined ? config.content.cycle : ''}
@@ -758,7 +756,7 @@ class DeviceModalEdit extends Component {
               />
             </Form.Field>
             <Form.Field>
-              <label> Device Type </label>
+              <label htmlFor="device_type"> Device Type </label>
               <Dropdown
                 placeholder="device type"
                 fluid
@@ -789,7 +787,7 @@ class DeviceModalEdit extends Component {
               />
             </Form.Field>
             <Form.Field className={handleSendToApp ? '' : 'hide'}>
-              <label>Apps</label>
+              <label htmlFor="apps">Apps</label>
               <Dropdown
                 placeholder="apps"
                 fluid
@@ -800,67 +798,55 @@ class DeviceModalEdit extends Component {
               />
             </Form.Field>
             <Form.Field className={handleSendToDB ? '' : 'hide'}>
-              <label>Title</label>
+              <label htmlFor="title">Title</label>
               <input
                 placeholder="Device title"
-                onChange={(e) =>
-                  this.handleChangeEditDevice({ title: e.target.value })
-                }
+                onChange={(e) => this.handleChangeEditDevice({ title: e.target.value })}
                 value={title !== undefined ? title : ''}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field className={handleSendToDB ? '' : 'hide'}>
-              <label>Subtitle</label>
+              <label htmlFor="subtitle">Subtitle</label>
               <input
                 placeholder="Device subtitle"
-                onChange={(e) =>
-                  this.handleChangeEditDevice({ subtitle: e.target.value })
-                }
+                onChange={(e) => this.handleChangeEditDevice({ subtitle: e.target.value })}
                 value={subtitle !== undefined ? subtitle : ''}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field className={handleSendToDB ? '' : 'hide'}>
-              <label>Latitude</label>
+              <label htmlFor="latitude">Latitude</label>
               <input
                 placeholder="Device latitude"
-                onChange={(e) =>
-                  this.handleChangeEditDevice({ latitude: e.target.value })
-                }
+                onChange={(e) => this.handleChangeEditDevice({ latitude: e.target.value })}
                 value={latitude !== undefined ? latitude : ''}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field className={handleSendToDB ? '' : 'hide'}>
-              <label>Longitude</label>
+              <label htmlFor="longitude">Longitude</label>
               <input
                 placeholder="Device longitude"
-                onChange={(e) =>
-                  this.handleChangeEditDevice({ longitude: e.target.value })
-                }
+                onChange={(e) => this.handleChangeEditDevice({ longitude: e.target.value })}
                 value={longitude !== undefined ? longitude : ''}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field className={handleSendToDB ? '' : 'hide'}>
-              <label>Asset text</label>
+              <label htmlFor="asset_text">Asset text</label>
               <input
                 placeholder="Asset text"
-                onChange={(e) =>
-                  this.handleChangeEditDevice({ assettext: e.target.value })
-                }
+                onChange={(e) => this.handleChangeEditDevice({ assettext: e.target.value })}
                 value={assettext !== undefined ? assettext : ''}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field className={handleSendToDB ? '' : 'hide'}>
-              <label>Asset value</label>
+              <label htmlFor="asset_value">Asset value</label>
               <input
                 placeholder="Asset value"
-                onChange={(e) =>
-                  this.handleChangeEditDevice({ assetvalue: e.target.value })
-                }
+                onChange={(e) => this.handleChangeEditDevice({ assetvalue: e.target.value })}
                 value={assetvalue !== undefined ? assetvalue : ''}
                 // className={isThingMacDisabled ? 'show_error' : ''}
               />
@@ -922,3 +908,9 @@ class DeviceModalEdit extends Component {
 }
 
 export default DeviceModalEdit
+
+DeviceModalEdit.propTypes = {
+  connection: PropTypes.instanceOf(Object).isRequired,
+  callbackFromParent: PropTypes.func.isRequired,
+  showModalEditDevice: PropTypes.bool.isRequired,
+}

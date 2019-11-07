@@ -1,12 +1,22 @@
 import React, { Component } from 'react'
 import './Connections.scss'
-import { Item, Button, Icon, Popup, Loader } from 'semantic-ui-react'
+import {
+  Item,
+  Button,
+  Icon,
+  Popup,
+  Loader,
+} from 'semantic-ui-react'
 import AppModalCreate from '../applications/AppModalCreate'
 import AppModalEdit from '../applications/AppModalEdit'
 import DeviceModalCreate from '../devices/DeviceModalCreate'
 import DeviceModalEdit from '../devices/DeviceModalEdit'
 import ConnectionModalRemove from './ConnectionModalRemove'
 import ErrorModal from '../errorModal'
+
+const Console = {
+  log: (text) => console.log(text),
+}
 
 class Connections extends Component {
   _isMounted = false
@@ -27,6 +37,23 @@ class Connections extends Component {
       errorText: '',
       loader: true,
     }
+  }
+
+  componentDidMount() {
+    this._isMounted = true
+    this.getToken()
+    this.getConnections()
+  }
+
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (nextProps !== this.props) {
+      this.getConnections()
+    }
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   getToken = async () => {
@@ -57,51 +84,39 @@ class Connections extends Component {
           item.content = JSON.parse(item.content)
           return item
         })
-        if (this._isMounted)
+        if (this._isMounted) {
           this.setState({ connections: parsedConnections, loader: false })
+        }
       })
-      .catch((err) => console.log(err))
-  }
-
-  componentDidMount() {
-    this._isMounted = true
-    this.getToken()
-    this.getConnections()
-  }
-
-  componentWillUnmount() {
-    this._isMounted = false
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps !== this.props) {
-      this.getConnections()
-    }
+      .catch((err) => Console.log(err))
   }
 
   createAppModalCallback = (showModalCreateApp, oldConnections) => {
-    if (this._isMounted)
+    if (this._isMounted) {
       this.setState({ showModalCreateApp, connections: oldConnections })
+    }
     this.getConnections()
   }
 
   createDeviceModalCallback = (showModalCreateDevice, oldConnections) => {
-    if (this._isMounted)
+    if (this._isMounted) {
       this.setState({ showModalCreateDevice, connections: oldConnections })
+    }
     this.getConnections()
   }
 
   removeModalCallback = (showModalRemove, id) => {
+    const { connections } = this.state
     if (this._isMounted) this.setState({ showModalRemove })
     if (id) {
       // FIXME:
-      const connections = this.state.connections
-      let connection = connections.filter((i) => i.mainflux_id === id)
+      const bunchOfConnections = connections
+      const connection = bunchOfConnections.filter((i) => i.mainflux_id === id)
       const { type, app } = connection[0].content
       if (type === 'device' && app !== undefined) {
-        let connectedApp = connections.filter((i) => i.external_id === app)
+        const connectedApp = connections.filter((i) => i.external_id === app)
         const edittedApp = connectedApp[0].content.devices.filter(
-          (i) => i.device_id !== id
+          (i) => i.device_id !== id,
         )
         connections[
           connections.indexOf(connectedApp[0])
@@ -110,7 +125,7 @@ class Connections extends Component {
       }
       if (this._isMounted) {
         this.setState({
-          connections: this.state.connections.filter((i) => i.mainflux_id !== id),
+          connections: connections.filter((i) => i.mainflux_id !== id),
         })
       }
     }
@@ -185,12 +200,20 @@ class Connections extends Component {
               <Item key={item.mainflux_id}>
                 <Item.Content verticalAlign="middle">
                   <Popup
-                    content={
+                    content={(
                       <div>
-                        <p>id: {item.mainflux_id}</p>
-                        <p>key: {item.mainflux_key}</p>
+                        <p>
+                          id:
+                          {' '}
+                          {item.mainflux_id}
+                        </p>
+                        <p>
+                          key:
+                          {' '}
+                          {item.mainflux_key}
+                        </p>
                       </div>
-                    }
+                    )}
                     trigger={<Item.Header>{item.name}</Item.Header>}
                   />
                   <Item.Description>{item.content.type}</Item.Description>
@@ -202,12 +225,10 @@ class Connections extends Component {
                       icon="trash alternate outline"
                       labelPosition="right"
                       content="Remove"
-                      onClick={() =>
-                        this.setState({
-                          showModalRemove: true,
-                          removingConnection: item,
-                        })
-                      }
+                      onClick={() => this.setState({
+                        showModalRemove: true,
+                        removingConnection: item,
+                      })}
                     />
                     <Button
                       color="yellow"
@@ -215,17 +236,15 @@ class Connections extends Component {
                       icon="edit outline"
                       labelPosition="right"
                       content="Edit"
-                      onClick={() =>
-                        item.content.type === 'app'
-                          ? this.setState({
-                              showModalEditApp: true,
-                              edittingApp: item,
-                            })
-                          : this.setState({
-                              showModalEditDevice: true,
-                              edittingDevice: item,
-                            })
-                      }
+                      onClick={() => (item.content.type === 'app'
+                        ? this.setState({
+                          showModalEditApp: true,
+                          edittingApp: item,
+                        })
+                        : this.setState({
+                          showModalEditDevice: true,
+                          edittingDevice: item,
+                        }))}
                     />
                   </Item.Extra>
                 </Item.Content>
@@ -234,21 +253,21 @@ class Connections extends Component {
           )}
         </Item.Group>
 
-        {this.state.showModalCreateApp ? (
+        {showModalCreateApp ? (
           <AppModalCreate
             showModalCreateApp={showModalCreateApp}
             callbackFromParent={this.createAppModalCallback}
           />
         ) : null}
 
-        {this.state.showModalCreateDevice ? (
+        {showModalCreateDevice ? (
           <DeviceModalCreate
             showModalCreateDevice={showModalCreateDevice}
             callbackFromParent={this.createDeviceModalCallback}
           />
         ) : null}
 
-        {this.state.showModalRemove ? (
+        {showModalRemove ? (
           <ConnectionModalRemove
             showModalRemove={showModalRemove}
             connection={removingConnection}
@@ -256,7 +275,7 @@ class Connections extends Component {
           />
         ) : null}
 
-        {this.state.showModalError ? (
+        {showModalError ? (
           <ErrorModal
             showModalError={showModalError}
             errorText={errorText}
@@ -264,7 +283,7 @@ class Connections extends Component {
           />
         ) : null}
 
-        {this.state.showModalEditApp ? (
+        {showModalEditApp ? (
           <AppModalEdit
             showModalEditApp={showModalEditApp}
             connection={edittingApp}
@@ -272,7 +291,7 @@ class Connections extends Component {
           />
         ) : null}
 
-        {this.state.showModalEditDevice ? (
+        {showModalEditDevice ? (
           <DeviceModalEdit
             showModalEditDevice={showModalEditDevice}
             connection={edittingDevice}

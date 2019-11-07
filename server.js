@@ -13,8 +13,9 @@ import ThingRouter from './api/thing/thingRouter';
 import ChannelRouter from './api/channel/channelRouter';
 import BootstrapRouter from './api/bootstrap/bootstrapRouter';
 import OtherRouter from './api/other/otherRouter';
-import ConnectionRouter from './api/connection/connectionRouter';
 import DeviceRouter from './api/device/deviceRouter';
+import ConnectionRouter from './api/connection/connectionRouter';
+import MainfluxRouter from './api/data/MainfluxRouter';
 
 const app = express();
 const originsWhitelist = [
@@ -23,6 +24,7 @@ const originsWhitelist = [
   'http://mainflux.zeinetsse.com',
   'http://key.zeinetsse.com',
   'http://flash.zeinetsse.com',
+  'http://admin.zeinetsse.com',
   process.env.UI_URL
 ];
 
@@ -59,6 +61,7 @@ app.use( (req, res, next) => {
     'http://mainflux.zeinetsse.com',
     'http://key.zeinetsse.com',
     'http://flash.zeinetsse.com',
+    'http://admin.zeinetsse.com',
 ];
   if (allowedOrigins.includes(req.headers.origin)) {
     res.header("Access-Control-Allow-Origin", req.headers.origin);
@@ -80,6 +83,7 @@ app.use('/api/device', DeviceRouter);
 app.use('/api/channels', ChannelRouter);
 app.use('/api/bootstrap', BootstrapRouter);
 app.use('/api/connection', ConnectionRouter);
+app.use('/api/data', MainfluxRouter);
 
 connectDb().then( async () => {
   app.listen(process.env.PORT, () =>

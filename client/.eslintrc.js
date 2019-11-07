@@ -19,9 +19,19 @@ module.exports = {
   plugins: ['react'],
   parser: 'babel-eslint',
   rules: {
-    semi: [2, 'never'],
+    'singleQuote': true,
+    "trailingComma": 'es5',
+    'bracketSpacing': false,
+    'semi': [2, 'never'],
     'no-param-reassign': [2, { props: false }],
     'no-underscore-dangle': ['error', { allow: ['_isMounted'] }],
+    "no-use-before-define": [
+      "error", {
+        "functions": false,
+        "classes": true,
+        "variables": true
+      }
+    ],
     'import/no-named-as-default': 0,
     'react/jsx-filename-extension': [
       1,

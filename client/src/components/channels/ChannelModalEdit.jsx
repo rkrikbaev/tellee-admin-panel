@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import './Channels.scss'
 import { Button, Form, Modal } from 'semantic-ui-react'
 
@@ -8,11 +9,10 @@ class ChannelModalEdit extends Component {
 
     this.state = {
       showModalEdit: false,
-      name: props.channel.name,
     }
   }
 
-  editChannel = async (channel, event) => {
+  editChannel = async (channel) => {
     fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/edit/${channel.id}`, {
       method: 'PUT',
       headers: {
@@ -26,15 +26,19 @@ class ChannelModalEdit extends Component {
   }
 
   show = () => this.setState({ showModalEdit: true })
+
   close = () => {
+    const { callbackFromParent } = this.props
+    const { showModalEdit } = this.state
     this.setState({ showModalEdit: false })
-    this.props.callbackFromParent(this.state.showModalEdit)
+    callbackFromParent(showModalEdit)
   }
 
   handleChangeName = (e) => {
-    let obj = this.props.channel
+    const { channel, callbackFromParent } = this.props
+    const obj = channel
     obj.name = e.target.value
-    this.props.callbackFromParent(true, obj)
+    callbackFromParent(true, obj)
   }
 
   render() {
@@ -46,7 +50,7 @@ class ChannelModalEdit extends Component {
         <Modal.Content>
           <Form>
             <Form.Field>
-              <label>Name</label>
+              <label htmlFor="name">Name</label>
               <input
                 placeholder="name"
                 value={channel.name}
@@ -73,3 +77,9 @@ class ChannelModalEdit extends Component {
 }
 
 export default ChannelModalEdit
+
+ChannelModalEdit.propTypes = {
+  channel: PropTypes.instanceOf(Object).isRequired,
+  callbackFromParent: PropTypes.func.isRequired,
+  showModalEdit: PropTypes.bool.isRequired,
+}

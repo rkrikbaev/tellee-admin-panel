@@ -9,6 +9,7 @@ import Home from './components/Home'
 import TopBar from './components/TopBar'
 import Connections from './components/connections/Connections'
 import Channels from './components/channels/Channels'
+import Graphs from './components/graphs/Graphs'
 import Notfound from './components/NotFound'
 
 export default class App extends Component {
@@ -45,12 +46,18 @@ export default class App extends Component {
                     Connections
                   </NavLink>
                 </li>
+                <li>
+                  <NavLink to="/graphs" activeClassName="active_item">
+                    Graphs
+                  </NavLink>
+                </li>
               </ul>
             </Menu>
             <Switch>
               <Route exact path="/" component={Home} />
               <Route path="/channels" component={Channels} />
               <Route path="/connections" component={Connections} />
+              <Route path="/graphs" component={Graphs} />
               <Route component={Notfound} />
             </Switch>
           </div>

@@ -1,6 +1,12 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import './Channels.scss'
-import { Button, Header, Modal, Icon } from 'semantic-ui-react'
+import {
+  Button,
+  Header,
+  Modal,
+  Icon,
+} from 'semantic-ui-react'
 
 class ChannelModalRemove extends Component {
   constructor(props) {
@@ -11,7 +17,9 @@ class ChannelModalRemove extends Component {
     }
   }
 
-  removeChannel = async (id, event) => {
+  removeChannel = async (id) => {
+    const { callbackFromParent } = this.props
+    const { showModalRemove } = this.state
     fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/remove/${id}`, {
       method: 'DELETE',
       headers: {
@@ -21,12 +29,14 @@ class ChannelModalRemove extends Component {
       credentials: 'include',
     })
     this.setState({ showModalRemove: false })
-    this.props.callbackFromParent(this.state.showModalRemove, id)
+    callbackFromParent(showModalRemove, id)
   }
 
   close = () => {
+    const { callbackFromParent } = this.props
+    const { showModalRemove } = this.state
     this.setState({ showModalRemove: false })
-    this.props.callbackFromParent(this.state.showModalRemove)
+    callbackFromParent(showModalRemove)
   }
 
   render() {
@@ -36,11 +46,17 @@ class ChannelModalRemove extends Component {
       <Modal basic size="small" open={showModalRemove}>
         <Header icon="archive" content="REMOVE CHANNEL?" />
         <Modal.Content>
-          <p>Do you want to remove channel: {channel.name}</p>
+          <p>
+            Do you want to remove channel:
+            {' '}
+            {channel.name}
+          </p>
         </Modal.Content>
         <Modal.Actions>
           <Button basic color="green" inverted onClick={this.close}>
-            <Icon name="remove" /> No
+            <Icon name="remove" />
+            {' '}
+            No
           </Button>
           <Button
             color="red"
@@ -49,7 +65,9 @@ class ChannelModalRemove extends Component {
               this.removeChannel(channel.id, event)
             }}
           >
-            <Icon name="checkmark" /> Yes
+            <Icon name="checkmark" />
+            {' '}
+            Yes
           </Button>
         </Modal.Actions>
       </Modal>
@@ -58,3 +76,9 @@ class ChannelModalRemove extends Component {
 }
 
 export default ChannelModalRemove
+
+ChannelModalRemove.propTypes = {
+  channel: PropTypes.instanceOf(Object).isRequired,
+  callbackFromParent: PropTypes.func.isRequired,
+  showModalRemove: PropTypes.bool.isRequired,
+}

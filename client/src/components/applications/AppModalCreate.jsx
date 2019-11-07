@@ -1,7 +1,13 @@
+/* eslint-disable no-var */
+/* eslint-disable vars-on-top */
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import '../connections/Connections.scss'
 import { Button, Modal, Form } from 'semantic-ui-react'
 
+const Console = {
+  log: (text) => console.log(text),
+}
 class AppModalCreate extends Component {
   _isMounted = false
 
@@ -32,6 +38,20 @@ class AppModalCreate extends Component {
     this.regexpMac = /^[0-9a-z]{1,2}([.:-])(?:[0-9a-z]{1,2}\1){4}[0-9a-z]{2}$/gim
   }
 
+  componentDidMount() {
+    this._isMounted = true
+    this.getThings()
+    this.getConnections()
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !(this.props === nextProps && this.state === nextState)
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
+  }
+
   getThings = async () => {
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
       mode: 'cors',
@@ -43,7 +63,7 @@ class AppModalCreate extends Component {
           this.setState({ oldThings })
         }
       })
-      .catch((err) => console.log(err))
+      .catch((err) => Console.log(err))
   }
 
   getConnections = async () => {
@@ -57,10 +77,11 @@ class AppModalCreate extends Component {
           this.setState({ oldConnections })
         }
       })
-      .catch((err) => console.log(err))
+      .catch((err) => Console.log(err))
   }
 
   createThing = async () => {
+    const { newThing } = this.state
     await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things/create`, {
       method: 'POST',
       headers: {
@@ -68,7 +89,7 @@ class AppModalCreate extends Component {
       },
       mode: 'cors',
       credentials: 'include',
-      body: JSON.stringify(this.state.newThing),
+      body: JSON.stringify(newThing),
     })
   }
 
@@ -87,6 +108,9 @@ class AppModalCreate extends Component {
 
   createAppConnection = async () => {
     const { newThing, connectionName } = this.state
+    const { callbackFromParent } = this.props
+    let channel
+    let thing
     try {
       let arr = []
       await this.createChannel()
@@ -95,29 +119,21 @@ class AppModalCreate extends Component {
         credentials: 'include',
       })
         .then((res) => res.json())
-        .then((oldChannels) => {
-          return oldChannels
-        })
-        .catch((err) => console.log(err))
-      var channel = arr.filter((item) => {
-        return item.name === `zsse/${newThing.name}`
-      })
+        .then((oldChannels) => oldChannels)
+        .catch((err) => Console.log(err))
+      channel = arr.filter((item) => item.name === `zsse/${newThing.name}`)
       await this.createThing()
       arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/things`, {
         mode: 'cors',
         credentials: 'include',
       })
         .then((res) => res.json())
-        .then((oldThings) => {
-          return oldThings
-        })
-        .catch((err) => console.log(err))
+        .then((oldThings) => oldThings)
+        .catch((err) => Console.log(err))
 
-      var thing = arr.filter((item) => {
-        return item.name === `zsse/${newThing.name}`
-      })
+      thing = arr.filter((item) => item.name === `zsse/${newThing.name}`)
     } catch (err) {
-      console.log(err)
+      Console.log(err)
     }
 
     const obj = {
@@ -147,7 +163,7 @@ class AppModalCreate extends Component {
           },
           mode: 'cors',
           credentials: 'include',
-        }
+        },
       )
       await this.getConnections()
 
@@ -156,77 +172,58 @@ class AppModalCreate extends Component {
       if (this._isMounted) {
         this.setState({ showModalCreateApp: false })
       }
-      this.props.callbackFromParent(showModalCreateApp, oldConnections)
+      callbackFromParent(showModalCreateApp, oldConnections)
     } catch (err) {
-      console.log(err)
+      Console.log(err)
     }
   }
 
   close = async () => {
     const { showModalCreateApp, oldConnections } = this.state
+    const { callbackFromParent } = this.props
     if (this._isMounted) this.setState({ showModalCreateApp: false })
-    this.props.callbackFromParent(showModalCreateApp, oldConnections)
-  }
-
-  componentDidMount() {
-    this._isMounted = true
-    this.getThings()
-    this.getConnections()
-  }
-
-  componentWillUnmount() {
-    this._isMounted = false
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return !(this.props === nextProps && this.state === nextState)
+    callbackFromParent(showModalCreateApp, oldConnections)
   }
 
   handleChangeConnectionName = (e) => {
-    let str = e.target.value
-    let arr = this.state.oldConnections.filter((item) => {
-      return item.name === str
-    })
-    if (arr.length !== 0 || !this.regexpName.test(str)) {
-      if (this._isMounted) this.setState({ isConnectionNameEnabled: true })
-    } else {
-      if (this._isMounted) {
-        this.setState((prevState) => ({
-          newThing: {
-            ...prevState.newThing,
-            name: str,
-          },
-          channel: {
-            ...prevState.channel,
-            name: str,
-          },
-          connectionName: str,
-          isConnectionNameEnabled: false,
-        }))
-      }
+    const { oldConnections } = this.state
+    const str = e.target.value
+    const arr = oldConnections.filter((item) => item.name === str)
+    if ((arr.length !== 0 || !this.regexpName.test(str)) && this._isMounted) {
+      this.setState({ isConnectionNameEnabled: true })
+    } else if ((arr.length === 0 || this.regexpName.test(str)) && this._isMounted) {
+      this.setState((prevState) => ({
+        newThing: {
+          ...prevState.newThing,
+          name: str,
+        },
+        channel: {
+          ...prevState.channel,
+          name: str,
+        },
+        connectionName: str,
+        isConnectionNameEnabled: false,
+      }))
     }
   }
 
   handleChangeThingMac = (e) => {
-    let str = e.target.value
-    let arr = this.state.oldThings.filter((item) => {
-      return item.metadata.mac === str
-    })
-    if (arr.length !== 0 || !this.regexpMac.test(str)) {
-      if (this._isMounted) this.setState({ isThingMacEnabled: true })
-    } else {
-      if (this._isMounted) {
-        this.setState((prevState) => ({
-          newThing: {
-            ...prevState.newThing,
-            metadata: {
-              ...prevState.newThing.metadata,
-              mac: str,
-            },
+    const { oldThings } = this.state
+    const str = e.target.value
+    const arr = oldThings.filter((item) => item.metadata.mac === str)
+    if ((arr.length !== 0 || !this.regexpMac.test(str)) && this._isMounted) {
+      this.setState({ isThingMacEnabled: true })
+    } else if ((arr.length === 0 || this.regexpMac.test(str)) && this._isMounted) {
+      this.setState((prevState) => ({
+        newThing: {
+          ...prevState.newThing,
+          metadata: {
+            ...prevState.newThing.metadata,
+            mac: str,
           },
-          isThingMacEnabled: false,
-        }))
-      }
+        },
+        isThingMacEnabled: false,
+      }))
     }
   }
 
@@ -246,7 +243,7 @@ class AppModalCreate extends Component {
         <Modal.Content>
           <Form>
             <Form.Field>
-              <label> Name </label>
+              <label htmlFor="name"> Name </label>
               <input
                 placeholder="name"
                 onChange={(e) => this.handleChangeConnectionName(e)}
@@ -254,7 +251,7 @@ class AppModalCreate extends Component {
               />
             </Form.Field>
             <Form.Field>
-              <label> Mac </label>
+              <label htmlFor="mac"> Mac </label>
               <input
                 placeholder="mac"
                 onChange={(e) => this.handleChangeThingMac(e)}
@@ -283,3 +280,8 @@ class AppModalCreate extends Component {
 }
 
 export default AppModalCreate
+
+AppModalCreate.propTypes = {
+  callbackFromParent: PropTypes.func.isRequired,
+  showModalCreateApp: PropTypes.bool.isRequired,
+}

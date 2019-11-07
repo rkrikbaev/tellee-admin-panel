@@ -1,5 +1,9 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import { Card } from 'semantic-ui-react'
+import { addUser } from '../shared/actions/user'
+
 
 import 'semantic-ui-css/semantic.min.css'
 
@@ -10,7 +14,7 @@ import generator from '../static/icons/generator.svg'
 const statusTypes = ['connected', 'not connected']
 const statusColorTypes = []
 
-export default class Home extends Component {
+class Home extends Component {
   _isMounted = false
 
   constructor(props) {
@@ -19,6 +23,12 @@ export default class Home extends Component {
     this.state = {
       devices: [],
     }
+  }
+
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
+    // eslint-disable-next-line react/destructuring-assignment
+    this.props.addUser('milk')
   }
 
   async componentDidMount() {
@@ -108,7 +118,6 @@ export default class Home extends Component {
 
   render() {
     const { devices } = this.state
-
     return (
       <div className="main_wrapper">
         <h1>Home</h1>
@@ -167,4 +176,20 @@ export default class Home extends Component {
       </div>
     )
   }
+}
+
+const mapStateToProps = (state) => ({
+  users: state.users.items,
+})
+
+function mapDispatchToProps(dispatch) {
+  return {
+    addUser: (article) => dispatch(addUser(article)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home)
+
+Home.propTypes = {
+  addUser: PropTypes.func.isRequired,
 }

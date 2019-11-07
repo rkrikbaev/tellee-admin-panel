@@ -1,6 +1,16 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import './Connections.scss'
-import { Button, Header, Modal, Icon } from 'semantic-ui-react'
+import {
+  Button,
+  Header,
+  Modal,
+  Icon,
+} from 'semantic-ui-react'
+
+const Console = {
+  log: (text) => console.log(text),
+}
 
 class ConnectionModalRemove extends Component {
   _isMounted = false
@@ -18,28 +28,46 @@ class ConnectionModalRemove extends Component {
     this._isMounted = true
   }
 
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    const { content } = nextProps.connection
+    if (
+      (content !== undefined
+      && content.type === 'app'
+      && content.devices.length !== 0)
+      && this._isMounted
+    ) {
+      this.setState({ isRemoveable: false })
+    } else if (
+      (content !== undefined
+      && content.type !== 'app'
+      && content.devices.length === 0)
+      && this._isMounted) {
+      this.setState({ isRemoveable: true })
+    }
+  }
+
   componentWillUnmount() {
     this._isMounted = false
   }
 
   getChannel = async (app) => {
-    let arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
+    const arr = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels`, {
       mode: 'cors',
       credentials: 'include',
     })
       .then((res) => res.json())
-      .then((oldChannels) => {
-        return oldChannels
-      })
-      .catch((err) => console.log(err))
+      .then((oldChannels) => oldChannels)
+      .catch((err) => Console.log(err))
 
-    var channel = arr.filter((item) => {
-      return item.name === app
-    })
+    const channel = arr.filter((item) => item.name === app)
     return channel[0]
   }
 
   removeConnection = async (connection) => {
+    const { callbackFromParent } = this.props
+    const { showModalRemove } = this.state
+    const { sendToApp, app, type } = connection.content
     fetch(
       `${process.env.REACT_APP_EXPRESS_HOST}/api/things/remove/${connection.mainflux_id}`,
       {
@@ -49,7 +77,7 @@ class ConnectionModalRemove extends Component {
         },
         mode: 'cors',
         credentials: 'include',
-      }
+      },
     )
     fetch(
       `${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/remove/${connection.mainflux_id}`,
@@ -60,7 +88,7 @@ class ConnectionModalRemove extends Component {
         },
         mode: 'cors',
         credentials: 'include',
-      }
+      },
     )
     fetch(
       `${process.env.REACT_APP_EXPRESS_HOST}/api/device/remove/${connection.mainflux_id}`,
@@ -71,9 +99,8 @@ class ConnectionModalRemove extends Component {
         },
         mode: 'cors',
         credentials: 'include',
-      }
+      },
     )
-    const { sendToApp, app, type } = connection.content
     if (sendToApp) {
       await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/${app}`, {
         mode: 'cors',
@@ -84,9 +111,8 @@ class ConnectionModalRemove extends Component {
           response.content = JSON.parse(response.content)
           const { content } = response
 
-          content.devices = content.devices.filter((item) => {
-            return item.device_id !== connection.mainflux_id
-          })
+          content.devices = content.devices.filter((item) => (
+            item.device_id !== connection.mainflux_id))
 
           fetch(
             `${process.env.REACT_APP_EXPRESS_HOST}/api/bootstrap/edit/info/${response.mainflux_id}`,
@@ -98,12 +124,12 @@ class ConnectionModalRemove extends Component {
               mode: 'cors',
               credentials: 'include',
               body: JSON.stringify({ response }),
-            }
+            },
           )
         })
     }
     if (type === 'app') {
-      let arr = await this.getChannel(connection.name)
+      const arr = await this.getChannel(connection.name)
       fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/remove/${arr.id}`, {
         method: 'DELETE',
         headers: {
@@ -114,27 +140,18 @@ class ConnectionModalRemove extends Component {
       })
     }
 
-    if (this._isMounted) this.setState({ showModalRemove: false })
-    this.props.callbackFromParent(this.state.showModalRemove, connection.mainflux_id)
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { content } = nextProps.connection
-    if (
-      content !== undefined &&
-      content.type === 'app' &&
-      content.devices.length !== 0
-    ) {
-      if (this._isMounted) this.setState({ isRemoveable: false })
-    } else {
-      if (this._isMounted) this.setState({ isRemoveable: true })
+    if (this._isMounted) {
+      this.setState({ showModalRemove: false })
     }
+    callbackFromParent(showModalRemove, connection.mainflux_id)
   }
 
   close = () => {
+    const { callbackFromParent } = this.props
+    const { showModalRemove } = this.state
     if (this._isMounted) {
       this.setState({ showModalRemove: false, isRemoveable: true }, () => {
-        this.props.callbackFromParent(this.state.showModalRemove)
+        callbackFromParent(showModalRemove)
       })
     }
   }
@@ -157,16 +174,18 @@ class ConnectionModalRemove extends Component {
         </Modal.Content>
         <Modal.Actions>
           <Button basic color="green" inverted onClick={this.close}>
-            <Icon name="remove" /> No
+            <Icon name="remove" />
+            {' '}
+            No
           </Button>
           <Button
             color="red"
             inverted
-            onClick={() => {
-              isRemoveable ? this.removeConnection(connection) : this.close()
-            }}
+            onClick={() => (isRemoveable ? this.removeConnection(connection) : this.close())}
           >
-            <Icon name="checkmark" /> Yes
+            <Icon name="checkmark" />
+            {' '}
+            Yes
           </Button>
         </Modal.Actions>
       </Modal>
@@ -175,3 +194,9 @@ class ConnectionModalRemove extends Component {
 }
 
 export default ConnectionModalRemove
+
+ConnectionModalRemove.propTypes = {
+  connection: PropTypes.instanceOf(Object).isRequired,
+  callbackFromParent: PropTypes.func.isRequired,
+  showModalRemove: PropTypes.bool.isRequired,
+}

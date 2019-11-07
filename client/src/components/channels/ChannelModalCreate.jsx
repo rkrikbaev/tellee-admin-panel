@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import './Channels.scss'
 import { Button, Form, Modal } from 'semantic-ui-react'
 
@@ -15,7 +16,7 @@ class ChannelModalCreate extends Component {
     }
   }
 
-  createChannel = async (name) => {
+  createChannel = async () => {
     const { channel } = this.state
     fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/create`, {
       method: 'POST',
@@ -30,12 +31,14 @@ class ChannelModalCreate extends Component {
   }
 
   close = () => {
+    const { callbackFromParent } = this.props
+    const { showModalCreate } = this.state
     this.setState({ showModalCreate: false })
-    this.props.callbackFromParent(this.state.showModalCreate)
+    callbackFromParent(showModalCreate)
   }
 
   handleChangeName = (e) => {
-    let str = e.target.value
+    const str = e.target.value
     this.setState((prevState) => ({
       channel: {
         ...prevState.channel,
@@ -54,7 +57,7 @@ class ChannelModalCreate extends Component {
         <Modal.Content>
           <Form>
             <Form.Field>
-              <label>Name</label>
+              <label htmlFor="name">Name</label>
               <input
                 placeholder="name"
                 value={name}
@@ -81,3 +84,8 @@ class ChannelModalCreate extends Component {
 }
 
 export default ChannelModalCreate
+
+ChannelModalCreate.propTypes = {
+  callbackFromParent: PropTypes.func.isRequired,
+  showModalCreate: PropTypes.bool.isRequired,
+}

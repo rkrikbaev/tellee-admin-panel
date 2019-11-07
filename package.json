@@ -20,7 +20,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "cd client && npm run lint:fix && npm run format"
+      "pre-commit": "cd client && yarn run lint:fix"
     }
   },
   "author": "Galymzhan Almabek",
