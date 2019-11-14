@@ -1,0 +1,37 @@
+#graph_wrapper__header {
+  display: flex;
+  justify-content: space-between;
+  .graph_name, .graph_actions {
+    height: 30px;
+  }
+  .graph_name {
+    width: 92%;
+    text-align: center;
+    h5 {
+      margin: 0;
+    }
+  }
+  .graph_actions {
+    width: 60px;
+    display: flex;
+    justify-content: space-between;
+    img {
+      width: 15px;
+      height: 15px;
+    }
+    .graph_edit__btn, .graph_remove__btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      border-radius: 4px;
+      &:hover {
+        background: #A3B5BF;
+      }
+    }
+  }
+}
+
+.dimmable.dimmed.blurring.react-draggable-transparent-selection {
+  z-index: -1;
+}

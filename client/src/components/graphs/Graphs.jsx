@@ -1,8 +1,14 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { graphActionWindow } from '../../shared/actions/graphs'
+import Store from '../../store/configureStore'
+
 import './Graphs.scss'
-import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-} from 'recharts'
+
+import GraphActionWindow from '../../shared/components/GraphActionWindow'
+import ToggleComponent from '../../shared/components/ToggleComponent'
+import GraphWrapper from '../../shared/components/GraphWrapper/GraphWrapper'
 
 const data = [
   {
@@ -28,43 +34,101 @@ const data = [
   },
 ]
 
-export default class Graphs extends Component {
+class Graphs extends Component {
+  _isMounted = false
+
   constructor(props) {
     super(props)
 
     this.state = {
-      width: 1000,
-      height: 300,
+      width: 620,
+      height: 650,
+      graphsList: [],
     }
+    Store.subscribe(() => {
+      this.setState({ graphsList: Store.getState().graph.graphsList })
+    })
+  }
+
+  async componentDidMount() {
+    this._isMounted = true
+    // fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/edit/${channel.id}`, {
+    //   method: 'PUT',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   mode: 'cors',
+    //   credentials: 'include',
+    //   body: JSON.stringify({ name: channel.name, metadata: channel.metadata }),
+    // })
+  }
+
+  shouldComponentUpdate(prevProps, prevState) {
+    if (this.state === prevState) {
+      return false
+    }
+    return true
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
+  }
+
+  createGraph = () => {
+    const { showGraphActionWindow } = this.props
+    showGraphActionWindow(!Store.getState().graph.showGraphActionWindow)
   }
 
   render() {
-    const { width, height } = this.state
+    const { width, height, graphsList } = this.state
     return (
       <div id="graphs" className="main_wrapper">
         <div className="graphs_header">
-          <button type="button">Create</button>
+          <button type="button" onClick={this.createGraph}>Create</button>
         </div>
-        <p>Hello from graphs component!</p>
-        <span>{width}</span>
-        <span>{height}</span>
-        <LineChart
-          width={width}
-          height={height}
-          data={data}
-          margin={{
-            top: 5, right: 30, left: 20, bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-          <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
-        </LineChart>
+        {
+          graphsList.length > 0
+            ? graphsList.map((item, i) => (
+              <GraphWrapper
+                // eslint-disable-next-line react/no-array-index-key
+                key={i}
+                width={width}
+                height={height}
+                title=""
+                type={item.type}
+                data={data}
+              />
+            ))
+            : ''
+        }
+
+        <ToggleComponent title="Show Component">
+          <GraphActionWindow
+            showEditWindow
+            callbackFromParent={this.createGraph}
+            graphTitle=""
+            graphType=""
+            deviceName=""
+            requestDate={0}
+          />
+        </ToggleComponent>
       </div>
     )
   }
+}
+
+const mapStateToProps = (state) => ({
+  showGraphActionWindow: state.isShowGraphActionWindow,
+})
+
+function mapDispatchToProps(dispatch) {
+  return {
+    showGraphActionWindow: (isVisible) => dispatch(graphActionWindow(isVisible)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Graphs)
+
+Graphs.propTypes = {
+  showGraphActionWindow: PropTypes.func.isRequired,
 }
