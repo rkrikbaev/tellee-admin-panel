@@ -15,7 +15,7 @@ import BootstrapRouter from './api/bootstrap/bootstrapRouter';
 import OtherRouter from './api/other/otherRouter';
 import DeviceRouter from './api/device/deviceRouter';
 import ConnectionRouter from './api/connection/connectionRouter';
-import MainfluxRouter from './api/data/MainfluxRouter';
+import MainfluxRouter from './api/data/mainfluxRouter';
 
 const app = express();
 const originsWhitelist = [
