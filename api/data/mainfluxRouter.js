@@ -8,8 +8,12 @@ const MainfluxRouter = express.Router();
 MainfluxRouter.route('/').get(async (req, res, next) => {
   try {
     const allData = await Mainflux.find({
-      "channel" : "1446019e-ed23-42b5-95c8-6d082618c251",
-      "value": 624.03
+      "time" : {
+        $gte: Math.round(
+          (new Date(new Date().setDate(new Date().getDate()-1)))
+          .getTime() / 1000
+        )
+      }
     });
     res.send(allData);
     next();
