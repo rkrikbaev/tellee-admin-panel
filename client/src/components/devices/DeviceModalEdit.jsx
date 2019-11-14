@@ -803,7 +803,6 @@ class DeviceModalEdit extends Component {
                 placeholder="Device title"
                 onChange={(e) => this.handleChangeEditDevice({ title: e.target.value })}
                 value={title !== undefined ? title : ''}
-                // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field className={handleSendToDB ? '' : 'hide'}>
@@ -812,7 +811,6 @@ class DeviceModalEdit extends Component {
                 placeholder="Device subtitle"
                 onChange={(e) => this.handleChangeEditDevice({ subtitle: e.target.value })}
                 value={subtitle !== undefined ? subtitle : ''}
-                // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field className={handleSendToDB ? '' : 'hide'}>
@@ -821,7 +819,6 @@ class DeviceModalEdit extends Component {
                 placeholder="Device latitude"
                 onChange={(e) => this.handleChangeEditDevice({ latitude: e.target.value })}
                 value={latitude !== undefined ? latitude : ''}
-                // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field className={handleSendToDB ? '' : 'hide'}>
@@ -830,7 +827,6 @@ class DeviceModalEdit extends Component {
                 placeholder="Device longitude"
                 onChange={(e) => this.handleChangeEditDevice({ longitude: e.target.value })}
                 value={longitude !== undefined ? longitude : ''}
-                // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field className={handleSendToDB ? '' : 'hide'}>
@@ -839,7 +835,6 @@ class DeviceModalEdit extends Component {
                 placeholder="Asset text"
                 onChange={(e) => this.handleChangeEditDevice({ assettext: e.target.value })}
                 value={assettext !== undefined ? assettext : ''}
-                // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
             <Form.Field className={handleSendToDB ? '' : 'hide'}>
@@ -848,45 +843,8 @@ class DeviceModalEdit extends Component {
                 placeholder="Asset value"
                 onChange={(e) => this.handleChangeEditDevice({ assetvalue: e.target.value })}
                 value={assetvalue !== undefined ? assetvalue : ''}
-                // className={isThingMacDisabled ? 'show_error' : ''}
               />
             </Form.Field>
-            {/* <Form.Field className={handleSendToDB ? '' : 'hide'}>
-              <label>Severity</label>
-              <input
-                placeholder='Device severity'
-                onChange={e => this.handleChangeEditDevice({severity: e.target.value})}
-                value={severity !== undefined ? severity : ''}
-                // className={isThingMacDisabled ? 'show_error' : ''}
-              />
-            </Form.Field>
-            <Form.Field className={handleSendToDB ? '' : 'hide'}>
-              <label>Alert text</label>
-              <input
-                placeholder='Alert text'
-                onChange={e => this.handleChangeEditDevice({alerttext: e.target.value})}
-                value={alerttext !== undefined ? alerttext : ''}
-                // className={isThingMacDisabled ? 'show_error' : ''}
-              />
-            </Form.Field>
-            <Form.Field className={handleSendToDB ? '' : 'hide'}>
-              <label>Alert value</label>
-              <input
-                placeholder='Alert value'
-                onChange={e => this.handleChangeEditDevice({alertvalue: e.target.value})}
-                value={alertvalue !== undefined ? alertvalue : ''}
-                // className={isThingMacDisabled ? 'show_error' : ''}
-              />
-            </Form.Field>
-            <Form.Field className={handleSendToDB ? '' : 'hide'}>
-              <label>Message text</label>
-              <input
-                placeholder='Message text'
-                onChange={e => this.handleChangeEditDevice({messagetext: e.target.value})}
-                value={messagetext !== undefined ? messagetext : ''}
-                // className={isThingMacDisabled ? 'show_error' : ''}
-              />
-            </Form.Field> */}
           </Form>
         </Modal.Content>
         <Modal.Actions>
