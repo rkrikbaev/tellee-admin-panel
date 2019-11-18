@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Rnd } from 'react-rnd'
 import Timeseries from '../Timeseries'
 import GraphWrapperHeader from './GraphWrapperHeader'
+import Store from '../../../store/configureStore'
 
 class GraphWrapper extends Component {
   constructor(props) {
@@ -10,29 +11,39 @@ class GraphWrapper extends Component {
     this.state = {
       width: 620,
       height: 350,
-      graphTitle: 'Timeseries',
     }
   }
 
-  static getDerivedStateFromProps(props, state) {
-    if (props.width !== state.width) {
-      return {
-        width: props.width,
-        height: props.height,
-      }
-    }
-
-    return null
+  componentDidMount() {
+    const { defaultWidth, defaultHeight } = Store.getState().graph
+    this._isMounted = true
+    this.setState({
+      width: defaultWidth,
+      height: defaultHeight,
+    })
   }
 
   render() {
-    console.info(this.props)
-    const { width, height, graphTitle } = this.state
     const {
-      type,
-      title,
-      data,
-    } = this.props
+      width,
+      height,
+    } = this.state
+    const { type, title, data } = this.props
+    let component
+
+    if (type === 'timeseries') {
+      component = (
+        <Timeseries
+          width={width}
+          height={height - 30}
+          type={type}
+          title={title}
+          data={data}
+        />
+      )
+    } else {
+      component = <h4 style={{ color: 'red' }}>Error occured, please check the configs of this graph!</h4>
+    }
 
     return (
       <div
@@ -52,21 +63,17 @@ class GraphWrapper extends Component {
             borderRadius: '5px',
           }}
           onResize={(e, direction, ref, delta, position) => {
+            // console.info(parseInt(ref.style.width, 10), parseInt(ref.style.height, 10))
             this.setState({
               width: parseInt(ref.style.width, 10),
               height: parseInt(ref.style.height, 10),
               ...position,
             })
           }}
+          cancel=".disable-dragging"
         >
-          <GraphWrapperHeader width={width - 20} graphTitle={graphTitle} />
-          <Timeseries
-            width={width}
-            height={height - 30}
-            type={type}
-            title={title}
-            data={data}
-          />
+          <GraphWrapperHeader width={width - 20} graphTitle={title} />
+          {component}
         </Rnd>
       </div>
     )
@@ -76,8 +83,6 @@ class GraphWrapper extends Component {
 export default GraphWrapper
 
 GraphWrapper.propTypes = {
-  width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
   type: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   data: PropTypes.instanceOf(Object).isRequired,

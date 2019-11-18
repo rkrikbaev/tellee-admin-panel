@@ -41,8 +41,6 @@ class Graphs extends Component {
     super(props)
 
     this.state = {
-      width: 620,
-      height: 650,
       graphsList: [],
     }
     Store.subscribe(() => {
@@ -51,7 +49,9 @@ class Graphs extends Component {
   }
 
   async componentDidMount() {
+    const { graphsList } = Store.getState().graph
     this._isMounted = true
+    this.setState({ graphsList })
     // fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/edit/${channel.id}`, {
     //   method: 'PUT',
     //   headers: {
@@ -80,7 +80,7 @@ class Graphs extends Component {
   }
 
   render() {
-    const { width, height, graphsList } = this.state
+    const { graphsList } = this.state
     return (
       <div id="graphs" className="main_wrapper">
         <div className="graphs_header">
@@ -92,9 +92,7 @@ class Graphs extends Component {
               <GraphWrapper
                 // eslint-disable-next-line react/no-array-index-key
                 key={i}
-                width={width}
-                height={height}
-                title=""
+                title={item.title}
                 type={item.type}
                 data={data}
               />

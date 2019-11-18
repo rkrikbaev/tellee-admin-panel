@@ -1,10 +1,21 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Button, Form, Modal } from 'semantic-ui-react'
+import {
+  Button,
+  Form,
+  Modal,
+  Dropdown,
+} from 'semantic-ui-react'
 
 import { addGraphAction } from '../actions/graphs'
 import './GraphWrapper/GraphWrapper.scss'
+
+const types = [
+  { key: 0, text: 'Timeseries', value: 'timeseries' },
+  { key: 1, text: 'KPI', value: 'kpi' },
+  { key: 2, text: 'Table', value: 'table' },
+]
 
 class GraphActionWindow extends Component {
   constructor(props) {
@@ -39,7 +50,16 @@ class GraphActionWindow extends Component {
   componentDidMount() {}
 
   handleChangeData = (key, e) => {
-    const { value } = e.target
+    const { value, textContent } = e.target
+    if (value === undefined) {
+      this.setState((prevState) => ({
+        config: {
+          ...prevState.config,
+          [key]: textContent.toLowerCase(),
+        },
+      }))
+      return
+    }
     this.setState((prevState) => ({
       config: {
         ...prevState.config,
@@ -77,10 +97,20 @@ class GraphActionWindow extends Component {
         <Modal.Content>
           <Form>
             <Form.Field>
-              <label htmlFor="name">Type</label>
+              <label htmlFor="name">Title</label>
               <input
-                placeholder="type"
-                value={config.type}
+                placeholder="title"
+                value={config.title}
+                onChange={(e) => this.handleChangeData('title', e)}
+              />
+            </Form.Field>
+            <Form.Field>
+              <label htmlFor="mainflux_key">Type</label>
+              <Dropdown
+                placeholder="types"
+                fluid
+                selection
+                options={types}
                 onChange={(e) => this.handleChangeData('type', e)}
               />
             </Form.Field>

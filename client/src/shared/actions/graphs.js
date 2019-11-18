@@ -14,3 +14,10 @@ export const addGraphAction = (data) => (dispatch) => {
     payload: data,
   })
 }
+
+export const toggleGraphDraggingAction = (data) => (dispatch) => {
+  dispatch({
+    type: actionTypes.TOGGLE_GRAPH_DRAGGING,
+    payload: data,
+  })
+}
