@@ -50,17 +50,19 @@ class Graphs extends Component {
 
   async componentDidMount() {
     const { graphsList } = Store.getState().graph
+    const { device, date, parameter } = graphsList[0]
     this._isMounted = true
     this.setState({ graphsList })
-    // fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/channels/edit/${channel.id}`, {
-    //   method: 'PUT',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   mode: 'cors',
-    //   credentials: 'include',
-    //   body: JSON.stringify({ name: channel.name, metadata: channel.metadata }),
-    // })
+    const resp = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/data/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors',
+      credentials: 'include',
+      body: JSON.stringify({ device, date: date * 3600000, parameter }),
+    })
+    console.table(resp)
   }
 
   shouldComponentUpdate(prevProps, prevState) {

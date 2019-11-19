@@ -7,8 +7,9 @@ const initialState = {
   graphsList: [{
     title: 'My Timerseries',
     type: 'timeseries',
-    device: 'device_01',
-    date: '23120987',
+    device: 'turbine',
+    date: '360',
+    parameter: 'Ambient_temp',
   }],
   isGraphDraggable: false,
 }

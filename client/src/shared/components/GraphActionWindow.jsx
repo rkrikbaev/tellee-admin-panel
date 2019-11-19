@@ -17,6 +17,12 @@ const types = [
   { key: 2, text: 'Table', value: 'table' },
 ]
 
+const dates = [
+  { key: 0, text: '1 hour', value: '1' },
+  { key: 1, text: '3 hours', value: '3' },
+  { key: 2, text: '6 hours', value: '6' },
+]
+
 class GraphActionWindow extends Component {
   constructor(props) {
     super(props)
@@ -26,7 +32,8 @@ class GraphActionWindow extends Component {
         title: '',
         type: '',
         device: '',
-        date: 0,
+        date: '',
+        parameter: '',
       },
     }
   }
@@ -47,15 +54,13 @@ class GraphActionWindow extends Component {
     return null
   }
 
-  componentDidMount() {}
-
-  handleChangeData = (key, e) => {
-    const { value, textContent } = e.target
+  handleChangeData = (key, e, dropdownValue) => {
+    const { value } = e.target
     if (value === undefined) {
       this.setState((prevState) => ({
         config: {
           ...prevState.config,
-          [key]: textContent.toLowerCase(),
+          [key]: dropdownValue,
         },
       }))
       return
@@ -111,23 +116,33 @@ class GraphActionWindow extends Component {
                 fluid
                 selection
                 options={types}
-                onChange={(e) => this.handleChangeData('type', e)}
+                onChange={(e, { value }) => this.handleChangeData('type', e, value)}
               />
             </Form.Field>
             <Form.Field>
               <label htmlFor="name">Device name</label>
               <input
-                placeholder="device"
+                placeholder="device name"
                 value={config.device}
                 onChange={(e) => this.handleChangeData('device', e)}
               />
             </Form.Field>
             <Form.Field>
-              <label htmlFor="name">Date</label>
+              <label htmlFor="name">Parameter</label>
               <input
+                placeholder="parameter"
+                value={config.parameter}
+                onChange={(e) => this.handleChangeData('parameter', e)}
+              />
+            </Form.Field>
+            <Form.Field>
+              <label htmlFor="name">Date</label>
+              <Dropdown
                 placeholder="date"
-                value={config.date}
-                onChange={(e) => this.handleChangeData('date', e)}
+                fluid
+                selection
+                options={dates}
+                onChange={(e, { value }) => this.handleChangeData('date', e, value)}
               />
             </Form.Field>
           </Form>

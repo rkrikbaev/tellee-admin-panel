@@ -5,19 +5,23 @@ require('dotenv').config();
 const MainfluxRouter = express.Router();
 
 // -- Get all data from "mainflux" collection -- //
-MainfluxRouter.route('/').get(async (req, res, next) => {
+MainfluxRouter.route('/').post(async (req, res, next) => {
+  const { device, parameter, date } = req.body
+  const joinedString = `zsse/${device}/${parameter}/value`
+  const timestamp = Math.round((Date.now() - date) / 1000)
+  let requestedData = []
   try {
-    const allData = await Mainflux.find({
-      "time" : {
-        $gte: Math.round(
-          (new Date(new Date().setDate(new Date().getDate()-1)))
-          .getTime() / 1000
-        )
-      }
-    });
-    res.send(allData);
+    requestedData = await Mainflux.find({
+      name: joinedString,
+      time: { $gte: timestamp },
+    }, (err, records) => {
+      if (err) return err
+      return records
+    })
+    res.status(200).send(requestedData)
     next();
   } catch(err) {
+    res.status(502).send(requestedData)
     return next(err);
   };
 });
