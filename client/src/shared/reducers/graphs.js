@@ -4,14 +4,26 @@ const initialState = {
   defaultWidth: 620,
   defaultHeight: 350,
   showGraphActionWindow: false,
-  graphsList: [{
-    title: 'My Timerseries',
-    type: 'timeseries',
-    device: 'turbine',
-    date: '360',
-    parameter: 'Ambient_temp',
-  }],
   isGraphDraggable: false,
+  graphsConfigList: [
+    {
+      title: 'My Ambient',
+      type: 'timeseries',
+      device: 'turbine',
+      date: '24',
+      parameter: 'Ambient_temp',
+    },
+    {
+      title: 'My Inlete',
+      type: 'timeseries',
+      device: 'turbine',
+      date: '24',
+      parameter: 'Inlete_temp',
+    },
+  ],
+  graphsData: [],
+  loading: false,
+  error: null,
 }
 
 function graphsDataReducer(state = initialState, action) {
@@ -21,15 +33,33 @@ function graphsDataReducer(state = initialState, action) {
         ...state,
         showGraphActionWindow: action.payload,
       })
-    case actionTypes.ADD_GRAPH:
+    case actionTypes.ADD_GRAPH_CONFIG:
       return ({
         ...state,
-        graphsList: [...state.graphsList, action.payload],
+        graphsConfigList: [...state.graphsConfigList, action.payload],
       })
     case actionTypes.TOGGLE_GRAPH_DRAGGING:
       return ({
         ...state,
         isGraphDraggable: action.payload,
+      })
+    case actionTypes.DATA_REQUEST_STARTED:
+      return ({
+        ...state,
+        loading: true,
+      })
+    case actionTypes.DATA_RECIEVE_SUCCESS:
+      return ({
+        ...state,
+        loading: false,
+        error: null,
+        graphsData: [...state.graphsData, action.payload],
+      })
+    case actionTypes.DATA_RECIEVE_FAILURE:
+      return ({
+        ...state,
+        loading: false,
+        error: action.payload.error,
       })
     default:
       return state

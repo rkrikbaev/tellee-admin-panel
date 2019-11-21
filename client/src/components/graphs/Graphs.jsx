@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { graphActionWindow } from '../../shared/actions/graphs'
+import { graphActionWindow, addGraphDataAction } from '../../shared/actions/graphs'
 import Store from '../../store/configureStore'
 
 import './Graphs.scss'
@@ -10,30 +10,6 @@ import GraphActionWindow from '../../shared/components/GraphActionWindow'
 import ToggleComponent from '../../shared/components/ToggleComponent'
 import GraphWrapper from '../../shared/components/GraphWrapper/GraphWrapper'
 
-const data = [
-  {
-    name: 'Page A', uv: 4000, pv: 2400, amt: 2400,
-  },
-  {
-    name: 'Page B', uv: 3000, pv: 1398, amt: 2210,
-  },
-  {
-    name: 'Page C', uv: 2000, pv: 9800, amt: 2290,
-  },
-  {
-    name: 'Page D', uv: 2780, pv: 3908, amt: 2000,
-  },
-  {
-    name: 'Page E', uv: 1890, pv: 4800, amt: 2181,
-  },
-  {
-    name: 'Page F', uv: 2390, pv: 3800, amt: 2500,
-  },
-  {
-    name: 'Page G', uv: 3490, pv: 4300, amt: 2100,
-  },
-]
-
 class Graphs extends Component {
   _isMounted = false
 
@@ -41,32 +17,33 @@ class Graphs extends Component {
     super(props)
 
     this.state = {
-      graphsList: [],
+      graphsConfigList: [],
+      graphsData: [],
+      loading: false,
     }
     Store.subscribe(() => {
-      this.setState({ graphsList: Store.getState().graph.graphsList })
+      const { graphsConfigList, graphsData, loading } = Store.getState().graph
+      this.setState({ graphsConfigList, graphsData, loading })
     })
   }
 
-  async componentDidMount() {
-    const { graphsList } = Store.getState().graph
-    const { device, date, parameter } = graphsList[0]
+  componentDidMount() {
+    const { graphsConfigList, graphsData } = Store.getState().graph
+    const { addGraphData } = this.props
     this._isMounted = true
-    this.setState({ graphsList })
-    const resp = await fetch(`${process.env.REACT_APP_EXPRESS_HOST}/api/data/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      mode: 'cors',
-      credentials: 'include',
-      body: JSON.stringify({ device, date: date * 3600000, parameter }),
+    this.setState({ graphsConfigList, graphsData })
+    graphsConfigList.forEach(async (item) => {
+      addGraphData(item)
     })
-    console.table(resp)
   }
 
-  shouldComponentUpdate(prevProps, prevState) {
-    if (this.state === prevState) {
+  shouldComponentUpdate() {
+    const { graph } = Store.getState()
+    const { graphsConfigList, graphsData } = this.state
+    if (
+      graph.graphsConfigList === graphsConfigList
+      && graph.graphsData === graphsData
+    ) {
       return false
     }
     return true
@@ -82,21 +59,25 @@ class Graphs extends Component {
   }
 
   render() {
-    const { graphsList } = this.state
+    const { graphsConfigList, graphsData, loading } = this.state
+
     return (
       <div id="graphs" className="main_wrapper">
         <div className="graphs_header">
           <button type="button" onClick={this.createGraph}>Create</button>
         </div>
         {
-          graphsList.length > 0
-            ? graphsList.map((item, i) => (
+          loading ? <p>LOADING...</p> : ''
+        }
+        {
+          (graphsData.length > 0)
+            ? graphsConfigList.map((item, i) => (
               <GraphWrapper
                 // eslint-disable-next-line react/no-array-index-key
                 key={i}
                 title={item.title}
                 type={item.type}
-                data={data}
+                data={graphsData[i] || ['wait']}
               />
             ))
             : ''
@@ -105,11 +86,11 @@ class Graphs extends Component {
         <ToggleComponent title="Show Component">
           <GraphActionWindow
             showEditWindow
-            callbackFromParent={this.createGraph}
             graphTitle=""
             graphType=""
             deviceName=""
-            requestDate={0}
+            deviceParameter=""
+            requestDate={1}
           />
         </ToggleComponent>
       </div>
@@ -118,12 +99,13 @@ class Graphs extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  showGraphActionWindow: state.isShowGraphActionWindow,
+  graph: state.config,
 })
 
 function mapDispatchToProps(dispatch) {
   return {
     showGraphActionWindow: (isVisible) => dispatch(graphActionWindow(isVisible)),
+    addGraphData: (config) => dispatch(addGraphDataAction(config)),
   }
 }
 
@@ -131,4 +113,5 @@ export default connect(mapStateToProps, mapDispatchToProps)(Graphs)
 
 Graphs.propTypes = {
   showGraphActionWindow: PropTypes.func.isRequired,
+  addGraphData: PropTypes.func.isRequired,
 }

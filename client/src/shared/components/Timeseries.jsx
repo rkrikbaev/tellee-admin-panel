@@ -10,7 +10,6 @@ class Timeseries extends Component {
     this.state = {
       opacity: {
         uv: 1,
-        pv: 1,
       },
     }
   }
@@ -18,6 +17,13 @@ class Timeseries extends Component {
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(props, nextProps) {
     if (props === nextProps) {
+      return false
+    }
+    return true
+  }
+
+  shouldComponentUpdate(prevProps) {
+    if (prevProps === this.props) {
       return false
     }
     return true
@@ -43,7 +49,18 @@ class Timeseries extends Component {
 
   render() {
     const { width, height, data } = this.props
+
     const { opacity } = this.state
+    let param = []
+    // let loader = false
+    if (data[0] === 'wait') {
+      return (
+        <p>Waiting for data...</p>
+      )
+    }
+    if (data.length > 0) {
+      param = Object.keys(data[0]).filter((item) => item !== 'name')
+    }
     return (
       <div id="timeseries" className="disable-dragging">
         <LineChart
@@ -56,11 +73,17 @@ class Timeseries extends Component {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis />
+          <YAxis type="number" domain={[10, 11]} />
           <Tooltip />
           <Legend onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} />
-          <Line type="monotone" dataKey="pv" strokeOpacity={opacity.pv} stroke="#8884d8" activeDot={{ r: 8 }} />
-          <Line type="monotone" dataKey="uv" strokeOpacity={opacity.uv} stroke="#82ca9d" />
+          <Line
+            type="monotone"
+            dataKey={param[0]}
+            strokeOpacity={opacity.pv}
+            stroke="#8884d8"
+            activeDot={{ r: 8 }}
+          />
+          {/* <Line type="monotone" dataKey="uv" strokeOpacity={opacity.uv} stroke="#82ca9d" /> */}
           <Brush />
         </LineChart>
       </div>

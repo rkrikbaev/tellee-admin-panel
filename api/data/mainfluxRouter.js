@@ -9,21 +9,21 @@ MainfluxRouter.route('/').post(async (req, res, next) => {
   const { device, parameter, date } = req.body
   const joinedString = `zsse/${device}/${parameter}/value`
   const timestamp = Math.round((Date.now() - date) / 1000)
-  let requestedData = []
   try {
-    requestedData = await Mainflux.find({
+    await Mainflux.find({
       name: joinedString,
       time: { $gte: timestamp },
-    }, (err, records) => {
-      if (err) return err
-      return records
-    })
-    res.status(200).send(requestedData)
+    }, (req, records) => {
+      const arr = records.map((item) => ({
+        time: item.time,
+        [parameter]: item.value,
+      }))
+      return res.status(200).send(arr)
+    }).limit(20)
     next();
   } catch(err) {
-    res.status(502).send(requestedData)
-    return next(err);
-  };
+    return res.send(err)
+  }
 });
 
 export default MainfluxRouter;

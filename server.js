@@ -43,7 +43,7 @@ const expressLogger = expressPino({ logger });
 
 const corsOptions = {
   origin: true,
-  credentials: true
+  credentials: true,
 }
 
 app.use(cors(corsOptions));

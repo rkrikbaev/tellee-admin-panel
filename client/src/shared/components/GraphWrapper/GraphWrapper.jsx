@@ -23,12 +23,20 @@ class GraphWrapper extends Component {
     })
   }
 
+  shouldComponentUpdate(prevProps) {
+    if (prevProps === this.props) {
+      return false
+    }
+    return true
+  }
+
   render() {
     const {
       width,
       height,
     } = this.state
     const { type, title, data } = this.props
+
     let component
 
     if (type === 'timeseries') {
@@ -63,7 +71,6 @@ class GraphWrapper extends Component {
             borderRadius: '5px',
           }}
           onResize={(e, direction, ref, delta, position) => {
-            // console.info(parseInt(ref.style.width, 10), parseInt(ref.style.height, 10))
             this.setState({
               width: parseInt(ref.style.width, 10),
               height: parseInt(ref.style.height, 10),
