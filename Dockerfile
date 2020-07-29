@@ -4,7 +4,7 @@ MAINTAINER GALYMZHAN ALMABEK
 
 WORKDIR /api
 
-COPY . /api/
+COPY . /api
 
 ENV PORT=5000
 ENV DATABASE_URL=mongodb://mainflux-db:27017/mainflux_admin
