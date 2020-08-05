@@ -29,7 +29,7 @@ services:
       REACT_APP_EXPRESS_HOST: http://localhost:5000
       REACT_APP_MAINFLUX_USER: zeinetsse4@email.com
       REACT_APP_CHANNEL_NAME: global_channel
-      FLASK_URL: 134.209.240.215:8100
+      FLASK_URL: tellee-ml
 
   mainflux_server:
     container_name: mainflux_server
