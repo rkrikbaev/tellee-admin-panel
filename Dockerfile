@@ -4,13 +4,13 @@ MAINTAINER GALYMZHAN ALMABEK
 
 WORKDIR /api
 
-COPY . /api
+COPY . /api/
 
 ENV PORT=5000
-ENV DATABASE_URL=mongodb://mainflux-db:27017/mainflux_admin
-ENV MAINFLUX_URL=134.209.240.215
-ENV BOOTSTRAP_URL=134.209.240.215:8200
-ENV UI_URL=http://134.209.240.215:8000
+ENV DATABASE_URL=mongodb://tellee-db:27017/tellee_admin
+ENV MAINFLUX_URL=http://nginx
+ENV BOOTSTRAP_URL=http://bootstrap:8200
+ENV UI_URL=http://admin-panel-interface:8000
 
 RUN npm install
 

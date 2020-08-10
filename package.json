@@ -1,5 +1,5 @@
 {
-  "name": "mainflux_admin",
+  "name": "tellee_admin",
   "version": "1.0.0",
   "description": "Admin dashboard for mainflux & bootstrap",
   "main": "server.js",

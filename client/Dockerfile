@@ -6,10 +6,10 @@ WORKDIR /client
 
 COPY . /client/
 
-ENV REACT_APP_EXPRESS_HOST http://134.209.240.215:5000
+ENV REACT_APP_EXPRESS_HOST http://admin-panel-server:5000
 ENV REACT_APP_MAINFLUX_USER zeinetsse10@email.com
 ENV REACT_APP_CHANNEL_NAME global_channel
-ENV FLASK_URL 134.209.240.215:8100
+ENV FLASK_URL tellee-ml:8100
 
 RUN npm install && npm run build
 
